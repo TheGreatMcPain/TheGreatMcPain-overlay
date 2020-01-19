@@ -1,0 +1,13 @@
+diff --git a/setup.py b/setup.py
+index f6d0202..48c6eb3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -28,7 +28,7 @@ setup(name='quantumrandom',
+       author_email='lmacken@redhat.com',
+       url='http://github.com/lmacken/quantumrandom',
+       license='MIT',
+-      packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
++      packages=find_packages(exclude=['ez_setup', 'examples']),
+       include_package_data=True,
+       zip_safe=True,
+       install_requires=requires,

@@ -1,0 +1,13 @@
+diff --git a/setup.py b/setup.py
+index 746cedb..c7c5612 100755
+--- a/setup.py
++++ b/setup.py
+@@ -27,7 +27,7 @@ setuptools.setup(
+     install_requires=['requests', 'colorama', 'coloredlogs', 'verboselogs'],
+     tests_require=['pytest', 'mock'],
+     platforms=['GNU/Linux', 'Ubuntu', 'Debian', 'Kali', 'CentOS', 'Arch', 'Fedora'],
+-    packages=setuptools.find_packages(),
++    packages=setuptools.find_packages(exclude=['tests']),
+     entry_points={
+         'console_scripts': [
+             'openpyn = openpyn.openpyn:main',

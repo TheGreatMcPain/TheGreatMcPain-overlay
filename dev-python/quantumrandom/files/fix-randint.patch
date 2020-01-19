@@ -1,0 +1,22 @@
+From e143ed97c0202d88219811efc74e1044959ec9cc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Brian=20=C3=93=20Donnell?= <brian.odonnell@uvm.edu>
+Date: Wed, 3 Jul 2019 11:18:31 -0400
+Subject: [PATCH] Change range behavior to conform with random.randint()
+
+---
+ quantumrandom/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/quantumrandom/__init__.py b/quantumrandom/__init__.py
+index 7c4bc86..343621d 100644
+--- a/quantumrandom/__init__.py
++++ b/quantumrandom/__init__.py
+@@ -101,7 +101,7 @@ def hex(array_length=100, block_size=100):
+ def randint(min=0, max=10, generator=None):
+     """Return an int between min and max. If given, takes from generator instead.
+     This can be useful to reuse the same cached_generator() instance over multiple calls."""
+-    rand_range = max - min
++    rand_range = (max + 1) - min
+     if rand_range == 0:
+         # raise ValueError("range cannot be zero")  # meh
+         return min

@@ -7,7 +7,7 @@ MULTILIB_COMPAT=( abi_x86_{32,64} )
 
 inherit meson multilib-minimal flag-o-matic
 
-DESCRIPTION="A Vulkan-based translation layer for Direct3D 9 using DXVK's codebase"
+DESCRIPTION="dxvk_config.dll library from Valve's Proton (winelib)"
 HOMEPAGE="https://github.com/Joshua-Ashton/d9vk"
 
 if [[ ${PV} == "9999" ]] ; then

@@ -9,6 +9,5 @@ DESCRIPTION="Vundle, the plug-in manager for Vim"
 HOMEPAGE="https://github.com/VundleVim/Vundle.vim"
 EGIT_REPO_URI="https://github.com/VundleVim/Vundle.vim"
 LICENSE="MIT"
-KEYWORDS="*"
 
 VIM_PLUGIN_HELPFILES="vundle"

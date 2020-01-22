@@ -11,3 +11,9 @@ EGIT_REPO_URI="https://github.com/VundleVim/Vundle.vim"
 LICENSE="MIT"
 
 VIM_PLUGIN_HELPFILES="vundle"
+
+src_install() {
+	rm -r test
+
+	vim-plugin_src_install
+}

@@ -130,10 +130,13 @@ src_test() {
 
 src_install() {
 	use doc && dodoc *.md third_party/ycmd/*.md
-	rm -r *.md *.sh *.ini *.yml COPYING.txt test third_party/ycmd/cpp third_party/ycmd/ycmd/tests third_party/ycmd/examples/samples || die
-	rm -r third_party/ycmd/{*.md,*.sh,*.yml,.coveragerc,.gitignore,.gitmodules,build.*,*.txt,run_tests.*,*.ini,update*} || die
-	find python -name *test* -exec rm -rf {} + || die
+	dodoc *.md third_party/ycmd/*.md
+	rm -r *.md *.sh COPYING.txt third_party/ycmd/cpp || die
+	rm -r third_party/ycmd/{*.md,*.sh} || die
+	#find python -name *test* -exec rm -rf {} + || die
 	egit_clean
+
+	cp -v .ycm_extra_conf.py /usr/share/vim/vimfiles/
 
 	vim-plugin_src_install
 

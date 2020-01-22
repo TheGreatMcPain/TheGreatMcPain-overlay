@@ -55,7 +55,6 @@ DEPEND="
 	${COMMON_DEPEND}
 	rust? (
 		|| ( dev-lang/rust[rls] dev-lang/rust-bin )
-		dev-util/cargo
 	)
 	go? (
 		dev-go/gopls

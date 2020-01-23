@@ -13,16 +13,25 @@ HOMEPAGE="http://valloric.github.io/YouCompleteMe/"
 EGIT_REPO_URI="https://github.com/Valloric/YouCompleteMe.git"
 EGIT_SUBMODULES=(
 	'*'
-	'-third_party/OmniSharpServer'
-	'-third_party/argparse'
-	'-third_party/bottle'
-	'-third_party/waitress'
-	'-third_party/gocode'
-	'-third_party/godef'
-	'-third_party/jedi'
-	'-third_party/parso'
+	'-third_party/ycmd/third_party/bottle'
+	'-third_party/ycmd/third_party/jedi'
+	'-third_party/ycmd/third_party/jedi_deps/numpydoc'
+	'-third_party/ycmd/third_party/parso'
+	'-third_party/ycmd/third_party/python-future'
+	'-third_party/ycmd/third_party/go/src/golang.org/x/tools'
+	'-third_party/ycmd/third_party/certifi'
+	'-third_party/ycmd/third_party/chardet'
+	'-third_party/ycmd/third_party/idna'
+	'-third_party/ycmd/third_party/requests'
+	'-third_party/ycmd/third_party/urllib3'
+	'-third_party/ycmd/third_party/waitress'
+	'-third_party/requests_deps/certifi'
+	'-third_party/requests_deps/chardet'
+	'-third_party/requests_deps/idna'
+	'-third_party/requests_deps/requests'
+	'-third_party/requests_deps/urllib3'
+	'-third_party/requests-futures'
 	'-third_party/python-future'
-	'-third_party/requests'
 )
 
 LICENSE="GPL-3"
@@ -49,12 +58,16 @@ RDEPEND="
 	dev-python/requests[${PYTHON_USEDEP}]
 	dev-python/sh[${PYTHON_USEDEP}]
 	dev-python/waitress[${PYTHON_USEDEP}]
+	dev-python/requests-futures[${PYTHON_USEDEP}]
 	virtual/python-futures[${PYTHON_USEDEP}]
 "
 DEPEND="
 	${COMMON_DEPEND}
 	rust? (
-		|| ( dev-lang/rust[rls] dev-lang/rust-bin )
+		|| (
+			dev-lang/rust[rls]
+			dev-lang/rust-bin
+		)
 	)
 	go? (
 		dev-go/gopls
@@ -62,6 +75,7 @@ DEPEND="
 	test? (
 		>=dev-python/mock-1.0.1[${PYTHON_USEDEP}]
 		>=dev-python/nose-1.3.0[${PYTHON_USEDEP}]
+		dev-cpp/gmock
 		dev-cpp/gtest
 	)
 "
@@ -72,7 +86,6 @@ CMAKE_USE_DIR=${S}/third_party/ycmd/cpp
 VIM_PLUGIN_HELPFILES="${PN}"
 
 src_unpack() {
-	use rust || EGIT_SUBMODULES+=('-third_party/racerd')
 	git-r3_src_unpack
 }
 
@@ -89,12 +102,14 @@ src_prepare() {
 		rm -r "${S}"/third_party/${third_party_module} || die "Failed to remove third party module ${third_party_module}"
 	done
 	rm -r "${S}"/third_party/ycmd/cpp/BoostParts || die "Failed to remove bundled boost"
+	cmake-utils_src_prepare
 }
 
 src_configure() {
 	local mycmakeargs=(
 		-DUSE_CLANG_COMPLETER="$(usex clang ON OFF)"
 		-DEXTERNAL_LIBCLANG_PATH="$(usex clang $(clang --print-file-name=libclang.so) '')"
+		-DUSE_SYSTEM_GMOCK=ON
 		-DUSE_SYSTEM_BOOST=ON
 		-DUSE_PYTHON2=OFF
 	)
@@ -133,13 +148,26 @@ src_install() {
 	dodoc *.md third_party/ycmd/*.md
 	rm -r *.md *.sh COPYING.txt third_party/ycmd/cpp || die
 	rm -r third_party/ycmd/{*.md,*.sh} || die
-	#find python -name *test* -exec rm -rf {} + || die
-	egit_clean
 
-	cp -v .ycm_extra_conf.py /usr/share/vim/vimfiles/
+	# Remove dot so that vim-plugin_src_install doesn't delete it.
+	mv -v .ycm_extra_conf.py ycm_extra_conf.py || die
+
+	find python -name '*test*' -exec rm -rf {} + || die
+	egit_clean
+	use clang && (rm third_party/ycmd/third_party/clang/lib/libclang.so* || die)
 
 	vim-plugin_src_install
 
 	python_optimize "${ED}"
 	python_fix_shebang "${ED}"
+}
+
+pkg_postinst() {
+	# Apply .ycm_extra_conf.py so that YouCompleteMe won't complain about it missing.
+	bzcat /usr/share/doc/${PF}/ycm_extra_conf.py.bz2 > /usr/share/vim/vimfiles/.ycm_extra_conf.py || die
+}
+
+pkg_postrm() {
+	# Remove .ycm_extra_conf.py
+	rm -v /usr/share/vim/vimfiles/.ycm_extra_conf.py || die
 }

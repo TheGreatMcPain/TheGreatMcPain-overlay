@@ -11,11 +11,14 @@ inherit eutils cmake-utils git-r3 multilib python-single-r1 vim-plugin
 DESCRIPTION="vim plugin: a code-completion engine for Vim"
 HOMEPAGE="http://valloric.github.io/YouCompleteMe/"
 EGIT_REPO_URI="https://github.com/Valloric/YouCompleteMe.git"
+# I know I could just do EGIT_SUBMODULES=(-* +third_party/ycmd ),
+# but listing the submodules gives me an idea on what dependences are needed.
 EGIT_SUBMODULES=(
 	'*'
 	'-third_party/ycmd/third_party/bottle'
 	'-third_party/ycmd/third_party/jedi'
 	'-third_party/ycmd/third_party/jedi_deps/numpydoc'
+	'-third_party/ycmd/third_party/cregex'
 	'-third_party/ycmd/third_party/parso'
 	'-third_party/ycmd/third_party/python-future'
 	'-third_party/ycmd/third_party/go/src/golang.org/x/tools'
@@ -53,6 +56,7 @@ RDEPEND="
 	${COMMON_DEPEND}
 	dev-python/bottle[${PYTHON_USEDEP}]
 	dev-python/future[${PYTHON_USEDEP}]
+	dev-python/regex[${PYTHON_USEDEP}]
 	dev-python/jedi[${PYTHON_USEDEP}]
 	dev-python/parso[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]
@@ -61,13 +65,13 @@ RDEPEND="
 	dev-python/requests-futures[${PYTHON_USEDEP}]
 	virtual/python-futures[${PYTHON_USEDEP}]
 "
+
+# Unfortunatly rust-bin doesn't have an 'rls' binary,
+# so we have build rust with the 'rls' useflag.
 DEPEND="
 	${COMMON_DEPEND}
 	rust? (
-		|| (
-			dev-lang/rust[rls]
-			dev-lang/rust-bin
-		)
+		dev-lang/rust[rls]
 	)
 	go? (
 		dev-go/gopls
@@ -118,6 +122,8 @@ src_configure() {
 src_compile() {
 	cmake-utils_src_compile
 
+	# Apply patches that force YouCompleteMe to use system
+	# versions of 'rls', and 'gopls'.
 	if use rust ; then
 		cd "${S}"/third_party/ycmd || die "Failed to move to ycmd directory"
 		patch -p1 -i "${FILESDIR}"/rust.patch || die "Failed to apply rust.patch"
@@ -148,25 +154,12 @@ src_install() {
 	rm -r *.md *.sh COPYING.txt third_party/ycmd/cpp || die
 	rm -r third_party/ycmd/{*.md,*.sh} || die
 
-	# Remove dot so that vim-plugin_src_install doesn't delete it.
-	mv -v .ycm_extra_conf.py ycm_extra_conf.py || die
-
 	find python -name '*test*' -exec rm -rf {} + || die
 	egit_clean
-	#use clang && (rm third_party/ycmd/third_party/clang/lib/libclang.so* || die)
+	use clang && (rm third_party/ycmd/third_party/clang/lib/libclang.so* || die)
 
 	vim-plugin_src_install
 
 	python_optimize "${ED}"
 	python_fix_shebang "${ED}"
-}
-
-pkg_postinst() {
-	# Apply .ycm_extra_conf.py so that YouCompleteMe won't complain about it missing.
-	bzcat /usr/share/doc/${PF}/ycm_extra_conf.py.bz2 > /usr/share/vim/vimfiles/.ycm_extra_conf.py || die
-}
-
-pkg_postrm() {
-	# Remove .ycm_extra_conf.py
-	rm -v /usr/share/vim/vimfiles/.ycm_extra_conf.py || die
 }

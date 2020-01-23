@@ -20,7 +20,7 @@ index 2e5577e4..62a1c5fc 100644
 -  'gopls',
 -  utils.ExecutableName( 'gopls' ) ) )
 -
-+PATH_TO_GOPLS = os.path.join( /usr/bin, 'gopls' )
++PATH_TO_GOPLS = os.path.join( '/usr/bin', 'gopls' )
  
  def ShouldEnableGoCompleter( user_options ):
    server_exists = os.path.isfile( PATH_TO_GOPLS )

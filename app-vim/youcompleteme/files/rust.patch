@@ -1,8 +1,8 @@
 diff --git a/ycmd/completers/rust/rust_completer.py b/ycmd/completers/rust/rust_completer.py
-index c76cec12..e17f49da 100644
+index c76cec12..f8b7c964 100644
 --- a/ycmd/completers/rust/rust_completer.py
 +++ b/ycmd/completers/rust/rust_completer.py
-@@ -33,11 +33,15 @@ from ycmd.utils import LOGGER, re
+@@ -33,11 +33,16 @@ from ycmd.utils import LOGGER, re
  
  
  LOGFILE_FORMAT = 'rls_'
@@ -14,8 +14,9 @@ index c76cec12..e17f49da 100644
 +
 +def findFile(name, path):
 +    for root, dirs, files, in os.walk(path):
-+        if name in files:
-+            reutrn os.path.join(root, name)
++        for file in files:
++            if name in file:
++                return os.path.join(root, file)
 +
 +RLS_BIN_DIR = "/usr/bin"
 +RUSTC_EXECUTABLE = os.path.join( RLS_BIN_DIR, 'rustc' )

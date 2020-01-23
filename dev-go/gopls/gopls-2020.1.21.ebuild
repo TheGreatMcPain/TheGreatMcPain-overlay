@@ -24,7 +24,7 @@ SRC_URI="https://github.com/golang/tools/archive/${GOLANG_PKG_VERSION}.tar.gz ->
 
 inherit golang-single
 
-DESCRIPTION="gopls from golang.org/x/tools"
+DESCRIPTION="'gopls' is the official language server for the Go language."
 
 LICENSE="BSD"
 SLOT="0"

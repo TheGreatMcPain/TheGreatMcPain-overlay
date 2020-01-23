@@ -108,8 +108,7 @@ src_prepare() {
 src_configure() {
 	local mycmakeargs=(
 		-DUSE_CLANG_COMPLETER="$(usex clang ON OFF)"
-		-DEXTERNAL_LIBCLANG_PATH="$(usex clang $(clang --print-file-name=libclang.so) '')"
-		-DUSE_SYSTEM_GMOCK=ON
+		-DUSE_SYSTEM_LIBCLANG="$(usex clang ON OFF)"
 		-DUSE_SYSTEM_BOOST=ON
 		-DUSE_PYTHON2=OFF
 	)
@@ -154,7 +153,7 @@ src_install() {
 
 	find python -name '*test*' -exec rm -rf {} + || die
 	egit_clean
-	use clang && (rm third_party/ycmd/third_party/clang/lib/libclang.so* || die)
+	#use clang && (rm third_party/ycmd/third_party/clang/lib/libclang.so* || die)
 
 	vim-plugin_src_install
 

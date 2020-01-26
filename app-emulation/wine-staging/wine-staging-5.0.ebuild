@@ -21,8 +21,8 @@ inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchai
 WINE_PV="9999"
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
-#EGIT_OVERRIDE_BRANCH_LUTRIS_WINE="lutris-5.0-rc5"
-EGIT_COMMIT="fef11c12242ecaae5b267e42bb5f3856a1d51920"
+EGIT_BRANCH="lutris-fshack-5.0"
+#EGIT_COMMIT="fef11c12242ecaae5b267e42bb5f3856a1d51920"
 KEYWORDS="-* ~amd64 ~x86"
 
 DESCRIPTION="Free implementation of Windows(tm) on Unix, without any external patchsets"

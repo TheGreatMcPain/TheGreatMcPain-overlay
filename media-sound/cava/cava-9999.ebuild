@@ -39,7 +39,6 @@ src_prepare() {
 src_configure() {
 	econf \
 			$(use_enable debug ) \
-			--enable-legacy_iniparser \
 			--docdir="${EREFIX}"/usr/share/doc/${PF}
 }
 

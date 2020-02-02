@@ -7,18 +7,16 @@ MULTILIB_COMPAT=( abi_x86_{32,64} )
 
 inherit meson multilib-minimal flag-o-matic
 
-DESCRIPTION="A Vulkan-based translation layer for Direct3D 10/11"
-HOMEPAGE="https://github.com/doitsujin/dxvk"
+DESCRIPTION="dxvk_config.dll library from Valve's Proton (mingw)"
+HOMEPAGE="https://github.com/Joshua-Ashton/d9vk"
 
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"
 	EGIT_BRANCH="master"
-	EGIT_COMMIT="v1.4.2"
-	EGIT_OVERRIDE_COMMIT_DOITSUJIN_DXVK="v1.4.2"
 	inherit git-r3
 	SRC_URI=""
 else
-	SRC_URI="https://github.com/doitsujin/dxvk/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/doitsujin/dxvk/archive/${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="-* ~amd64"
 fi
 
@@ -39,11 +37,8 @@ DEPEND="${RDEPEND}
 
 PATCHES=(
 	"${FILESDIR}/flags.patch"
+	"${FILESDIR}/add-dxvk-mingw_config-library.patch"
 )
-
-if [[ ${PV} != "9999" ]] ; then
-	S="${WORKDIR}/dxvk-${PV}"
-fi
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 
@@ -69,34 +64,41 @@ src_prepare() {
 	replace-flags "-O3" "-O3 -fno-stack-protector"
 
 	# Create versioned setup script
-	cp "setup_dxvk.sh" "dxvk-farcry-setup"
-	sed -e "s#basedir=.*#basedir=\"${EPREFIX}/usr\"#" -i "dxvk-farcry-setup" || die
+	cp "setup_dxvk.sh" "dxvk-mingw-config-setup"
+	sed \
+		-e "s#with_dxgi=1#with_dxgi=0#" \
+		-e "s#\$action d3d1.*##" \
+		-e "s#basedir=.*#basedir=\"${EPREFIX}/usr\"#" -i "dxvk-mingw-config-setup" || die
 
 	bootstrap_dxvk() {
 		# Set DXVK location for each ABI
-		sed -e "s#x$(bits)#$(get_libdir)/dxvk-farcry#" -i "${S}/dxvk-farcry-setup" || die
+		sed -e "s#x$(bits)#$(get_libdir)/dxvk-mingw-config#" -i "${S}/dxvk-mingw-config-setup" || die
 
 		# Add *FLAGS to cross-file
 		sed -i \
-			-e "s!@CFLAGS@!$(_meson_env_array "${CFLAGS}")!" \
-			-e "s!@CXXFLAGS@!$(_meson_env_array "${CXXFLAGS}")!" \
+			-e "s!@CFLAGS@!$(_meson_env_array "${CFLAGS}" -fpermissive)!" \
+			-e "s!@CXXFLAGS@!$(_meson_env_array "${CXXFLAGS}" -fpermissive)!" \
 			-e "s!@LDFLAGS@!$(_meson_env_array "${LDFLAGS}")!" \
-			build-wine$(bits).txt || die
+			build-win$(bits).txt || die
 	}
 
 	multilib_foreach_abi bootstrap_dxvk
 
 	# Clean missed ABI in setup script
 	sed -e "s#.*x32.*##" -e "s#.*x64.*##" \
-		-i "dxvk-farcry-setup" || die
+		-i "dxvk-mingw-config-setup" || die
 }
 
 multilib_src_configure() {
 	local emesonargs=(
-		--cross-file="${S}/build-wine$(bits).txt"
-		--libdir="$(get_libdir)/dxvk-farcry"
-		--bindir="$(get_libdir)/dxvk-farcry"
+		--cross-file="${S}/build-win$(bits).txt"
+		--libdir="$(get_libdir)/dxvk-mingw-config"
+		--bindir="$(get_libdir)/dxvk-mingw-config"
 		-Denable_tests=false
+		-Denable_dxgi=false
+		-Denable_d3d9=false
+		-Denable_d3d10=false
+		-Denable_d3d11=false
 	)
 	meson_src_configure
 }
@@ -108,7 +110,7 @@ multilib_src_install() {
 multilib_src_install_all() {
 	# create combined setup helper
 	exeinto /usr/bin
-	doexe "${S}/dxvk-farcry-setup"
+	doexe "${S}/dxvk-mingw-config-setup"
 
 	dodoc "${S}/dxvk.conf"
 

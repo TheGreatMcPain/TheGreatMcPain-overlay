@@ -23,7 +23,7 @@ fi
 LICENSE="ZLIB"
 SLOT=0
 
-RESTRICT="test"
+RESTRICT="test strip"
 
 RDEPEND="
 	|| (

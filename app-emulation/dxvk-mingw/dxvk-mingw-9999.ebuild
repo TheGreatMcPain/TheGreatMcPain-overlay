@@ -90,7 +90,6 @@ multilib_src_configure() {
 		--cross-file="${S}/build-win$(bits).txt"
 		--libdir="$(get_libdir)/dxvk-mingw"
 		--bindir="$(get_libdir)/dxvk-mingw"
-		--strip
 		-Denable_tests=false
 	)
 	meson_src_configure

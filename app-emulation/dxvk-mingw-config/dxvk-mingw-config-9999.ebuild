@@ -35,6 +35,10 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	dev-util/glslang"
 
+if [[ ${PV} != "9999" ]] ; then
+	S="${WORKDIR}/dxvk-${PV}"
+fi
+
 PATCHES=(
 	"${FILESDIR}/flags.patch"
 	"${FILESDIR}/add-dxvk-mingw_config-library.patch"
@@ -94,6 +98,7 @@ multilib_src_configure() {
 		--cross-file="${S}/build-win$(bits).txt"
 		--libdir="$(get_libdir)/dxvk-mingw-config"
 		--bindir="$(get_libdir)/dxvk-mingw-config"
+		--strip
 		-Denable_tests=false
 		-Denable_dxgi=false
 		-Denable_d3d9=false

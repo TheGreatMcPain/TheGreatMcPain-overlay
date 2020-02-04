@@ -35,6 +35,10 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	dev-util/glslang"
 
+if [[ ${PV} != "9999" ]] ; then
+	S="${WORKDIR}/dxvk-${PV}"
+fi
+
 PATCHES=(
 	"${FILESDIR}/flags.patch"
 )
@@ -90,6 +94,7 @@ multilib_src_configure() {
 		--cross-file="${S}/build-win$(bits).txt"
 		--libdir="$(get_libdir)/dxvk-mingw"
 		--bindir="$(get_libdir)/dxvk-mingw"
+		--strip
 		-Denable_tests=false
 	)
 	meson_src_configure

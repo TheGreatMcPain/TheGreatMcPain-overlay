@@ -9,7 +9,7 @@ COMPRESSTYPE=".tar.gz"
 K_USEPV="yes"
 UNIPATCH_STRICTORDER="yes"
 K_SECURITY_UNSUPPORTED="1"
-PV="5.4-23"
+TAG="5.5-4"
 
 CKV="$(ver_cut 1-2)"
 ETYPE="sources"
@@ -20,7 +20,7 @@ K_NOSETEXTRAVERSION="don't_set_it"
 
 DESCRIPTION="The Liquorix Kernel Sources v5.x"
 HOMEPAGE="http://liquorix.net/"
-LIQUORIX_VERSION="${PV/_p[0-9]*}"
+LIQUORIX_VERSION="${TAG/_p[0-9]*}"
 LIQUORIX_FILE="${LIQUORIX_VERSION}${COMPRESSTYPE}"
 LIQUORIX_URI="https://github.com/damentz/liquorix-package/archive/${LIQUORIX_FILE}"
 SRC_URI="${KERNEL_URI} ${LIQUORIX_URI}";

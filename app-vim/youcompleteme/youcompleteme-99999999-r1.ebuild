@@ -3,7 +3,6 @@
 
 EAPI=6
 
-#PYTHON_COMPAT=( python2_7 )
 PYTHON_COMPAT=( python3_{6,7} )
 
 inherit eutils cmake-utils git-r3 multilib python-single-r1 vim-plugin
@@ -46,24 +45,24 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 COMMON_DEPEND="
 	${PYTHON_DEPS}
 	clang? ( >=sys-devel/clang-3.9:= )
-	dev-libs/boost[python,threads,${PYTHON_USEDEP}]
+	dev-libs/boost[python,threads,${PYTHON_MULTI_USEDEP}]
 	|| (
-		app-editors/vim[python,${PYTHON_USEDEP}]
-		app-editors/gvim[python,${PYTHON_USEDEP}]
+		app-editors/vim[python,${PYTHON_MULTI_USEDEP}]
+		app-editors/gvim[python,${PYTHON_MULTI_USEDEP}]
 	)
 "
 RDEPEND="
 	${COMMON_DEPEND}
-	dev-python/bottle[${PYTHON_USEDEP}]
-	dev-python/future[${PYTHON_USEDEP}]
-	dev-python/regex[${PYTHON_USEDEP}]
-	dev-python/jedi[${PYTHON_USEDEP}]
-	dev-python/parso[${PYTHON_USEDEP}]
-	dev-python/requests[${PYTHON_USEDEP}]
-	dev-python/sh[${PYTHON_USEDEP}]
-	dev-python/waitress[${PYTHON_USEDEP}]
-	dev-python/requests-futures[${PYTHON_USEDEP}]
-	virtual/python-futures[${PYTHON_USEDEP}]
+	dev-python/bottle[${PYTHON_MULTI_USEDEP}]
+	dev-python/future[${PYTHON_MULTI_USEDEP}]
+	dev-python/regex[${PYTHON_MULTI_USEDEP}]
+	dev-python/jedi[${PYTHON_MULTI_USEDEP}]
+	dev-python/parso[${PYTHON_MULTI_USEDEP}]
+	dev-python/requests[${PYTHON_MULTI_USEDEP}]
+	dev-python/sh[${PYTHON_MULTI_USEDEP}]
+	dev-python/waitress[${PYTHON_MULTI_USEDEP}]
+	dev-python/requests-futures[${PYTHON_MULTI_USEDEP}]
+	virtual/python-futures[${PYTHON_MULTI_USEDEP}]
 "
 
 # Unfortunatly rust-bin doesn't have an 'rls' binary,
@@ -77,8 +76,8 @@ DEPEND="
 		dev-go/gopls
 	)
 	test? (
-		>=dev-python/mock-1.0.1[${PYTHON_USEDEP}]
-		>=dev-python/nose-1.3.0[${PYTHON_USEDEP}]
+		>=dev-python/mock-1.0.1[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/nose-1.3.0[${PYTHON_MULTI_USEDEP}]
 		dev-cpp/gmock
 		dev-cpp/gtest
 	)

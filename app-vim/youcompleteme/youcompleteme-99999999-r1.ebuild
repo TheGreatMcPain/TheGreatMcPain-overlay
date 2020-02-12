@@ -106,11 +106,11 @@ src_prepare() {
 		sed -i '/^add_subdirectory( tests )/d' third_party/ycmd/cpp/ycm/CMakeLists.txt || die
 	fi
 
-	sed -i '/^#! python3.7/d' third_party/ycmd/third_party/cregex/tools/build_regex_unicode.py
+	# sed -i '/^#! python3.7/d' third_party/ycmd/third_party/cregex/tools/build_regex_unicode.py
 
-	for third_party_module in pythonfutures; do
-		rm -r "${S}"/third_party/${third_party_module} || die "Failed to remove third party module ${third_party_module}"
-	done
+	# for third_party_module in pythonfutures; do
+	# 	rm -r "${S}"/third_party/${third_party_module} || die "Failed to remove third party module ${third_party_module}"
+	# done
 	rm -r "${S}"/third_party/ycmd/cpp/BoostParts || die "Failed to remove bundled boost"
 	cmake-utils_src_prepare
 }

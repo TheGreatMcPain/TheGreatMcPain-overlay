@@ -42,36 +42,33 @@ KEYWORDS=""
 IUSE="clang doc test rust go"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-COMMON_DEPEND="
+COMMON_DEPEND="$(python_gen_cond_dep '
 	${PYTHON_DEPS}
-	$(python_gen_cond_dep '
-		clang? ( >=sys-devel/clang-3.9:= )
-		dev-libs/boost[python,threads,${PYTHON_MULTI_USEDEP}]
-		|| (
-			app-editors/vim[python,${PYTHON_MULTI_USEDEP}]
-			app-editors/gvim[python,${PYTHON_MULTI_USEDEP}]
-		)
-	')
-"
-RDEPEND="
+	clang? ( >=sys-devel/clang-3.9:= )
+	dev-libs/boost[python,threads,${PYTHON_MULTI_USEDEP}]
+	|| (
+		app-editors/vim[python,${PYTHON_MULTI_USEDEP}]
+		app-editors/gvim[python,${PYTHON_MULTI_USEDEP}]
+	)
+')"
+
+RDEPEND="$(python_gen_cond_dep '
 	${COMMON_DEPEND}
-	$(python_gen_cond_dep '
-		dev-python/bottle[${PYTHON_MULTI_USEDEP}]
-		dev-python/future[${PYTHON_MULTI_USEDEP}]
-		dev-python/regex[${PYTHON_MULTI_USEDEP}]
-		dev-python/jedi[${PYTHON_MULTI_USEDEP}]
-		dev-python/parso[${PYTHON_MULTI_USEDEP}]
-		dev-python/requests[${PYTHON_MULTI_USEDEP}]
-		dev-python/sh[${PYTHON_MULTI_USEDEP}]
-		dev-python/waitress[${PYTHON_MULTI_USEDEP}]
-		dev-python/requests-futures[${PYTHON_MULTI_USEDEP}]
-		virtual/python-futures[${PYTHON_MULTI_USEDEP}]
-	')
-"
+	dev-python/bottle[${PYTHON_MULTI_USEDEP}]
+	dev-python/future[${PYTHON_MULTI_USEDEP}]
+	dev-python/regex[${PYTHON_MULTI_USEDEP}]
+	dev-python/jedi[${PYTHON_MULTI_USEDEP}]
+	dev-python/parso[${PYTHON_MULTI_USEDEP}]
+	dev-python/requests[${PYTHON_MULTI_USEDEP}]
+	dev-python/sh[${PYTHON_MULTI_USEDEP}]
+	dev-python/waitress[${PYTHON_MULTI_USEDEP}]
+	dev-python/requests-futures[${PYTHON_MULTI_USEDEP}]
+	virtual/python-futures[${PYTHON_MULTI_USEDEP}]
+')"
 
 # Unfortunatly rust-bin doesn't have an 'rls' binary,
 # so we have build rust with the 'rls' useflag.
-DEPEND="
+DEPEND="$(python_gen_cond_dep '
 	${COMMON_DEPEND}
 	rust? (
 		dev-lang/rust[rls]
@@ -85,7 +82,7 @@ DEPEND="
 		dev-cpp/gmock
 		dev-cpp/gtest
 	)
-"
+')"
 
 CMAKE_IN_SOURCE_BUILD=1
 CMAKE_USE_DIR=${S}/third_party/ycmd/cpp

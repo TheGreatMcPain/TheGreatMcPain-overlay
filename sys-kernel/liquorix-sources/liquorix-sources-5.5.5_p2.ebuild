@@ -9,7 +9,7 @@ COMPRESSTYPE=".tar.gz"
 K_USEPV="yes"
 UNIPATCH_STRICTORDER="yes"
 K_SECURITY_UNSUPPORTED="1"
-TAG="5.5-4"
+TAG="5.5-9"
 
 CKV="$(ver_cut 1-2)"
 ETYPE="sources"
@@ -47,7 +47,7 @@ src_prepare(){
 	#epatch "${FILESDIR}"/reversed-mm-proactive-compaction.patch
 	epatch "${FILESDIR}"/4567_distro-Gentoo-Kconfig.patch
 	# Might fix ntfs3g fuse crashes
-	epatch "${FILESDIR}"/revert-fuse-thing.patch
+	epatch "${FILESDIR}"/fix-fuse_request_end-crash.patch
 }
 
 K_EXTRAEINFO="For more info on liquorix-sources and details on how to report problems, see: \

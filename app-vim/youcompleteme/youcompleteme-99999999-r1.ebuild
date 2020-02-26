@@ -118,9 +118,8 @@ src_prepare() {
 src_configure() {
 	local mycmakeargs=(
 		-DUSE_CLANG_COMPLETER="$(usex clang ON OFF)"
-		-DUSE_SYSTEM_LIBCLANG="$(usex clang ON OFF)"
+		-DEXTERNAL_LIBCLANG_PATH="$(usex clang $(clang --print-file-name=libclang.so) '')"
 		-DUSE_SYSTEM_BOOST=ON
-		-DUSE_PYTHON2=OFF
 	)
 	cmake-utils_src_configure
 }

@@ -20,6 +20,7 @@ DEPEND="
 "
 
 src_prepare() {
+	default
 	sed config.mk \
 		-e '/^CC/d' \
 		-e 's|/usr/local|/usr|g' \

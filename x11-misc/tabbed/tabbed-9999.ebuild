@@ -27,7 +27,7 @@ src_prepare() {
 		-e 's|/usr/local|/usr|g' \
 		-e 's|^CFLAGS.*|CFLAGS += -std=c99 -pedantic -Wall $(INCS) $(CPPFLAGS)|g' \
 		-e 's|^LDFLAGS.*|LDFLAGS += $(CFLAGS) $(LIBS)|g' \
-		-e 's|^LIBS.*|LIBS = -lX11|g' \
+		-e 's|-L/usr/lib||g' \
 		-e 's|{|(|g;s|}|)|g' \
 		-i || die
 

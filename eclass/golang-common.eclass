@@ -398,6 +398,7 @@ golang_setup() {
 		export CGO_ENABLED
 		export GOEXPERIMENT
 		export GO15VENDOREXPERIMENT=0
+		export GOPROXY=direct
 
 		debug-print "${FUNCNAME}: GOPATH = ${GOPATH}"
 		debug-print "${FUNCNAME}: GOBIN = ${GOBIN}"

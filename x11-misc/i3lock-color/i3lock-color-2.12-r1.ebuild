@@ -22,7 +22,7 @@ RDEPEND="
 	x11-libs/cairo[X,xcb(+)]
 	x11-libs/libxcb[xkb]
 	x11-libs/xcb-util
-	x11-libs/xcd-util-image
+	x11-libs/xcb-util-image
 	x11-libs/xcb-util-xrm
 	!x11-misc/i3lock
 "

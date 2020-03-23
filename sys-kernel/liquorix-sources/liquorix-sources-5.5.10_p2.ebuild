@@ -46,8 +46,6 @@ src_prepare(){
 	# Reversing "mm: Proactive Compation" patch due to build error
 	#epatch "${FILESDIR}"/reversed-mm-proactive-compaction.patch
 	epatch "${FILESDIR}"/4567_distro-Gentoo-Kconfig.patch
-	# Might fix ntfs3g fuse crashes
-	epatch "${FILESDIR}"/fix-fuse_request_end-crash.patch
 }
 
 K_EXTRAEINFO="For more info on liquorix-sources and details on how to report problems, see: \

@@ -1,11 +1,8 @@
----
- fs/fuse/dev.c    |    6 +++---
- fs/fuse/fuse_i.h |    2 ++
- 2 files changed, 5 insertions(+), 3 deletions(-)
-
+diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
+index 8e02d76fe..c888c5764 100644
 --- a/fs/fuse/dev.c
 +++ b/fs/fuse/dev.c
-@@ -276,12 +276,10 @@ static void flush_bg_queue(struct fuse_c
+@@ -276,12 +276,10 @@ static void flush_bg_queue(struct fuse_conn *fc)
  void fuse_request_end(struct fuse_conn *fc, struct fuse_req *req)
  {
  	struct fuse_iqueue *fiq = &fc->iq;
@@ -18,7 +15,7 @@
  	/*
  	 * test_and_set_bit() implies smp_mb() between bit
  	 * changing and below intr_entry check. Pairs with
-@@ -324,7 +322,7 @@ void fuse_request_end(struct fuse_conn *
+@@ -324,7 +322,7 @@ void fuse_request_end(struct fuse_conn *fc, struct fuse_req *req)
  		wake_up(&req->waitq);
  	}
  
@@ -27,7 +24,7 @@
  		req->args->end(fc, req->args, req->out.h.error);
  put_request:
  	fuse_put_request(fc, req);
-@@ -471,6 +469,8 @@ static void fuse_args_to_req(struct fuse
+@@ -471,6 +469,8 @@ static void fuse_args_to_req(struct fuse_req *req, struct fuse_args *args)
  	req->in.h.opcode = args->opcode;
  	req->in.h.nodeid = args->nodeid;
  	req->args = args;
@@ -36,6 +33,8 @@
  }
  
  ssize_t fuse_simple_request(struct fuse_conn *fc, struct fuse_args *args)
+diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
+index aa75e2305..ca344bf71 100644
 --- a/fs/fuse/fuse_i.h
 +++ b/fs/fuse/fuse_i.h
 @@ -301,6 +301,7 @@ struct fuse_io_priv {
@@ -54,5 +53,3 @@
  };
  
  /**
-
-  

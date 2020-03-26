@@ -33,6 +33,8 @@ src_configure() {
 src_install() {
 	cmake-utils_src_install
 
+	doenvd "${FILESDIR}"/70${PN}
+
 	insinto /lib/udev/rules.d
 	doins "${FILESDIR}"/92-local-vchiq-permissions.rules
 

@@ -16,11 +16,14 @@ if [[ ${PV} == "9999" ]]; then
 	EGIT_BRANCH="master"
 	inherit git-r3
 	SRC_URI=""
+	KEYWORDS=""
+else
+	SRC_URI="https://gitlab.com/leinardi/gwe/-/archive/0.14.0/${PN}-${PV}.tar.gz"
+	KEYWORDS="~amd64"
 fi
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS=""
 IUSE=""
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 

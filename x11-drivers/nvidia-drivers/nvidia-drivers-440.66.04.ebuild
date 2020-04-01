@@ -203,8 +203,8 @@ src_prepare() {
 			${NV_OBJ}/nvidia-persistenced-init/systemd/nvidia-persistenced.service.template \
 			${NV_OBJ}/nvidia-persistenced.service
 		# Start nvidia-persistenced with user 'x'
-		sed -i 's/\/usr\/bin\/nvidia-persistenced/\/opt\/bin\/nvidia-persistenced' ${NV_OBJ}/nvidia-persistenced.service
-		sed -i 's/__USER__/x/' ${NV_OBJ}/nvidia-persistenced.service
+		sed -i 's/\/usr\/bin\/nvidia-persistenced/\/opt\/bin\/nvidia-persistenced/' ${NV_OBJ}/nvidia-persistenced.service || die
+		sed -i 's/__USER__/x/' ${NV_OBJ}/nvidia-persistenced.service || die
 	fi
 
 	if use tools; then

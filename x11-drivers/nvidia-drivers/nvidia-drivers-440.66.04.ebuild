@@ -3,7 +3,7 @@
 
 EAPI=6
 inherit eutils flag-o-matic linux-info linux-mod multilib-minimal nvidia-driver \
-	portability toolchain-funcs unpacker user udev
+	portability toolchain-funcs unpacker user udev systemd
 
 DESCRIPTION="NVIDIA Accelerated Graphics Driver"
 HOMEPAGE="https://www.nvidia.com/"
@@ -28,7 +28,7 @@ KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror"
 EMULTILIB_PKG="true"
 
-IUSE="acpi compat +driver gtk3 kernel_FreeBSD kernel_linux +kms libglvnd multilib static-libs +tools uvm wayland +X"
+IUSE="acpi compat +driver gtk3 kernel_FreeBSD kernel_linux +kms libglvnd multilib static-libs systemd +tools uvm wayland +X"
 REQUIRED_USE="
 	tools? ( X )
 	static-libs? ( tools )
@@ -196,6 +196,15 @@ src_prepare() {
 	for man_file in "${NV_MAN}"/*1.gz; do
 		gunzip $man_file || die
 	done
+
+	if use systemd; then
+		bsdtar -xf ${NV_OBJ}/nvidia-persistenced-init.tar.bz2 || die
+		cp \
+			${NV_OBJ}/nvidia-persistenced-init/systemd/nvidia-persistenced.service.template \
+			${NV_OBJ}/nvidia-persistenced.service
+		# Start nvidia-persistenced with user 'x'
+		sed -i 's/__USER__/x/' ${NV_OBJ}/nvidia-persistenced.service
+	fi
 
 	if use tools; then
 		cp "${FILESDIR}"/nvidia-settings-linker.patch "${WORKDIR}" || die
@@ -387,6 +396,9 @@ src_install() {
 		newinitd "${FILESDIR}/nvidia-smi.init" nvidia-smi
 		newconfd "${FILESDIR}/nvidia-persistenced.conf" nvidia-persistenced
 		newinitd "${FILESDIR}/nvidia-persistenced.init" nvidia-persistenced
+		if use systemd; then
+			systemd_dounit ${NV_OBJ}/nvidia-persistenced.service
+		fi
 	fi
 
 	if use tools; then

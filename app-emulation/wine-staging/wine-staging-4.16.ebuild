@@ -21,7 +21,7 @@ inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchai
 WINE_PV="9999"
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
-EGIT_BRANCH="lutris-4.21"
+EGIT_BRANCH="lutris-4.16"
 #EGIT_COMMIT="fef11c12242ecaae5b267e42bb5f3856a1d51920"
 KEYWORDS="-* ~amd64 ~x86"
 
@@ -114,7 +114,7 @@ RDEPEND="${COMMON_DEPEND}
 	>=app-eselect/eselect-wine-1.5.5
 	dos? ( >=games-emulation/dosbox-0.74_p20160629 )
 	gecko? ( app-emulation/wine-gecko:2.47.1[abi_x86_32?,abi_x86_64?] )
-	mono? ( app-emulation/wine-mono:4.9.4 )
+	mono? ( app-emulation/wine-mono:4.9.3 )
 	perl? (
 		dev-lang/perl
 		dev-perl/XML-Simple

@@ -49,6 +49,14 @@ DEPEND="${RDEPEND}
 	sys-devel/bison
 "
 
+src_prepare() {
+	default
+	# Force vulkan layer to be multilib.
+	sed ${S}/renderdoc/driver/vulkan/renderdoc.json \
+		-e 's|@VULKAN_LAYER_MODULE_PATH@|librenderdoc.so|g' \
+		-i || die
+}
+
 multilib_src_configure() {
 	if ! multilib_is_native_abi; then
 		local mycmakeargs=(

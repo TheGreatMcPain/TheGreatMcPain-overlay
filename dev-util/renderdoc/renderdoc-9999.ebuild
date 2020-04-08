@@ -5,7 +5,7 @@ EAPI="6"
 
 PYTHON_COMPAT=( python3_6 )
 
-inherit qmake-utils cmake-multilib eutils python-single-r1 git-r3
+inherit qmake-utils cmake-multilib eutils python-single-r1 git-r3 xdg-utils
 
 SWIG_VERSION="7"
 SWIG_ZIP_FILENAME="${PN}_swig_modified-${SWIG_VERSION}.zip"
@@ -62,4 +62,16 @@ multilib_src_configure() {
 		)
 	fi
 	cmake-utils_src_configure
+}
+
+pkg_postinst() {
+	xdg_icon_cache_update
+	xdg_desktop_database_update
+	xdg_mimeinfo_database_update
+}
+
+pkg_postrm() {
+	xdg_icon_cache_update
+	xdg_desktop_database_update
+	xdg_mimeinfo_database_update
 }

@@ -49,6 +49,10 @@ DEPEND="${RDEPEND}
 	sys-devel/bison
 "
 
+PATCHES="
+	${FILESDIR}/renderdoc-dont-install-docs.patch
+"
+
 src_prepare() {
 	default
 	# Force vulkan layer to be multilib.
@@ -60,7 +64,6 @@ src_prepare() {
 multilib_src_configure() {
 	if ! multilib_is_native_abi; then
 		local mycmakeargs=(
-			-DRENDERDOC_SWIG_PACKAGE="${DISTDIR}/${SWIG_ZIP_FILENAME}"
 			-DENABLE_QRENDERDOC=OFF
 			-DENABLE_PYRENDERDOC=OFF
 		)
@@ -70,6 +73,12 @@ multilib_src_configure() {
 		)
 	fi
 	cmake-utils_src_configure
+}
+
+multilib_src_install_all() {
+	cp ${S}/util/LINUX_DIST_README ${S}/README || die
+	dodoc README
+	dodoc LICENSE.md
 }
 
 pkg_postinst() {

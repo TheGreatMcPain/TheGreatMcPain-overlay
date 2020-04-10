@@ -280,6 +280,11 @@ multilib_src_configure() {
 		wine_use_disabled faudio || myconf+=( "$(use_with faudio)" )
 	fi
 
+	# This will make sure our [C/LD]FLAGS are also applied when compiling with mingw.
+	local CROSSCFLAGS CROSSLDFLAGS
+	export CROSSCFLAGS="${CFLAGS}"
+	export CROSSLDFLAGS="${LDFLAGS}"
+
 	local PKG_CONFIG AR RANLIB
 	#472038 Avoid crossdev's i686-pc-linux-gnu-pkg-config if building wine32 on amd64
 	#483342 set AR and RANLIB to make QA scripts happy

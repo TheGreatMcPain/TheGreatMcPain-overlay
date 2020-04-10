@@ -1,42 +1,40 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-inherit eutils flag-o-matic linux-info linux-mod multilib-minimal nvidia-driver \
-	portability toolchain-funcs unpacker user udev systemd
+EAPI=7
+inherit desktop flag-o-matic linux-info linux-mod multilib-minimal \
+	nvidia-driver portability toolchain-funcs unpacker udev systemd
 
 DESCRIPTION="NVIDIA Accelerated Graphics Driver"
 HOMEPAGE="https://www.nvidia.com/"
 
+AMD64_FBSD_NV_PACKAGE="NVIDIA-FreeBSD-x86_64-${PV}"
 AMD64_NV_PACKAGE="NVIDIA-Linux-x86_64-${PV}"
+ARM_NV_PACKAGE="NVIDIA-Linux-armv7l-gnueabihf-${PV}"
 
 NV_URI="https://us.download.nvidia.com/XFree86/"
-NV_DEV_URI="https://developer.nvidia.com/"
-NV_SETTINGS_PV="$(ver_cut '1').64"
-NV_VULKAN_BETA_PV="$(ver_rs 1- '')"
-
 SRC_URI="
-	amd64? ( "https://developer.nvidia.com/vulkan-beta-${NV_VULKAN_BETA_PV}-linux" -> ${AMD64_NV_PACKAGE}.run )
+	amd64-fbsd? ( ${NV_URI}FreeBSD-x86_64/${PV}/${AMD64_FBSD_NV_PACKAGE}.tar.gz )
+	amd64? ( ${NV_URI}Linux-x86_64/${PV}/${AMD64_NV_PACKAGE}.run )
 	tools? (
-		https://download.nvidia.com/XFree86/nvidia-settings/nvidia-settings-${NV_SETTINGS_PV}.tar.bz2
+		https://download.nvidia.com/XFree86/nvidia-settings/nvidia-settings-${PV}.tar.bz2
 	)
 "
 
+EMULTILIB_PKG="true"
+KEYWORDS="-* ~amd64"
 LICENSE="GPL-2 NVIDIA-r2"
 SLOT="0/${PV%.*}"
-KEYWORDS="-* ~amd64"
-RESTRICT="bindist mirror"
-EMULTILIB_PKG="true"
 
-IUSE="acpi compat +driver gtk3 kernel_FreeBSD kernel_linux +kms libglvnd multilib static-libs systemd +tools uvm wayland +X"
+IUSE="acpi compat +driver gtk3 kernel_FreeBSD kernel_linux +kms +libglvnd multilib static-libs systemd +tools uvm wayland +X"
 REQUIRED_USE="
 	tools? ( X )
 	static-libs? ( tools )
 "
-RESTRICT="test"
 
 COMMON="
 	app-eselect/eselect-opencl
+	driver? ( kernel_linux? ( acct-group/video ) )
 	kernel_linux? ( >=sys-libs/glibc-2.6.1 )
 	tools? (
 		dev-libs/atk
@@ -84,57 +82,18 @@ RDEPEND="
 "
 QA_PREBUILT="opt/* usr/lib*"
 S=${WORKDIR}/
-
-nvidia_drivers_versions_check() {
-	CONFIG_CHECK=""
-
-	if use kernel_linux && kernel_is ge 5 6; then
-		ewarn "Gentoo supports kernels which are supported by NVIDIA"
-		ewarn "which are limited to the following kernels:"
-		ewarn "<sys-kernel/gentoo-sources-5.6"
-		ewarn "<sys-kernel/vanilla-sources-5.6"
-		ewarn ""
-		ewarn "You are free to utilize epatch_user to provide whatever"
-		ewarn "support you feel is appropriate, but will not receive"
-		ewarn "support as a result of those changes."
-		ewarn ""
-		ewarn "Do not file a bug report about this."
-		ewarn ""
-	fi
-
-	# Since Nvidia ships many different series of drivers, we need to give the user
-	# some kind of guidance as to what version they should install. This tries
-	# to point the user in the right direction but can't be perfect. check
-	# nvidia-driver.eclass
-	nvidia-driver_check
-
-	if use kms; then
-		if kernel_is lt 4 2; then
-			ewarn "NVIDIA does not support kernel moddsetting on"
-			ewarn "the fallowing kernel:"
-			ewarn "<sys-kernel/gentoo-sources-4.2"
-			ewarn "<sys-kernel/vanilla-sources-4.2"
-			ewarn
-		else
-			einfo "USE +kms: checking kernel for KMS CONFIG recommended by NVIDIA."
-			einfo
-			CONFIG_CHECK+=" ~DRM_KMS_HELPER ~DRM_KMS_FB_HELPER"
-		fi
-	fi
-
-	# Kernel features/options to check for
-	CONFIG_CHECK+=" !DEBUG_MUTEXES !I2C_NVIDIA_GPU ~!LOCKDEP ~MTRR ~SYSVIPC ~ZONE_DMA"
-
-	# Now do the above checks
-	use kernel_linux && check_extra_config
-}
+PATCHES=(
+	"${FILESDIR}"/${PN}-440.26-locale.patch
+)
+NV_KV_MAX_PLUS="5.7"
+CONFIG_CHECK="!DEBUG_MUTEXES ~!I2C_NVIDIA_GPU ~!LOCKDEP ~MTRR ~SYSVIPC ~ZONE_DMA"
 
 pkg_pretend() {
-	nvidia_drivers_versions_check
+	nvidia-driver_check
 }
 
 pkg_setup() {
-	nvidia_drivers_versions_check
+	nvidia-driver_check
 
 	# try to turn off distcc and ccache for people that have a problem with it
 	export DISTCC_DISABLE=1
@@ -207,10 +166,14 @@ src_prepare() {
 	fi
 
 	if use tools; then
+		cp "${FILESDIR}"/nvidia-settings-fno-common.patch "${WORKDIR}" || die
 		cp "${FILESDIR}"/nvidia-settings-linker.patch "${WORKDIR}" || die
 		sed -i \
-			-e "s:@PV@:${NV_SETTINGS_PV}:g" \
-			"${WORKDIR}"/nvidia-settings-linker.patch || die
+			-e "s:@PV@:${PV}:g" \
+			"${WORKDIR}"/nvidia-settings-fno-common.patch \
+			"${WORKDIR}"/nvidia-settings-linker.patch \
+			|| die
+		eapply "${WORKDIR}"/nvidia-settings-fno-common.patch
 		eapply "${WORKDIR}"/nvidia-settings-linker.patch
 	fi
 
@@ -234,7 +197,7 @@ src_compile() {
 	fi
 
 	if use tools; then
-		emake -C "${S}"/nvidia-settings-${NV_SETTINGS_PV}/src/libXNVCtrl \
+		emake -C "${S}"/nvidia-settings-${PV}/src/libXNVCtrl \
 			DO_STRIP= \
 			LIBDIR="$(get_libdir)" \
 			NVLD="$(tc-getLD)" \
@@ -242,7 +205,7 @@ src_compile() {
 			OUTPUTDIR=. \
 			RANLIB="$(tc-getRANLIB)"
 
-		emake -C "${S}"/nvidia-settings-${NV_SETTINGS_PV}/src \
+		emake -C "${S}"/nvidia-settings-${PV}/src \
 			DO_STRIP= \
 			GTK3_AVAILABLE=$(usex gtk3 1 0) \
 			LIBDIR="$(get_libdir)" \
@@ -285,12 +248,10 @@ donvidia() {
 	# If the library has a SONAME and SONAME does not match the library name,
 	# then we need to create a symlink
 	if [[ ${nv_SOVER} ]] && ! [[ "${nv_SOVER}" = "${nv_LIBNAME}" ]]; then
-		dosym ${nv_LIBNAME} ${nv_DEST}/${nv_SOVER} \
-			|| die "failed to create ${nv_DEST}/${nv_SOVER} symlink"
+		dosym ${nv_LIBNAME} ${nv_DEST}/${nv_SOVER}
 	fi
 
-	dosym ${nv_LIBNAME} ${nv_DEST}/${nv_LIBNAME/.so*/.so} \
-		|| die "failed to create ${nv_LIBNAME/.so*/.so} symlink"
+	dosym ${nv_LIBNAME} ${nv_DEST}/${nv_LIBNAME/.so*/.so}
 }
 
 src_install() {
@@ -375,6 +336,9 @@ src_install() {
 
 		insinto /etc/vulkan/icd.d
 		doins nvidia_icd.json
+
+		insinto /etc/vulkan/implicit_layer.d
+		doins nvidia_layers.json
 	fi
 
 	if use kernel_linux; then
@@ -402,7 +366,7 @@ src_install() {
 	fi
 
 	if use tools; then
-		emake -C "${S}"/nvidia-settings-${NV_SETTINGS_PV}/src/ \
+		emake -C "${S}"/nvidia-settings-${PV}/src/ \
 			DESTDIR="${D}" \
 			DO_STRIP= \
 			GTK3_AVAILABLE=$(usex gtk3 1 0) \
@@ -414,10 +378,10 @@ src_install() {
 			install
 
 		if use static-libs; then
-			dolib.a "${S}"/nvidia-settings-${NV_SETTINGS_PV}/src/libXNVCtrl/libXNVCtrl.a
+			dolib.a "${S}"/nvidia-settings-${PV}/src/libXNVCtrl/libXNVCtrl.a
 
 			insinto /usr/include/NVCtrl
-			doins "${S}"/nvidia-settings-${NV_SETTINGS_PV}/src/libXNVCtrl/*.h
+			doins "${S}"/nvidia-settings-${PV}/src/libXNVCtrl/*.h
 		fi
 
 		insinto /usr/share/nvidia/
@@ -524,7 +488,7 @@ src_install-libs() {
 		if use wayland && has_multilib_profile && [[ ${ABI} == "amd64" ]];
 		then
 			NV_GLX_LIBRARIES+=(
-				"libnvidia-egl-wayland.so.1.1.3"
+				"libnvidia-egl-wayland.so.1.1.4"
 			)
 		fi
 
@@ -560,7 +524,7 @@ pkg_preinst() {
 	if use driver && use kernel_linux; then
 		linux-mod_pkg_preinst
 
-		local videogroup="$(egetent group video | cut -d ':' -f 3)"
+		local videogroup="$(getent group video | cut -d ':' -f 3)"
 		if [ -z "${videogroup}" ]; then
 			eerror "Failed to determine the video group gid"
 			die "Failed to determine the video group gid"

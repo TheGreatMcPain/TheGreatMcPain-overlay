@@ -84,7 +84,9 @@ RDEPEND="
 "
 QA_PREBUILT="opt/* usr/lib*"
 S=${WORKDIR}/
-
+PATCHES=(
+	"${FILESDIR}"/${PN}-440.26-locale.patch
+)
 nvidia_drivers_versions_check() {
 	CONFIG_CHECK=""
 
@@ -208,10 +210,14 @@ src_prepare() {
 
 	if use tools; then
 		cp "${FILESDIR}"/nvidia-settings-linker.patch "${WORKDIR}" || die
+		cp "${FILESDIR}"/nvidia-settings-fno-common.patch "${WORKDIR}" || dir
 		sed -i \
 			-e "s:@PV@:${NV_SETTINGS_PV}:g" \
-			"${WORKDIR}"/nvidia-settings-linker.patch || die
+			"${WORKDIR}"/nvidia-settings-linker.patch \
+			"${WORKDIR}"/nvidia-settings-fno-common.patch \
+			|| die
 		eapply "${WORKDIR}"/nvidia-settings-linker.patch
+		eapply "${WORKDIR}"/nvidia-settings-fno-common.patch
 	fi
 
 	default

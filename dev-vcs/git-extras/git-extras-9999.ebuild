@@ -16,13 +16,16 @@ fi
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE=""
+IUSE="zsh-completion"
 
 RDEPEND="
 	dev-vcs/git
 "
 
-DEPEND="${RDEPEND}"
+DEPEND="
+	${RDEPEND}
+	zsh-completion? ( app-shells/zsh )
+"
 
 src_compile() {
 	# ebuild will attempt to run make without the install command
@@ -36,4 +39,9 @@ src_install() {
 		MANPREFIX=/usr/share/man/man1 \
 		SYSCONFDIR=/etc \
 		install
+
+	if use zsh-completion; then
+		insinto /usr/share/zsh/site-functions
+		doins etc/git-extras-completion.zsh
+	fi
 }

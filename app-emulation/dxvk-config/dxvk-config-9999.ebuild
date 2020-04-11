@@ -35,6 +35,10 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	dev-util/glslang"
 
+if [[ ${PV} != "9999" ]] ; then
+	S="${WORKDIR}/dxvk-${PV}"
+fi
+
 PATCHES=(
 	"${FILESDIR}/flags.patch"
 	"${FILESDIR}/add-dxvk_config-library.patch"

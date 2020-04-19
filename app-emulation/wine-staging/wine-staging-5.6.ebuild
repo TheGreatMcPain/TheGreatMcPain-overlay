@@ -21,7 +21,7 @@ inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchai
 WINE_PV="9999"
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
-EGIT_BRANCH="lutris-fshack-5.4"
+EGIT_BRANCH="lutris-fshack-5.6"
 #EGIT_COMMIT="fef11c12242ecaae5b267e42bb5f3856a1d51920"
 KEYWORDS="-* ~amd64 ~x86"
 

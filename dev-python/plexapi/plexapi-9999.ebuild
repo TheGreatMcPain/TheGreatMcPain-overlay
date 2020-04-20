@@ -15,6 +15,7 @@ else
 	KEYWORDS="~amd64"
 	EGIT_COMMIT="v${PV}"
 	SRC_URI="https://github.com/pkkid/python-plexapi/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
+	S=${WORKDIR}/python-${P}
 fi
 
 DESCRIPTION="Python bindings for the Plex API."

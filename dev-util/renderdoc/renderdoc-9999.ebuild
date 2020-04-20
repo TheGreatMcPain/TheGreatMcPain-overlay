@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
@@ -50,13 +50,13 @@ DEPEND="${RDEPEND}
 "
 
 PATCHES="
-	${FILESDIR}/renderdoc-dont-install-docs.patch
+	"${FILESDIR}"/renderdoc-dont-install-docs.patch
 "
 
 src_prepare() {
 	default
 	# Force vulkan layer to be multilib.
-	sed ${S}/renderdoc/driver/vulkan/renderdoc.json \
+	sed "${S}"/renderdoc/driver/vulkan/renderdoc.json \
 		-e 's|@VULKAN_LAYER_MODULE_PATH@|librenderdoc.so|g' \
 		-i || die
 }
@@ -76,7 +76,7 @@ multilib_src_configure() {
 }
 
 multilib_src_install_all() {
-	cp ${S}/util/LINUX_DIST_README ${S}/README || die
+	cp "${S}"/util/LINUX_DIST_README "${S}"/README || die
 	dodoc README
 	dodoc LICENSE.md
 }

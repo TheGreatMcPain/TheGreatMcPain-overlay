@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sixsupersonic@gmail.com</email>
+	</maintainer>
+	<use>
+		<flag name="qt5">Build Qt5 based GUI.</flag>
+		<flag name="python">Build with python support.</flag>
+	</use>
+</pkgmetadata>

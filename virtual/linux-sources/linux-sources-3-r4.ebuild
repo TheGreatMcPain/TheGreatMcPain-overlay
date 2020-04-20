@@ -16,7 +16,6 @@ RDEPEND="
 		sys-kernel/ck-sources
 		sys-kernel/liquorix-sources
 		sys-kernel/git-sources
-		sys-kernel/hardened-sources
 		sys-kernel/mips-sources
 		sys-kernel/pf-sources
 		sys-kernel/rt-sources
@@ -25,5 +24,4 @@ RDEPEND="
 		sys-kernel/aufs-sources
 		sys-kernel/raspberrypi-sources
 		sys-kernel/vanilla-kernel
-		sys-kernel/vanilla-kernel-bin
 	)"

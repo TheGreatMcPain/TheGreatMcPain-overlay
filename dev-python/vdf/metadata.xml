@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sixsupersonic@gmail.com</email>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">ValvePython/vdf</remote-id>
+		<remote-id type="pypi">vdf</remote-id>
+	</upstream>
+</pkgmetadata>

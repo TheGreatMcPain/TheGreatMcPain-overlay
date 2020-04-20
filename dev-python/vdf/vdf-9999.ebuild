@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Foundation
+# Copyright 2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -26,10 +26,10 @@ KEYWORDS="~amd64"
 IUSE=""
 
 RDEPEND="
-  dev-python/mock[${PYTHON_USEDEP}]
+	dev-python/mock[${PYTHON_USEDEP}]
 	dev-python/pytest-cov[${PYTHON_USEDEP}]
 "
 DEPEND="
-  ${RDEPEND}
+	${RDEPEND}
 	dev-python/setuptools[${PYTHON_USEDEP}]
 "

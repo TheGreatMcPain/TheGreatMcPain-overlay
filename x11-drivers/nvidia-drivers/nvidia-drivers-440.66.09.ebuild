@@ -3,7 +3,7 @@
 
 EAPI=6
 inherit eutils flag-o-matic linux-info linux-mod multilib-minimal nvidia-driver \
-	portability toolchain-funcs unpacker user udev systemd
+	portability toolchain-funcs unpacker udev systemd
 
 DESCRIPTION="NVIDIA Accelerated Graphics Driver"
 HOMEPAGE="https://www.nvidia.com/"

@@ -20,7 +20,7 @@ KEYWORDS=""
 IUSE=""
 
 DEPEND="
-	=dev-python/websocket-client-0.48.0[${PYTHON_USEDEP}]
+	~dev-python/websocket-client-0.48.0[${PYTHON_USEDEP}]
 	dev-python/plexapi[${PYTHON_USEDEP}]
 "
 

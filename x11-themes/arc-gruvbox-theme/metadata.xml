@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sixsupersonic@gmail.com</email>
+	</maintainer>
+	<longdescription lang="en">
+		Arc is a flat theme with transparent elements for GTK 3, GTK 2 and
+		Gnome-Shell which supports GTK 3 and GTK 2 based desktop environments
+		like Gnome, Unity, Budgie, Pantheon, XFCE, Mate, etc.
+	</longdescription>
+	<use>
+		<flag name="cinnamon">Configure for Cinnamon support.</flag>
+		<flag name="dark">Install the Arc-Dark theme.</flag>
+		<flag name="darker">Install the Arc-Darker theme.</flag>
+		<flag name="gnome">Configure for gnome-shell support.</flag>
+		<flag name="gtk2">Configure for GTK2 support.</flag>
+		<flag name="gtk3">Configure for GTK3 support.</flag>
+		<flag name="light">Install the Arc-Light theme.</flag>
+		<flag name="mate">Configure for Metacity support.</flag>
+		<flag name="transparency">Include transparency support.</flag>
+		<flag name="unity">Configure for Unity support.</flag>
+		<flag name="xfce">Configure for XFWM support.</flag>
+		<flag name="plank">Install plank themes.</flag>
+	</use>
+</pkgmetadata>
+

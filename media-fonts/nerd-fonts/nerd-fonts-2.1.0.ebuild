@@ -71,16 +71,16 @@ REQUIRED_USE="X || ( ${IUSE_FLAGS[*]} )"
 
 MY_URI="https://github.com/ryanoasis/${PN}/releases/download/v${PV}"
 SRC_URI="3270?            ( "${MY_URI}/3270.zip" )
-    agave?                  ( "${MY_URI}/Agave.zip" )
-    anonymouspro?           ( "${MY_URI}/AnonymousPro.zip" )
-    arimo?                  ( "${MY_URI}/Arimo.zip" )
-    aurulentsansmono?       ( "${MY_URI}/AurulentSansMono.zip" )
-    bigblueterminal?        ( "${MY_URI}/BigBlueTerminal.zip" )
-    bitstreamverasansmono?  ( "${MY_URI}/BitstreamVeraSansMono.zip" )
-    cascadiacode?           ( "${MY_URI}/CascadiaCode.zip" )
-    codenewroman?           ( "${MY_URI}/CodeNewRoman.zip" )
-    cousine?                ( "${MY_URI}/Cousine.zip" )
-    daddytimemono?          ( "${MY_URI}/DaddyTimeMono.zip" )
+	agave?                  ( "${MY_URI}/Agave.zip" )
+	anonymouspro?           ( "${MY_URI}/AnonymousPro.zip" )
+	arimo?                  ( "${MY_URI}/Arimo.zip" )
+	aurulentsansmono?       ( "${MY_URI}/AurulentSansMono.zip" )
+	bigblueterminal?        ( "${MY_URI}/BigBlueTerminal.zip" )
+	bitstreamverasansmono?  ( "${MY_URI}/BitstreamVeraSansMono.zip" )
+	cascadiacode?           ( "${MY_URI}/CascadiaCode.zip" )
+	codenewroman?           ( "${MY_URI}/CodeNewRoman.zip" )
+	cousine?                ( "${MY_URI}/Cousine.zip" )
+	daddytimemono?          ( "${MY_URI}/DaddyTimeMono.zip" )
 	dejavusansmono?         ( "${MY_URI}/DejaVuSansMono.zip" )
 	droidsansmono?          ( "${MY_URI}/DroidSansMono.zip" )
 	fantasquesansmono?      ( "${MY_URI}/FantasqueSansMono.zip" )
@@ -130,7 +130,7 @@ CHECKREQS_DISK_USR="4G"
 
 S="${WORKDIR}"
 FONT_CONF=(
-	${FILESDIR}/10-nerd-font-symbols.conf
+	"${FILESDIR}"/10-nerd-font-symbols.conf
 )
 FONT_S=${S}
 

@@ -51,7 +51,7 @@ src_install() {
 
 	doicon -s 192 "${DISTDIR}"/minecraft-launcher.png
 
-	dosym "${ED%/}/opt/minecraft-launcher/minecraft-launcher" "/usr/bin/minecraft-launcher"
+	dosym "/opt/minecraft-launcher/minecraft-launcher" "/usr/bin/minecraft-launcher"
 	make_desktop_entry minecraft-launcher Minecraft minecraft-launcher Game
 }
 

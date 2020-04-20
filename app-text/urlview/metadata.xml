@@ -2,8 +2,10 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<maintainer type="person">
-		<email>winston+gentoo@ml1.net</email>
-		<name>Winston Weinert</name>
+		<email>sixsupersonic@gmail.com</email>
 	</maintainer>
-	<longdescription>urlview is a curses program for extracting URLs from text files and displaying a menu from whch you con select a specific URL to view using your favorite browser program. It respects the BROWSER convention (see &lt;http://www.catb.org/~esr/BROWSER/&gt;)</longdescription>
+	<longdescription>
+			urlview is a curses program for extracting URLs from text files and displaying a menu from whch you con select a specific URL to view using your favorite browser program.
+			It respects the BROWSER convention (see &lt;http://www.catb.org/~esr/BROWSER/&gt;)
+	</longdescription>
 </pkgmetadata>

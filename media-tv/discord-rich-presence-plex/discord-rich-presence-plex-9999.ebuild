@@ -40,7 +40,7 @@ src_install() {
 	dodoc README.md
 }
 
-src_postinst() {
+pkg_postinst() {
 	elog "To configure: Place the example config"
 	elog "located in '/usr/share/doc/${P}' named 'discordRichPresencePlex.conf'"
 	elog "into '~/.config'."

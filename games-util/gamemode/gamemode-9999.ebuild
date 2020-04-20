@@ -5,7 +5,7 @@ EAPI=6
 
 MULTILIB_COMPAT=( abi_x86_{32,64} )
 
-inherit meson multilib-minimal ninja-utils user
+inherit meson multilib-minimal ninja-utils
 
 DESCRIPTION="Optimise Linux system performance on demand"
 HOMEPAGE="https://github.com/FeralInteractive/gamemode"
@@ -27,6 +27,7 @@ IUSE=""
 RDEPEND="
 	>=sys-apps/systemd-236[${MULTILIB_USEDEP}]
 	sys-auth/polkit
+	acct-group/gamemode
 "
 DEPEND="${RDEPEND}"
 

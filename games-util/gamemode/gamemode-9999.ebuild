@@ -77,8 +77,6 @@ multilib_src_install() {
 }
 
 pkg_postinst() {
-	enewgroup gamemode
-
 	elog
 	elog "GameMode can renice your games. You need to be in the gamemode group for this to work."
 	elog "Run the following command as root to add your user:"

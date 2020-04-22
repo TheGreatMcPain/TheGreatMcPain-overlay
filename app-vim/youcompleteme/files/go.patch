@@ -1,8 +1,8 @@
 diff --git a/ycmd/completers/go/go_completer.py b/ycmd/completers/go/go_completer.py
-index 2e5577e4..62a1c5fc 100644
+index e1c8d62a..23deb0a3 100644
 --- a/ycmd/completers/go/go_completer.py
 +++ b/ycmd/completers/go/go_completer.py
-@@ -32,20 +32,7 @@ from ycmd.completers.language_server import simple_language_server_completer
+@@ -24,15 +24,7 @@ from ycmd import utils
  from ycmd.completers.language_server import language_server_completer
  
  
@@ -12,15 +12,10 @@ index 2e5577e4..62a1c5fc 100644
 -  '..',
 -  'third_party',
 -  'go',
--  'src',
--  'golang.org',
--  'x',
--  'tools',
--  'cmd',
--  'gopls',
+-  'bin',
 -  utils.ExecutableName( 'gopls' ) ) )
 -
 +PATH_TO_GOPLS = os.path.join( '/usr/bin', 'gopls' )
  
  def ShouldEnableGoCompleter( user_options ):
-   server_exists = os.path.isfile( PATH_TO_GOPLS )
+   server_exists = utils.FindExecutableWithFallback(

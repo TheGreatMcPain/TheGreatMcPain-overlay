@@ -12,7 +12,7 @@ HOMEPAGE="https://minecraft.net"
 SRC_URI="https://launcher.mojang.com/download/linux/x86_64/minecraft-launcher_${PV}.tar.gz
 		https://minecraft.net/android-icon-192x192.png -> minecraft-launcher.png"
 
-LICENSE="Minecraft-clickwrap-EULA"
+LICENSE="Mojang"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
@@ -20,7 +20,8 @@ IUSE=""
 DEPEND=""
 
 # This list is based on Mojang's deb package.
-RDEPEND="${DEPEND}
+RDEPEND="
+	${DEPEND}
 	gnome-base/gconf
 	sys-apps/dbus
 	x11-apps/xrandr
@@ -37,7 +38,8 @@ RDEPEND="${DEPEND}
 	>=x11-libs/gtk+-2.24.32-r1
 	media-libs/openal
 	virtual/opengl
-	virtual/jre"
+	virtual/jre
+"
 
 S="${WORKDIR}"
 
@@ -51,7 +53,7 @@ src_install() {
 
 	doicon -s 192 "${DISTDIR}"/minecraft-launcher.png
 
-	dosym "/opt/minecraft-launcher/minecraft-launcher" "/usr/bin/minecraft-launcher"
+	dosym "../${PN}/${PN}" /opt/bin/"${PN}"
 	make_desktop_entry minecraft-launcher Minecraft minecraft-launcher Game
 }
 

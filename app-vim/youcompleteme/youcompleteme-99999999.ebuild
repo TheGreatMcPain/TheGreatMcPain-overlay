@@ -66,6 +66,7 @@ RDEPEND="
 		dev-python/sh[${PYTHON_MULTI_USEDEP}]
 		dev-python/waitress[${PYTHON_MULTI_USEDEP}]
 		dev-python/requests-futures[${PYTHON_MULTI_USEDEP}]
+		dev-python/watchdog[${PYTHON_MULTI_USEDEP}]
 		virtual/python-futures[${PYTHON_MULTI_USEDEP}]
 	')
 "

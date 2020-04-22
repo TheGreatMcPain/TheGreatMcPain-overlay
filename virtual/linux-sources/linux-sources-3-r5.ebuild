@@ -5,7 +5,7 @@ EAPI=6
 
 DESCRIPTION="Virtual for Linux kernel sources"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86"
+KEYWORDS="~alpha amd64 arm ~arm64 hppa ~ia64 ~mips ppc ppc64 ~s390 sparc x86"
 IUSE="firmware"
 
 RDEPEND="
@@ -23,5 +23,8 @@ RDEPEND="
 		sys-kernel/zen-sources
 		sys-kernel/aufs-sources
 		sys-kernel/raspberrypi-sources
+		sys-kernel/gentoo-kernel
+		sys-kernel/gentoo-kernel-bin
 		sys-kernel/vanilla-kernel
+		sys-kernel/bliss-kernel-bin
 	)"

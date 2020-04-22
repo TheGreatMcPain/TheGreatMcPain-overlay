@@ -77,7 +77,7 @@ RDEPEND="
 # Unfortunatly rust-bin doesn't have an 'rls' binary,
 # so we have build rust with the 'rls' useflag.
 DEPEND="
-	${COMMON_DEPEND}
+	${RDEPEND}
 	rust? (
 		dev-lang/rust[rls]
 	)

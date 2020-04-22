@@ -41,7 +41,7 @@ LICENSE="
 	ubuntumono? ( UbuntuFontLicense-1.0 )
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~ppc ~ppc64 ~x86 ~x86-fbsd"
+KEYWORDS="~amd64 ~arm ~ppc ~ppc64 ~x86"
 
 #FIXME: Add support for all additional fonts supported by the repository.
 

@@ -6,9 +6,9 @@ You may want to read about the stuff in [app-emulation](app-emulation/README.md)
 
 ### Installation
 
-Add this to `/etc/portage/repos.conf/thegreatmcpain.conf`
+Add this to `/etc/portage/repos.conf/TheGreatMcPain.conf`
 
-`[thegreatmcpain]`\
-`sync-uri = https://gitlab.com/TheGreatMcPain/personal-gentoo-overly.git`\
+`[TheGreatMcPain]`\
+`sync-uri = https://gitlab.com/TheGreatMcPain/TheGreatMcPain-overlay.git`\
 `sync-type = git`\
 `location = /var/db/repos/thegreatmcpain`

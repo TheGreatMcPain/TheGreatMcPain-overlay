@@ -25,14 +25,14 @@ EGIT_BRANCH="lutris-fshack-5.6"
 #EGIT_COMMIT="fef11c12242ecaae5b267e42bb5f3856a1d51920"
 KEYWORDS="-* ~amd64 ~x86"
 
-DESCRIPTION="Free implementation of Windows(tm) on Unix, without any external patchsets"
+DESCRIPTION="Free implementation of Windows(tm) on Unix, Staging patchset."
 HOMEPAGE="https://www.winehq.org/"
 SRC_URI="${SRC_URI}"
 
 LICENSE="LGPL-2.1"
 SLOT="${PV}"
 
-IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio ffmpeg +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap +mono mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml mingw"
+IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio ffmpeg +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap mingw +mono mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml"
 REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )
 	X? ( truetype )
 	elibc_glibc? ( threads )

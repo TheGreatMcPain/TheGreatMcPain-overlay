@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit distutils-r1
 
@@ -12,7 +12,7 @@ if [[ ${PV} = *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/ValvePython/vdf.git"
 	KEYWORDS=""
 else
-	KEYWORDS="~amd64"
+	KEYWORDS="amd64"
 	EGIT_COMMIT="v${PV}"
 	SRC_URI="https://github.com/ValvePython/vdf/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 fi
@@ -22,14 +22,12 @@ HOMEPAGE="https://github.com/ValvePython/vdf"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 IUSE=""
 
-RDEPEND="
-	dev-python/mock[${PYTHON_USEDEP}]
-	dev-python/pytest-cov[${PYTHON_USEDEP}]
+BDEPEND="
+	${PYTHON_DEPS}
+	test? ( dev-python/mock )
 "
-DEPEND="
-	${RDEPEND}
-	dev-python/setuptools[${PYTHON_USEDEP}]
-"
+
+distutils_enable_tests pytest

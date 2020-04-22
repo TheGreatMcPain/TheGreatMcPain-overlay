@@ -25,14 +25,12 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
 
-RDEPEND="
-	dev-python/mock[${PYTHON_USEDEP}]
-	dev-python/pytest-cov[${PYTHON_USEDEP}]
+BDEPEND="
+	${PYTHON_DEPS}
+	test? ( dev-python/mock )
 "
-DEPEND="
-	${RDEPEND}
-	dev-python/setuptools[${PYTHON_USEDEP}]
-"
+
+distutils_enable_tests pytest
 
 PATCHES=(
 	"${FILESDIR}"/disable-tests.patch

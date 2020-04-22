@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -8,17 +8,10 @@ inherit cmake-utils
 DESCRIPTION="Raspberry Pi userspace tools and libraries"
 HOMEPAGE="https://github.com/raspberrypi/userland"
 
-if [[ ${PV} == 9999* ]]; then
-	inherit git-2
-	EGIT_REPO_URI="git://github.com/${PN/-//}.git"
-	SRC_URI=""
-	KEYWORDS=""
-else
-	GIT_COMMIT="dd98890"
-	SRC_URI="https://github.com/raspberrypi/userland/tarball/${GIT_COMMIT} -> ${P}.tar.gz"
-	KEYWORDS="~arm"
-	S="${WORKDIR}/raspberrypi-userland-${GIT_COMMIT}"
-fi
+GIT_COMMIT="dd98890"
+SRC_URI="https://github.com/raspberrypi/userland/tarball/${GIT_COMMIT} -> ${P}.tar.gz"
+KEYWORDS="~arm"
+S="${WORKDIR}/raspberrypi-userland-${GIT_COMMIT}"
 
 RDEPEND="!media-libs/raspberrypi-userland-bin
 	wayland? ( dev-libs/wayland )"
@@ -40,11 +33,7 @@ pkg_setup() {
 }
 
 src_unpack() {
-	if [[ ${PV} == 9999* ]]; then
-		git-2_src_unpack
-	else
-		default
-	fi
+	default
 }
 
 src_prepare() {

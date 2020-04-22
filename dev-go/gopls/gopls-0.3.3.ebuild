@@ -81,7 +81,7 @@ DESCRIPTION="'gopls' is the official language server for the Go language."
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 x86 arm"
+KEYWORDS="amd64 arm x86 "
 BDEPEND=">dev-lang/go-1.8.0"
 
 S=${WORKDIR}/tools-gopls-v${PV}/gopls

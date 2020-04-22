@@ -1,0 +1,11 @@
+DEFINED_PHASES=install postinst postrm
+DESCRIPTION=Official launcher for Minecraft
+EAPI=7
+HOMEPAGE=https://minecraft.net
+KEYWORDS=~amd64
+LICENSE=Mojang
+RDEPEND=gnome-base/gconf sys-apps/dbus x11-apps/xrandr x11-libs/libXcomposite x11-libs/libXcursor x11-libs/libXdamage x11-libs/libXext x11-libs/libXfixes x11-libs/libXi x11-libs/libXrender x11-libs/libXScrnSaver x11-libs/libXtst x11-libs/xcb-util >=x11-libs/gtk+-2.24.32-r1 media-libs/openal virtual/opengl virtual/jre
+SLOT=0
+SRC_URI=https://launcher.mojang.com/download/linux/x86_64/minecraft-launcher_2.1.13829.tar.gz https://minecraft.net/android-icon-192x192.png -> minecraft-launcher.png
+_eclasses_=desktop	7fd20552ce4cc97e8acb132a499a7dd8	xdg-utils	ff2ff954e6b17929574eee4efc5152ba
+_md5_=97c104498d6d90707450d207559ee850

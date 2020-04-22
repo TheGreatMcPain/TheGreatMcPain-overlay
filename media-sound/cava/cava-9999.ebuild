@@ -14,7 +14,7 @@ SLOT="0"
 KEYWORDS=""
 IUSE="debug"
 
-DEPEND="sci-libs/fftw
+DEPEND="sci-libs/fftw:*
 		dev-libs/iniparser:0
 		sys-libs/ncurses"
 RDEPEND="${DEPEND}"

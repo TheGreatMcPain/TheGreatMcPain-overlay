@@ -26,6 +26,7 @@ For this Wine variant - the external Wine Staging patchset is always applied whe
 		<flag name="gcrypt">Add support for the Diffie-Hellman key exchanges using <pkg>dev-libs/libgcrypt</pkg>.</flag>
 		<flag name="gecko">Add support for the Gecko engine when using iexplore</flag>
 		<flag name="gstreamer">Use <pkg>media-libs/gstreamer</pkg> to provide DirectShow functionality.</flag>
+		<flag name="mingw">Allow wine to compile select DLLs as native windows PEs using Mingw.</flag>
 		<flag name="mono">Add support for .NET using Wine's Mono add-on.</flag>
 		<flag name="netapi">Use libnetapi from <pkg>net-fs/samba</pkg> to support Windows networks in netapi32.dll.</flag>
 		<flag name="opencl">Enable OpenCL support.</flag>
@@ -45,7 +46,6 @@ For this Wine variant - the external Wine Staging patchset is always applied whe
 		<flag name="udev">Use <pkg>virtual/libudev</pkg> to provide plug and play support.</flag>
 		<flag name="vkd3d">Use <pkg>app-emulation/vkd3d</pkg> to provide DirectX D3D12 support</flag>
 		<flag name="vulkan">Enable Vulkan layer graphics support using <pkg>media-libs/vulkan-loader</pkg>.</flag>
-		<flag name="mingw">Allow wine to compile select DLLs as native windows PEs using Mingw.</flag>
 	</use>
 	<upstream>
 		<remote-id type="github">wine-staging/wine-staging</remote-id>

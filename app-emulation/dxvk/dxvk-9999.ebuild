@@ -33,9 +33,19 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	dev-util/glslang"
 
-PATCHES=(
-	"${FILESDIR}/flags.patch"
-)
+# Convert PV to not doted integer
+PVINT=$(echo "${PV//./}")
+# Restore winelib builds that were removed after 1.6.1.
+if [[ "${PVINT}" -gt "161" ]]; then
+	PATCHES=(
+		"${FILESDIR}/dxvk-restore-winelib.patch"
+		"${FILESDIR}/flags.patch"
+	)
+else
+	PATCHES=(
+		"${FILESDIR}/flags.patch"
+	)
+fi
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 

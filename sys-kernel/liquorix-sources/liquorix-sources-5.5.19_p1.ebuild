@@ -10,7 +10,7 @@ COMPRESSTYPE=".tar.gz"
 K_USEPV="yes"
 UNIPATCH_STRICTORDER="yes"
 K_SECURITY_UNSUPPORTED="1"
-TAG="5.5-22"
+TAG="5.5-23"
 
 CKV="$(ver_cut 1-2)"
 ETYPE="sources"
@@ -44,8 +44,6 @@ pkg_setup(){
 
 src_prepare(){
 	epatch "${DISTDIR}"/"${LIQUORIX_FILE}"
-	# Reversing "mm: Proactive Compation" patch due to build error
-	#epatch "${FILESDIR}"/reversed-mm-proactive-compaction.patch
 	epatch "${FILESDIR}"/4567_distro-Gentoo-Kconfig.patch
 }
 

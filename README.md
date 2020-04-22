@@ -8,7 +8,7 @@ You may want to read about the stuff in [app-emulation](app-emulation/README.md)
 
 Add this to `/etc/portage/repos.conf/thegreatmcpain.conf`
 
-`[thegreatmcpain]`
-`sync-uri = https://gitlab.com/TheGreatMcPain/personal-gentoo-overly.git`
-`sync-type = git`
+`[thegreatmcpain]`\
+`sync-uri = https://gitlab.com/TheGreatMcPain/personal-gentoo-overly.git`\
+`sync-type = git`\
 `location = /var/db/repos/thegreatmcpain`

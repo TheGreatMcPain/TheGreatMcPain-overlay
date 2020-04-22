@@ -25,6 +25,10 @@ LICENSE="Apache-2.0"
 SLOT="0"
 IUSE=""
 
+PATCHES=(
+	"${FILESDIR}/llvm-10.patch"
+)
+
 DEPEND="
 	>=sys-devel/clang-5.0:=
 	>=sys-devel/llvm-7.0:=

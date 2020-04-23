@@ -6,6 +6,13 @@ You may want to read about the stuff in [app-emulation](app-emulation/README.md)
 
 ### Installation
 
+#### Layman
+
+`layman -L`\
+`layman -a thegreatmcpain`
+
+#### Manual
+
 Add this to `/etc/portage/repos.conf/thegreatmcpain.conf`
 
 `[thegreatmcpain]`\

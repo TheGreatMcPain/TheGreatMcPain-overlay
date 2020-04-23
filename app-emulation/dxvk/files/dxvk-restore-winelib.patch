@@ -1,6 +1,6 @@
-commit cffa9e93377e4c84e0dfba36810cd5521888fbc5
+commit 3fed50eb5190cdb58f38801e746c225697976635
 Author: TheGreatMcPain <sixsupersonic@gmail.com>
-Date:   Tue Apr 21 19:16:02 2020 -0500
+Date:   Wed Apr 22 21:05:07 2020 -0500
 
     Revert "[meta] Remove support for winelib builds"
     
@@ -170,7 +170,7 @@ index 8c9e0a65..03aaf55e 100644
  glsl_compiler = find_program('glslangValidator')
  glsl_generator = generator(glsl_compiler,
 diff --git a/package-release.sh b/package-release.sh
-index e93613e0..79c23d56 100755
+index 3f5d9a4c..5bb11a51 100755
 --- a/package-release.sh
 +++ b/package-release.sh
 @@ -5,7 +5,7 @@ set -e
@@ -201,17 +201,6 @@ index e93613e0..79c23d56 100755
    *)
      echo "Unrecognized option: $1" >&2
      exit 1
-@@ -61,6 +66,10 @@ function build_arch {
-   ninja install
- 
-   if [ $opt_devbuild -eq 0 ]; then
-+    if [ $opt_winelib -eq 0 ]; then
-+      # get rid of some useless .a files
-+      rm "$DXVK_BUILD_DIR/x$1/"*.!(dll)
-+    fi
-     rm -R "$DXVK_BUILD_DIR/build.$1"
-   fi
- }
 diff --git a/src/d3d10/meson.build b/src/d3d10/meson.build
 index dd6c574f..d1d8d6a6 100644
 --- a/src/d3d10/meson.build

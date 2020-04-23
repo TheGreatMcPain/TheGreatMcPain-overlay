@@ -44,6 +44,35 @@ PATCHES=(
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 
+is_mingw() {
+	# For some reason tc-getCXX won't work correctly for this,
+	# so I'm just going to see if the files exist.
+	if [[ ${ABI} = amd64 ]]; then
+		if which x86_64-w64-mingw32-g++ >/dev/null; then
+			return 0
+		else
+			return 1
+		fi
+	else
+		if which i686-w64-mingw32-g++ >/dev/null; then
+			return 0
+		else
+			return 1
+		fi
+	fi
+}
+
+dxvk_check_mingw() {
+	if ! is_mingw; then
+		ewarn
+		ewarn "You need to have a mingw32 toolchain installed."
+		ewarn "To set up a mingw32 toolchain please read the 'Setting up Mingw in Gentoo' section here."
+		ewarn "https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay/app-emulation#setting-up-mingw-in-gentoo"
+		ewarn
+		die "Mingw32 toolchain required."
+	fi
+}
+
 dxvk_check_requirements() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
 		if ! tc-is-gcc || [[ $(gcc-major-version) -lt 7 || $(gcc-major-version) -eq 7 && $(gcc-minor-version) -lt 3 ]]; then
@@ -53,10 +82,12 @@ dxvk_check_requirements() {
 }
 
 pkg_pretend() {
+	multilib_foreach_abi dxvk_check_mingw
 	dxvk_check_requirements
 }
 
 pkg_setup() {
+	multilib_foreach_abi dxvk_check_mingw
 	dxvk_check_requirements
 }
 

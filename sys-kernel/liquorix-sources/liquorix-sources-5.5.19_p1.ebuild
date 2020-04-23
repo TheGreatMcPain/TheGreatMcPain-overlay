@@ -43,6 +43,7 @@ pkg_setup(){
 }
 
 src_prepare(){
+	default
 	epatch "${DISTDIR}"/"${LIQUORIX_FILE}"
 	epatch "${FILESDIR}"/4567_distro-Gentoo-Kconfig.patch
 }

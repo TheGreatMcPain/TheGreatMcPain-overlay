@@ -33,6 +33,8 @@ and the non-mingw varients will use winelib
 [1.6.1](https://github.com/doitsujin/dxvk/commit/436357e28096f5e1e25aa8b72fceb77123ea8404))\
 I've added a patch to the ebuilds that restore winelib builds for versions newer than 1.6.1.
 
+DO NOT REPORT WINELIB BUILD BUGS TO DXVK UPSTREAM.
+
 [See below section on how to setup a mingw toolchain.](#setting-up-mingw-in-gentoo)
 
 Each dxvk ebuild will have it's own setup script, `dxvk-setup`, `dxvk-mingw-setup`, etc.

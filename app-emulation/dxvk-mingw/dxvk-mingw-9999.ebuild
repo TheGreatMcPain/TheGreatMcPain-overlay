@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 MULTILIB_COMPAT=( abi_x86_{32,64} )
 
@@ -43,51 +43,33 @@ PATCHES=(
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 
-is_mingw() {
-	# For some reason tc-getCXX won't work correctly for this,
-	# so I'm just going to see if the files exist.
-	if [[ ${ABI} = amd64 ]]; then
-		if which x86_64-w64-mingw32-g++ >/dev/null; then
-			return 0
-		else
-			return 1
-		fi
-	else
-		if which i686-w64-mingw32-g++ >/dev/null; then
-			return 0
-		else
-			return 1
-		fi
-	fi
-}
-
 dxvk_check_mingw() {
-	if ! is_mingw; then
-		ewarn
-		ewarn "You need to have a mingw32 toolchain installed."
-		ewarn "To set up a mingw32 toolchain please read the 'Setting up Mingw in Gentoo' section here."
-		ewarn "https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay/-/tree/master/app-emulation#setting-up-mingw-in-gentoo"
-		ewarn
-		die "Mingw32 toolchain required."
-	fi
-}
+	local -a categories
+	use abi_x86_64 && categories+=("cross-x86_64-w64-mingw32")
+	use abi_x86_32 && categories+=("cross-i686-w64-mingw32")
 
-dxvk_check_requirements() {
-	if [[ ${MERGE_TYPE} != binary ]]; then
-		if ! tc-is-gcc || [[ $(gcc-major-version) -lt 7 || $(gcc-major-version) -eq 7 && $(gcc-minor-version) -lt 3 ]]; then
-			die "At least gcc 7.3 is required"
+	for cat in ${categories[@]}; do
+		if ! has_version -b "${cat}/mingw64-runtime[libraries]" ||
+				! has_version -b "${cat}/gcc"; then
+			eerror "The ${cat} toolchain is not properly installed."
+			eerror "Make sure to install ${cat}/gcc with:"
+			eerror "EXTRA_ECONF=\"--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2\""
+			eerror "and ${cat}/mingw64-runtime with USE=\"libraries\"."
+			einfo
+			einfo "For a short guide please go to the link below.:"
+			einfo "<https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay/-/tree/master/app-emulation#setting-up-mingw-in-gentoo>"
+			einfo
+			die "${cat} toolchain required."
 		fi
-	fi
+	done
 }
 
 pkg_pretend() {
-	multilib_foreach_abi dxvk_check_mingw
-	dxvk_check_requirements
+	dxvk_check_mingw
 }
 
 pkg_setup() {
-	multilib_foreach_abi dxvk_check_mingw
-	dxvk_check_requirements
+	dxvk_check_mingw
 }
 
 src_prepare() {

@@ -144,6 +144,47 @@ DEPEND="${COMMON_DEPEND}
 S="${WORKDIR}/${WINE_P}"
 [[ "${WINE_PV}" == "9999" ]] && EGIT_CHECKOUT_DIR="${S}"
 
+is_mingw() {
+	# For some reason tc-getCXX won't work correctly for this,
+	# so I'm just going to see if the files exist.
+	if [[ ${ABI} = amd64 ]]; then
+		if which x86_64-w64-mingw32-gcc >/dev/null; then
+			return 0
+		else
+			return 1
+		fi
+	else
+		if which i686-w64-mingw32-gcc >/dev/null; then
+			return 0
+		else
+			return 1
+		fi
+	fi
+}
+
+check_mingw() {
+	if ! is_mingw; then
+		ewarn
+		ewarn "You need to have a mingw32 toolchain installed."
+		ewarn "To set up a mingw32 toolchain please read the 'Setting up Mingw in Gentoo' section here."
+		ewarn "https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay/app-emulation#setting-up-mingw-in-gentoo"
+		ewarn
+		die "Mingw32 toolchain required."
+	fi
+}
+
+pkg_pretend() {
+	if use mingw; then
+		multilib_foreach_abi check_mingw
+	fi
+}
+
+pkg_setup() {
+	if use mingw; then
+		multilib_foreach_abi check_mingw
+	fi
+}
+
 src_unpack() {
 	# Fully Mirror git tree, Wine, so we can access commits in all branches
 	[[ "${WINE_PV}" == "9999" ]] && EGIT_MIN_CLONE_TYPE="mirror"

@@ -8,7 +8,7 @@ MULTILIB_COMPAT=( abi_x86_{32,64} )
 inherit meson multilib-minimal flag-o-matic
 
 DESCRIPTION="dxvk_config.dll library from Valve's Proton (mingw)"
-HOMEPAGE="https://github.com/Joshua-Ashton/d9vk"
+HOMEPAGE="https://github.com/ValveSoftware/dxvk"
 
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"

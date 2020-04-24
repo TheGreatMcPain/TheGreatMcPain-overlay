@@ -167,7 +167,7 @@ check_mingw() {
 		ewarn
 		ewarn "You need to have a mingw32 toolchain installed."
 		ewarn "To set up a mingw32 toolchain please read the 'Setting up Mingw in Gentoo' section here."
-		ewarn "https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay/app-emulation#setting-up-mingw-in-gentoo"
+		ewarn "https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay/-/tree/master/app-emulation#setting-up-mingw-in-gentoo"
 		ewarn
 		die "Mingw32 toolchain required."
 	fi

@@ -60,7 +60,7 @@ Now in order for our new toolchains to build DXVK we need to enable pthread supp
 We'll also go ahead and enable `dwarf2` for better performance in 32-bit DXVK.
 
 `# mkdir /etc/portage/{env,package.env}`\
-`# echo EXTRA_CONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2" > /etc/portage/env/mingw32_threads_dwarf2`\
+`# echo EXTRA_ECONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2" > /etc/portage/env/mingw32_threads_dwarf2`\
 `# echo -e 'cross-i686-w64-mingw32/gcc mingw32_threads_dwarf2\ncross-x86_64-w64-mingw32/gcc mingw32_threads_dwarf2' > /etc/portage/package.env/mingw32_threads_dwarf2`
 
 Will also need to enable the `libraries` useflag in `mingw64-runtime`.

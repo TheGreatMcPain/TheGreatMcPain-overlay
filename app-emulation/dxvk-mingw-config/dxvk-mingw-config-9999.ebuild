@@ -76,6 +76,12 @@ pkg_setup() {
 src_prepare() {
 	default
 
+	# For some reason avx is causing issues,
+	# so disable it if '-march' is used.
+	if is-flag "-march=*"; then
+		append-flags "-mno-avx"
+	fi
+
 	replace-flags "-O3" "-O3 -fno-stack-protector"
 
 	# Create versioned setup script

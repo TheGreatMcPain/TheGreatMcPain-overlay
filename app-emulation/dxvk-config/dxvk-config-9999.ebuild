@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 MULTILIB_COMPAT=( abi_x86_{32,64} )
 
@@ -55,24 +55,14 @@ fi
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 
-dxvk_check_requirements() {
-	if [[ ${MERGE_TYPE} != binary ]]; then
-		if ! tc-is-gcc || [[ $(gcc-major-version) -lt 7 || $(gcc-major-version) -eq 7 && $(gcc-minor-version) -lt 3 ]]; then
-			die "At least gcc 7.3 is required"
-		fi
-	fi
-}
-
-pkg_pretend() {
-	dxvk_check_requirements
-}
-
-pkg_setup() {
-	dxvk_check_requirements
-}
-
 src_prepare() {
 	default
+
+	# For some reason avx is causing issues,
+	# so disable it if '-march' is used.
+	if is-flag "-march=*"; then
+		append-flags "-mno-avx"
+	fi
 
 	replace-flags "-O3" "-O3 -fno-stack-protector"
 

@@ -51,16 +51,18 @@ In order to setup a mingw toolchain you'll need to install `crossdev` first.
 
 Then we can create a `i686-w64-mingw32` and `x86_64-w64-mingw32` toolchain like so.
 
-`# crossdev -t i686-w64-mingw32`\
-`# crossdev -t x86_64-w64-mingw32`
+`# crossdev -S -t i686-w64-mingw32`\
+`# crossdev -S -t x86_64-w64-mingw32`
 
-If you want to use stable version's of (binutils, glibc, gcc) you can add `-S` to the commands above.
+If you want to use unstable version's of (binutils, glibc, gcc) you can exclude `-S` from the commands above.
 
 Now in order for our new toolchains to build DXVK we need to enable pthread support.\
 We'll also go ahead and enable `dwarf2` for better performance in 32-bit DXVK.
 
-`# mkdir /etc/portage/{env,package.env}`\
-`# echo EXTRA_ECONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2" > /etc/portage/env/mingw32_threads_dwarf2`\
+`# mkdir /etc/portage/{env,package.env}`
+
+`# echo EXTRA_ECONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2" > /etc/portage/env/mingw32_threads_dwarf2`
+
 `# echo -e 'cross-i686-w64-mingw32/gcc mingw32_threads_dwarf2\ncross-x86_64-w64-mingw32/gcc mingw32_threads_dwarf2' > /etc/portage/package.env/mingw32_threads_dwarf2`
 
 Will also need to enable the `libraries` useflag in `mingw64-runtime`.

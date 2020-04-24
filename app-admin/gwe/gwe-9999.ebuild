@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_6 )
+PYTHON_COMPAT=( python3_{6,7} )
 
 inherit meson python-single-r1 xdg-utils gnome2-utils
 
@@ -18,7 +18,7 @@ if [[ ${PV} == "9999" ]]; then
 	SRC_URI=""
 	KEYWORDS=""
 else
-	SRC_URI="https://gitlab.com/leinardi/gwe/-/archive/0.14.0/${PN}-${PV}.tar.gz"
+	SRC_URI="https://gitlab.com/leinardi/gwe/-/archive/0.14.0/${P}.tar.gz"
 	KEYWORDS="~amd64"
 fi
 

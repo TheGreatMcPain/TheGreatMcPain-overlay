@@ -18,7 +18,6 @@ inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchai
 #	KEYWORDS="-* ~amd64 ~x86"
 #fi
 
-WINE_PV="9999"
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
 EGIT_BRANCH="lutris-fshack-5.6"
@@ -32,10 +31,11 @@ SRC_URI="${SRC_URI}"
 LICENSE="LGPL-2.1"
 SLOT="${PV}"
 
-IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio ffmpeg +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap mingw +mono mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml"
+IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio ffmpeg +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap mingw +mono mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks +unwind v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml"
 REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )
 	X? ( truetype )
 	elibc_glibc? ( threads )
+	faudio? ( !ffmpeg )
 	osmesa? ( opengl )
 	test? ( abi_x86_32 )
 	vkd3d? ( vulkan )" #286560 osmesa-opengl  #551124 X-truetype
@@ -98,6 +98,7 @@ COMMON_DEPEND="
 	truetype? ( >=media-libs/freetype-2.0.5[${MULTILIB_USEDEP}] )
 	udev? ( virtual/libudev:=[${MULTILIB_USEDEP}] )
 	udisks? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
+	unwind? ( sys-libs/libunwind[${MULTILIB_USEDEP}] )
 	vkd3d? ( >=app-emulation/vkd3d-1.1[${MULTILIB_USEDEP}] )
 	v4l? ( media-libs/libv4l[${MULTILIB_USEDEP}] )
 	vaapi? ( x11-libs/libva:=[drm,X?,${MULTILIB_USEDEP}] )
@@ -224,6 +225,7 @@ src_prepare() {
 
 	wine_eapply_bin
 
+	wine_winecfg_about_enhancement
 	wine_fix_block_scope_compound_literals
 
 	eautoreconf
@@ -295,6 +297,7 @@ multilib_src_configure() {
 		"$(use_enable test tests)"
 		"$(use_with truetype freetype)"
 		"$(use_with udev)"
+		"$(use_with unwind)"
 		"$(use_with udisks dbus)"
 		"$(use_with v4l v4l2)"
 		"$(use_with vaapi va)"
@@ -310,9 +313,9 @@ multilib_src_configure() {
 	)
 
 	if use ffmpeg; then
-		wine_use_disabled ffmpeg || myconf+=( "$(use_with ffmpeg)" )
+		myconf+=( "$(use_with ffmpeg)" )
 	else
-		wine_use_disabled faudio || myconf+=( "$(use_with faudio)" )
+		myconf+=( "$(use_with faudio)" )
 	fi
 
 	# This will make sure our [C/LD]FLAGS are also applied when compiling with mingw.

@@ -35,7 +35,6 @@
 # the Gentoo infrastructure.
 # Moving to a common Wine eclass has shown to provide impressive
 # space savings: >50% reduction ; for in-tree Wine package sizes.
-#EGIT_OVERRIDE_COMMIT_LUTRIS_WINE=${EGIT_COMMIT}
 
 if [[ -z "${_WINE_ECLASS}" ]]; then
 _WINE_ECLASS=1
@@ -240,7 +239,7 @@ readonly _WINE_IS_STAGING
 # @ECLASS-VARIABLE: WINE_EBUILD_COMMON_P
 # @DESCRIPTION:
 # Full name and version for current: gentoo-wine-ebuild-common; tarball.
-WINE_EBUILD_COMMON_P="gentoo-wine-ebuild-common-20190428"
+WINE_EBUILD_COMMON_P="gentoo-wine-ebuild-common-20200414"
 readonly WINE_EBUILD_COMMON_P
 
 # @ECLASS-VARIABLE: WINE_EBUILD_COMMON_PN
@@ -258,7 +257,7 @@ readonly WINE_EBUILD_COMMON_PV
 # @ECLASS-VARIABLE: WINE_ESYNC_P
 # @DESCRIPTION:
 # Full name and version for current: gentoo-wine-esync; tarball.
-WINE_ESYNC_P="gentoo-wine-esync-20191220"
+WINE_ESYNC_P="gentoo-wine-esync-20200423"
 readonly WINE_ESYNC_P
 
 # @ECLASS-VARIABLE: WINE_ESYNC_PN
@@ -300,6 +299,7 @@ readonly WINE_PBA_PV
 # @DESCRIPTION:
 # Wine release version. This will be stripped of components (see below).
 #WINE_PV="${PV}"
+WINE_PV="9999"
 
 # @ECLASS-VARIABLE: _WINE_VERSION_ARRAY_COMPONENTS
 # @INTERNAL
@@ -512,25 +512,25 @@ WINE_MANDIR="${WINE_DATADIR}/man"
 # @DESCRIPTION:
 # Set base SRC_URI components (excluding: wine-esync, wine-pba components)
 SRC_URI="https://github.com/bobwya/${WINE_EBUILD_COMMON_PN}/archive/${WINE_EBUILD_COMMON_PV}.tar.gz -> ${WINE_EBUILD_COMMON_P}.tar.gz"
-#if [[ "${WINE_PV}" != "9999" ]]; then
-#	if (( !_WINE_IS_STAGING && _WINE_IS_STABLE && WINE_IS_RC_VERSION && !_WINE_IS_STABLE_BASE )); then
-#		# Pull Wine RC intermediate stable versions from alternate Github repository...
-#		SRC_URI="${SRC_URI}
-#			https://github.com/mstefani/wine-stable/archive/${WINE_PN}-${WINE_PV}.tar.gz -> ${WINE_P}.tar.gz"
-#	elif (( (_WINE_MAJOR_VERSION < 2) || ((_WINE_VERSION_COMPONENT_COUNT == 2) && (_WINE_MAJOR_VERSION == 2) && (_WINE_MINOR_VERSION == 0)) )); then
-#		# The base Wine 2.0 release tarball was bzip2 compressed - switching to xz shortly after...
-#		SRC_URI="${SRC_URI}
-#			https://dl.winehq.org/wine/source/${_WINE_MAJOR_VERSION}.${_WINE_MINOR_VERSION}/${WINE_P}.tar.bz2 -> ${WINE_P}.tar.bz2"
-#	elif (( (_WINE_MAJOR_VERSION >= 2) && (_WINE_MINOR_VERSION == 0) )); then
-#		SRC_URI="${SRC_URI}
-#			https://dl.winehq.org/wine/source/${_WINE_MAJOR_VERSION}.0/${WINE_P}.tar.xz -> ${WINE_P}.tar.xz"
-#	else
-#		SRC_URI="${SRC_URI}
-#			https://dl.winehq.org/wine/source/${_WINE_MAJOR_VERSION}.x/${WINE_P}.tar.xz -> ${WINE_P}.tar.xz"
-#	fi
-#	((_WINE_IS_STAGING)) && SRC_URI="${SRC_URI}
-#			https://github.com/wine-staging/wine-staging/archive/v${WINE_STAGING_PV}${_WINE_STAGING_SUFFIX}.tar.gz -> ${WINE_STAGING_P}.tar.gz"
-#fi
+if [[ "${WINE_PV}" != "9999" ]]; then
+	if (( !_WINE_IS_STAGING && _WINE_IS_STABLE && WINE_IS_RC_VERSION && !_WINE_IS_STABLE_BASE )); then
+		# Pull Wine RC intermediate stable versions from alternate Github repository...
+		SRC_URI="${SRC_URI}
+			https://github.com/mstefani/wine-stable/archive/${WINE_PN}-${WINE_PV}.tar.gz -> ${WINE_P}.tar.gz"
+	elif (( (_WINE_MAJOR_VERSION < 2) || ((_WINE_VERSION_COMPONENT_COUNT == 2) && (_WINE_MAJOR_VERSION == 2) && (_WINE_MINOR_VERSION == 0)) )); then
+		# The base Wine 2.0 release tarball was bzip2 compressed - switching to xz shortly after...
+		SRC_URI="${SRC_URI}
+			https://dl.winehq.org/wine/source/${_WINE_MAJOR_VERSION}.${_WINE_MINOR_VERSION}/${WINE_P}.tar.bz2 -> ${WINE_P}.tar.bz2"
+	elif (( (_WINE_MAJOR_VERSION >= 2) && (_WINE_MINOR_VERSION == 0) )); then
+		SRC_URI="${SRC_URI}
+			https://dl.winehq.org/wine/source/${_WINE_MAJOR_VERSION}.0/${WINE_P}.tar.xz -> ${WINE_P}.tar.xz"
+	else
+		SRC_URI="${SRC_URI}
+			https://dl.winehq.org/wine/source/${_WINE_MAJOR_VERSION}.x/${WINE_P}.tar.xz -> ${WINE_P}.tar.xz"
+	fi
+	((_WINE_IS_STAGING)) && SRC_URI="${SRC_URI}
+			https://github.com/wine-staging/wine-staging/archive/v${WINE_STAGING_PV}${_WINE_STAGING_SUFFIX}.tar.gz -> ${WINE_STAGING_P}.tar.gz"
+fi
 
 # INTERNAL HELPER wine.eclass Git support function definitions
 
@@ -1083,7 +1083,8 @@ wine_staging_git_src_unpack() {
 	if [[ -n "${EGIT_OVERRIDE_COMMIT_WINE_STAGING_WINE_STAGING:-${EGIT_OVERRIDE_BRANCH_WINE_STAGING_WINE_STAGING}}" ]]; then
 		# References are relative to Wine Staging git tree (Wine Staging Git tree -> Wine Git tree)
 		# Use env variables "EGIT_OVERRIDE_COMMIT_WINE_STAGING_WINE_STAGING" or "EGIT_OVERRIDE_BRANCH_WINE_STAGING_WINE_STAGING" to reference Wine Staging git tree
-		#588604 Use git-r3 internal functions for secondary Wine Staging repository
+		# Use git-r3 internal functions for secondary Wine Staging repository
+		# See: https://bugs.gentoo.org/588604
 		ebegin "(subshell): Wine Staging git reference specified. Building Wine git with Wine Staging patchset ..."
 		(
 			EGIT_CHECKOUT_DIR="${_WINE_STAGING_DIR}" EGIT_REPO_URI="${EGIT_REPO_WINE_STAGING}" git-r3_src_unpack
@@ -1096,7 +1097,8 @@ wine_staging_git_src_unpack() {
 	else
 		# References are relative to Wine git tree (Wine Git tree -> Wine Staging Git tree)
 		# Use env variables "EGIT_OVERRIDE_COMMIT_WINE" or "EGIT_OVERRIDE_BRANCH_WINE" to reference Wine git tree
-		#588604 Use git-r3 internal functions for secondary Wine Staging repository
+		# Use git-r3 internal functions for secondary Wine Staging repository
+		# See: https://bugs.gentoo.org/588604
 		ebegin "(subshell): Wine git reference specified or inferred. Building Wine git with with Wine Staging patchset ..."
 		(
 			git-r3_src_unpack
@@ -1130,11 +1132,11 @@ _wine_env_vcs_variable_prechecks() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
 	local _env_error=0
-	#if [[ -n "${EGIT_COMMIT:-${EGIT_BRANCH}}" || -n "${EGIT_WINE_COMMIT:-${EGIT_WINE_BRANCH}}" ]]; then
-	#	_env_error=1
-	#elif [[ -n "${EGIT_STAGING_COMMIT:-${EGIT_STAGING_BRANCH}}" ]]; then
-	#	_env_error=$((_WINE_IS_STAGING))
-	#fi
+	if [[ -n "${EGIT_COMMIT:-${EGIT_BRANCH}}" || -n "${EGIT_WINE_COMMIT:-${EGIT_WINE_BRANCH}}" ]]; then
+		_env_error=1
+	elif [[ -n "${EGIT_STAGING_COMMIT:-${EGIT_STAGING_BRANCH}}" ]]; then
+		_env_error=$((_WINE_IS_STAGING))
+	fi
 
 	if (( _env_error )); then
 		eerror "To override fetched wine repository properties, use:"
@@ -1183,11 +1185,11 @@ _wine_build_environment_prechecks() {
 		ewarn "and are no longer supported byGentoo's Toolchain Team."
 		ewarn "If your ebuild fails the compiler checks in the src-configure phase then:"
 		ewarn "update your compiler, switch to <sys-devel-gcc-5.0.x or >=sys-devel/gcc-5.4.x"
-		ewarn "See https://bugs.gentoo.org/610752"
+		ewarn "See: https://bugs.gentoo.org/610752"
 	fi
 	if use abi_x86_32 && use opencl && [[ "$(eselect opencl show 2>/dev/null)" == "intel" ]]; then
 		eerror "You cannot build wine with USE=+opencl because dev-util/intel-ocl-sdk is 64-bit only."
-		eerror "See https://bugs.gentoo.org/487864"
+		eerror "See: https://bugs.gentoo.org/487864"
 		eerror
 		return 1
 	fi
@@ -1209,7 +1211,8 @@ _wine_gcc_specific_pretests() {
 	_gcc_major_version=$(gcc-major-version)
 	_gcc_minor_version=$(gcc-minor-version)
 
-	#549768 sys-devel/gcc-5 miscompiles ms_abi functions (breaks app-emulation/wine)
+	# sys-devel/gcc-5 miscompiles ms_abi functions (breaks app-emulation/wine)
+	# See: https://bugs.gentoo.org/549768
 	if (( _using_abi_x86_64 && (_gcc_major_version == 5 && _gcc_minor_version <= 2) )); then
 		ebegin "(subshell): checking for =sys-devel/gcc-5.1.x , =sys-devel/gcc-5.2.0 MS X86_64 ABI compiler bug ..."
 		$(tc-getCC) -O2 "${WORKDIR}/${WINE_EBUILD_COMMON_P%/}/files/pr66838.c" -o "${T}/pr66838" \
@@ -1221,13 +1224,14 @@ _wine_gcc_specific_pretests() {
 			eerror "Please re-emerge wine using an unaffected version of gcc or apply"
 			eerror "Re-emerge the latest =sys-devel/gcc-5.2.0 ebuild,"
 			eerror "or use gcc-config to select a different compiler version."
-			eerror "See https://bugs.gentoo.org/549768"
+			eerror "See: https://bugs.gentoo.org/549768"
 			eerror
 			return 1
 		fi
 	fi
 
-	#574044 sys-devel/gcc-5.3.0 miscompiles app-emulation/wine
+	# sys-devel/gcc-5.3.0 miscompiles app-emulation/wine
+	# See: https://bugs.gentoo.org/574044
 	if (( _using_abi_x86_64 && (_gcc_major_version == 5) && (_gcc_minor_version == 3) )); then
 		ebegin "(subshell): checking for =sys-devel/gcc-5.3.0 X86_64 misaligned stack compiler bug ..."
 		# Compile in a subshell to prevent "Aborted" message
@@ -1235,7 +1239,7 @@ _wine_gcc_specific_pretests() {
 			eerror "(subshell): =sys-devel/gcc-5.3.0 X86_64 misaligned stack compiler bug detected."
 			eerror "Please re-emerge the latest =sys-devel/gcc-5.3.0 ebuild,"
 			eerror "or use gcc-config to select a different compiler version."
-			eerror "See https://bugs.gentoo.org/574044"
+			eerror "See: https://bugs.gentoo.org/574044"
 			eerror
 			return 1
 		fi
@@ -1464,10 +1468,14 @@ wine_eapply_staging_patchset() {
 	ewarn "should explicitly state that Wine Staging was used."
 
 	# Declare Wine Staging excluded patchsets
-	_staging_exclude_patchsets=( "configure-OSMesa" "winhlp32-Flex_Workaround" )
+	_staging_exclude_patchsets=(
+		"configure-OSMesa"
+		"winemenubuilder-Desktop_Icon_Path" # See: https://bugs.gentoo.org/652176
+		"winhlp32-Flex_Workaround"
+	)
 	use gstreamer && _staging_exclude_patchsets+=( "quartz-NULL_TargetFormat" )
 	if [[ "${WINE_PV}" == "2.2" ]]; then
-		# https://bugs.winehq.org/show_bug.cgi?id=42512
+		# See: https://bugs.winehq.org/show_bug.cgi?id=42512
 		_staging_exclude_patchsets+=( "wined3d-buffer_create" )
 	fi
 
@@ -1476,12 +1484,13 @@ wine_eapply_staging_patchset() {
 	fi
 
 	if has faudio ${IUSE} && use faudio; then
+		# https://bugs.gentoo.org/681218
 		_staging_exclude_patchsets+=( "xaudio2_7-CreateFX-FXEcho" "xaudio2_7-WMA_support" "xaudio2_CommitChanges" "winepulse-PulseAudio_Support" "xaudio2-revert" )
 	fi
 
 	use pipelight || _staging_exclude_patchsets+=( "Pipelight" )
 	if [[ "${WINE_PV}" == "1.9.5" ]]; then
-		#577198
+		# https://bugs.gentoo.org/577198
 		use nls || _staging_exclude_patchsets+=( "makefiles-Disabled_Rules" )
 	fi
 
@@ -1574,7 +1583,10 @@ wine_eapply_esync_patchset() {
 		"e2411ebecb13b1005c4d0a528056c9b8a1719049" "d1a7b681ead5fdf10bc2001d9841b7ad9b09423b"
 		"461b5e56f95eb095d97e4af1cb1c5fd64bb2862a" "608d086f1b1bb7168e9322c65224c23f34e75f29"
 		"4538a137e089240f1981f0d6f82fb8d63a65f4f6" "b934f6626ed7cb8a6cc18b261550d363a0068141"
-		"fc17535eb98a4b200d6a418337a7e280568c7cfd"
+		"fc17535eb98a4b200d6a418337a7e280568c7cfd" "f181d5ce82470639459555cd59a076963861a61d"
+		"d637640f9af4ccfb6639361fc548d4bbeaafeb6f" "b664ae8e60e08224cdc3025c28a37cb22356aaa4"
+		"9bfbb4866231f9c2e6e22e23037c54c5702dd634" "6d2d3595c0ea08d915df5fef506fe3679ffa8051"
+		"321d26cbb4404ee63df439759cbc5a546434dde6" "87012607688f730755ee91de14620e6e3b78395c"
 	)
 
 	case "${WINE_PV}" in
@@ -1599,7 +1611,7 @@ wine_eapply_esync_patchset() {
 		3.19)
 			_rebased_patchset="2f17e0112dc0af3f0b246cf377e2cb8fd7a6cf58"
 			;;
-		3.2[0-1]|4.[0-3]|4.0.1-rc*|4.0.1|4.0.2-rc*|4.0.2|4.0.3-rc*|4.0.3)
+		3.2[0-1]|4.[0-3]|4.0.1-rc*|4.0.1|4.0.2-rc*|4.0.2|4.0.3-rc*|4.0.3|4.0.4-rc*|4.0.4)
 			_rebased_patchset="2600ecd4edfdb71097105c74312f83845305a4f2"
 			;;
 		4.4)
@@ -1632,8 +1644,17 @@ wine_eapply_esync_patchset() {
 		4.21)
 			_rebased_patchset="b934f6626ed7cb8a6cc18b261550d363a0068141"
 			;;
-		5.0-rc[1-6])
+		5.0-rc[1-6]|5.[0-4])
 			_rebased_patchset="fc17535eb98a4b200d6a418337a7e280568c7cfd"
+			;;
+		5.5)
+			_rebased_patchset="d637640f9af4ccfb6639361fc548d4bbeaafeb6f"
+			;;
+		5.6)
+			_rebased_patchset="321d26cbb4404ee63df439759cbc5a546434dde6"
+			;;
+		5.[7-9]|5.1[0-9])
+			_rebased_patchset="87012607688f730755ee91de14620e6e3b78395c"
 			;;
 		9999)
 			if ((_WINE_IS_STAGING)); then
@@ -1670,7 +1691,7 @@ wine_eapply_esync_patchset() {
 	if ((_WINE_IS_STABLE)); then
 		ewarn "using wine-stable"
 		case "${WINE_PV}" in
-			4.0.3-rc*|4.0.3|4.0.4-rc*|4.0.4|4.0.5-rc*|4.0.5)
+			4.0.3-rc*|4.0.3|4.0.4-rc*|4.0.4)
 				_apply_sed_fix=1
 				;;
 			9999)
@@ -1836,19 +1857,21 @@ wine_add_stock_gentoo_patches() {
 	local _patch_directory="${WORKDIR}/${WINE_EBUILD_COMMON_P%/}/patches"
 
 	PATCHES+=(
-		"${_patch_directory}/wine-1.8-multislot-apploader.patch" #310611
+		"${_patch_directory}/wine-1.8-multislot-apploader.patch" # https://bugs.gentoo.org/310611
 	)
 
 	case "${WINE_PV}" in
 		1.8|1.8.[12]|1.9.[0-8]|9999)
-			PATCHES+=( "${_patch_directory}/wine-1.9.9-sysmacros.patch" );; #580046
+			# https://bugs.gentoo.org/580046
+			PATCHES+=( "${_patch_directory}/wine-1.9.9-sysmacros.patch" );;
 		*)
 			;;
 	esac
 
 	case "${WINE_PV}" in
 		1.8|1.8.[1-3]|1.9.[0-8]|1.9.1[0-2]|9999)
-			PATCHES+=( "${_patch_directory}/wine-1.9.13-gnutls-3.5-compat.patch" ) #587028
+			# https://bugs.gentoo.org/587028
+			PATCHES+=( "${_patch_directory}/wine-1.9.13-gnutls-3.5-compat.patch" )
 			;;
 		*)
 			;;
@@ -1856,18 +1879,20 @@ wine_add_stock_gentoo_patches() {
 
 	use truetype && case "${WINE_PV}" in
 		1.8*|1.9*|2.0.[12]|2.0.[12]-rc[1-9]|2.[0-9]|2.1[1-7]|9999)
+			# https://bugs.gentoo.org/631676
 			PATCHES+=(
-				"${_patch_directory}/wine-2.18-freetype-2.8.1-segfault.patch"    #631676
-				"${_patch_directory}/wine-2.18-freetype-2.8.1-drop-glyphs.patch" #631676
+				"${_patch_directory}/wine-2.18-freetype-2.8.1-segfault.patch"
+				"${_patch_directory}/wine-2.18-freetype-2.8.1-drop-glyphs.patch"
 			)
-			PATCHES_BIN+=( "${_patch_directory}/wine-2.18-freetype-2.8.1-implement_minimum_em_size_required_by_opentype_1.8.2.patch" ) #631376
+			PATCHES_BIN+=( "${_patch_directory}/wine-2.18-freetype-2.8.1-implement_minimum_em_size_required_by_opentype_1.8.2.patch" )
 			;;
 		*)
 			;;
 	esac
 	use osmesa && case "${WINE_PV}" in
 		1.8*|1.9*|2.0.[1-4]|2.0.[1-4]-rc[1-9]|2.0.5-rc1|2.[0-6]|9999)
-			PATCHES+=( "${_patch_directory}/wine-2.7-osmesa-configure_support_recent_versions.patch" ) #429386
+			# https://bugs.gentoo.org/429386
+			PATCHES+=( "${_patch_directory}/wine-2.7-osmesa-configure_support_recent_versions.patch" )
 			;;
 		*)
 			;;
@@ -1875,7 +1900,7 @@ wine_add_stock_gentoo_patches() {
 
 	use cups && case "${WINE_PV}" in
 		1.8|1.8.[1-3]|1.9.[0-9]|1.9.1[0-3]|9999)
-			# https://bugs.winehq.org/show_bug.cgi?id=40851
+			# See: https://bugs.winehq.org/show_bug.cgi?id=40851
 			PATCHES+=( "${_patch_directory}/wine-1.9.14-cups-2.2-cupsgetppd-build-fix.patch" )
 			;;
 		*)
@@ -1884,15 +1909,20 @@ wine_add_stock_gentoo_patches() {
 
 	use pcap && case "${WINE_PV}" in
 		1.8*|1.9*|2.0.[1-2]|2.0.[1-2]-rc[1-9]|2.[0-9]|2.1[0-2]|9999)
-			# https://bugs.winehq.org/show_bug.cgi?id=40851
 			PATCHES+=( "${_patch_directory}/wine-2.13-fix_build_with_newer_pcap.patch" )
+			# See: https://bugs.gentoo.org/697650
+			PATCHES+=( "${_patch_directory}/wine-4.3-fix_build_with_newer_pcap.patch" )
+			;;
+		2.1[3-9]|2.2[0-2]|3.*|4.[0-2])
+			# See: https://bugs.gentoo.org/697650
+			PATCHES+=( "${_patch_directory}/wine-4.3-fix_build_with_newer_pcap.patch" )
 			;;
 		*)
 			;;
 	esac
 
 	use gstreamer && case "${WINE_PV}" in
-		# https://bugs.winehq.org/show_bug.cgi?id=31836
+		# See: https://bugs.winehq.org/show_bug.cgi?id=31836
 		1.8.[2-7])
 			PATCHES+=( "${_patch_directory}/wine-1.8-gstreamer-1.0_"{01,02,03,04,05,06,07,09,10,11}".patch" )
 			;;
@@ -1925,7 +1955,7 @@ wine_add_locale_docs() {
 # @DESCRIPTION:
 # This function fixes Gentoo Portage compiler (cc) multilib support.
 # Applied to all Wine versions.
-# See: #395615
+# See: https://bugs.gentoo.org/395615
 wine_fix_gentoo_cc_multilib_support() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1944,7 +1974,7 @@ wine_fix_gentoo_cc_multilib_support() {
 # @DESCRIPTION:
 # This function fixes Wine compilation, when using -O3 in CFLAGS.
 # Applied to all Wine versions.
-# See: #480508
+# See: https://bugs.gentoo.org/480508 , https://bugs.gentoo.org/703024
 wine_fix_gentoo_O3_compilation_support() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1957,7 +1987,7 @@ wine_fix_gentoo_O3_compilation_support() {
 # @FUNCTION: wine_fix_gentoo_winegcc_support
 # @DESCRIPTION:
 # This function fixes Gentoo Portage winegcc multilib support, applied to all Wine versions.
-# See: #260726
+# See: https://bugs.gentoo.org/260726 , https://bugs.gentoo.org/703024
 wine_fix_gentoo_winegcc_support() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -2017,6 +2047,35 @@ ${_WINE_AWK_FIX_BLOCK_SCOPE_LITERALS}"
 		|| die "awk failed"
 }
 
+# @FUNCTION: wine_winecfg_about_enhancement
+# @DESCRIPTION:
+# Improve formatting of Wine version, displayed on about tab, of the builtin winecfg utility.
+wine_winecfg_about_enhancement() {
+	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
+
+	sed -i -e '/#include "config.h"/d' \
+		-e '/#include <windows.h>/ i #include "config.h"' \
+		-e '/[ ]-MulDiv([[:digit:]][[:digit:]], GetDeviceCaps(hDC, LOGPIXELSY), 72),$/{s/24,/16,/}' \
+		-e '/^[ ]*SetWindowTextA(hWnd, [_[:upper:]]*);$/{s/PACKAGE_NAME/PACKAGE_STRING/}' \
+		-e '/^[ ]*SetDlgItemTextA(hDlg, IDC_ABT_PANEL_TEXT, PACKAGE_VERSION);$/d' \
+		-e '/IDC_ABT_PANEL_TEXT/d' \
+		-e '/wine_get_version/d' \
+		-e '/SendDlgItemMessageW(hDlg, IDC_ABT_TITLE_TEXT, WM_SETFONT, (WPARAM)titleFont, TRUE);$/ a SetDlgItemTextA(hDlg, IDC_ABT_TITLE_TEXT, PACKAGE_STRING);' \
+		"programs/winecfg/about.c" || die "sed failed"
+
+	sed -i -e '/IDC_ABT_PANEL_TEXT/d' \
+		"programs/winecfg/resource.h" || die "sed failed"
+	sed -i -e '/#include "config.h"/d' \
+		-e '/#include "resource.h"/ i #include "config.h"' \
+		-e '/^[ ]*LTEXT[ ]*/{s/".*",IDC_ABT_TITLE_TEXT,105,30,55,30/"",IDC_ABT_TITLE_TEXT,100,30,200,20/}' \
+		-e '/^[ ]*LTEXT[ ]*"",IDC_ABT_PANEL_TEXT,160,43,140,8$/d' \
+		-e '/IDC_ABT_WEB_LINK,"SysLink", LWS_TRANSPARENT, /{s/105,53,106,8$/100,53,106,8/}' \
+		-e '/^[ ]*IDC_ABT_LICENSE_TEXT,/{s/105,64,145,66$/100,64,145,66/}' \
+		"programs/winecfg/winecfg.rc" || die "sed failed"
+
+	einfo "Called wine_winecfg_about_enhancement"
+}
+
 # @FUNCTION: wine_support_wine_mono_downgrade
 # @DESCRIPTION:
 # This function fixes installation of an earlier version of Wine Mono, to a WINEPREFIX,
@@ -2042,7 +2101,8 @@ wine_support_wine_mono_downgrade() {
 wine_src_prepare_generate_64bit_manpages() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
-	#617864 Generate wine64 man pages for 64-bit bit only installation
+	# Generate wine64 man pages for 64-bit bit only installation
+	# See: https://bugs.gentoo.org/617864
 	find "${S%/}/loader" -type f -name "wine.*man.in" -exec sh -c 'mv "${1}" "${1/\/wine./\/wine64.}"' sh "{}" \; \
 		|| die "find (mv) failed"
 	sed -i -e '\|wine\.[^[:blank:]]*man\.in|{s|wine\.|wine64\.|g}' "${S%/}/loader/Makefile.in" \

@@ -78,7 +78,7 @@ src_prepare() {
 
 	# For some reason avx is causing issues,
 	# so disable it if '-march' is used.
-	if is-flag "-march=*"; then
+	if [ $(is-flag "-march=*") = "true" ]; then
 		append-flags "-mno-avx"
 	fi
 

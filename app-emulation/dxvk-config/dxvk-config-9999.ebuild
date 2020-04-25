@@ -40,14 +40,11 @@ fi
 # Convert PV to not doted integer
 PVINT=$(echo "${PV//./}")
 # Restore winelib builds that were removed after 1.6.1.
+PATCHES=()
 if [[ "${PVINT}" -gt "161" ]]; then
-	PATCHES=(
-		"${FILESDIR}/dxvk-restore-winelib.patch"
-		"${FILESDIR}/flags.patch"
-		"${FILESDIR}/add-dxvk_config-library.patch"
-	)
+	PATCHES+=("${FILESDIR}/dxvk-restore-winelib.patch")
 else
-	PATCHES=(
+	PATCHES+=(
 		"${FILESDIR}/flags.patch"
 		"${FILESDIR}/add-dxvk_config-library.patch"
 	)
@@ -60,7 +57,7 @@ src_prepare() {
 
 	# For some reason avx is causing issues,
 	# so disable it if '-march' is used.
-	if is-flag "-march=*"; then
+	if [ $(is-flag "-march=*") = "true" ]; then
 		append-flags "-mno-avx"
 	fi
 

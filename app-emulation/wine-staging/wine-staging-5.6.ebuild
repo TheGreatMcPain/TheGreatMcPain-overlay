@@ -98,7 +98,10 @@ COMMON_DEPEND="
 	truetype? ( >=media-libs/freetype-2.0.5[${MULTILIB_USEDEP}] )
 	udev? ( virtual/libudev:=[${MULTILIB_USEDEP}] )
 	udisks? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
-	unwind? ( sys-libs/libunwind[${MULTILIB_USEDEP}] )
+	unwind? (
+		sys-libs/libunwind[${MULTILIB_USEDEP}] ||
+		sys-libs/llvm-libunwind[${MULTILIB_USEDEP}]
+	)
 	vkd3d? ( >=app-emulation/vkd3d-1.1[${MULTILIB_USEDEP}] )
 	v4l? ( media-libs/libv4l[${MULTILIB_USEDEP}] )
 	vaapi? ( x11-libs/libva:=[drm,X?,${MULTILIB_USEDEP}] )

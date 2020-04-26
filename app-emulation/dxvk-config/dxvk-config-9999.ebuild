@@ -43,12 +43,11 @@ PVINT=$(echo "${PV//./}")
 PATCHES=()
 if [[ "${PVINT}" -gt "161" ]]; then
 	PATCHES+=("${FILESDIR}/dxvk-restore-winelib.patch")
-else
-	PATCHES+=(
-		"${FILESDIR}/flags.patch"
-		"${FILESDIR}/add-dxvk_config-library.patch"
-	)
 fi
+PATCHES+=(
+	"${FILESDIR}/flags.patch"
+	"${FILESDIR}/add-dxvk_config-library.patch"
+)
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 

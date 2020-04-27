@@ -14,7 +14,7 @@ IMGUI_COMMIT="96a2c4619b0c8009f684556683b2e1b6408bb0dc"
 if [[ ${PV} == "9999" ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/flightlessmango/MangoHud.git"
-	EGIT_SUBMODULES=("-*")
+	EGIT_SUBMODULES=(-*)
 	SRC_URI="https://github.com/flightlessmango/imgui/archive/${IMGUI_COMMIT}.tar.gz"
 else
 	SRC_URI="https://github.com/flightlessmango/MangoHud/archive/v${PV}.tar.gz \
@@ -42,10 +42,6 @@ fi
 
 src_unpack() {
 	default
-
-	if [[ ${PV} == "9999" ]]; then
-		git-r3_src_unpack
-	fi
 
 	mv "${WORKDIR}"/imgui-"${IMGUI_COMMIT}"/* \
 		"${S}/modules/ImGui/src/"

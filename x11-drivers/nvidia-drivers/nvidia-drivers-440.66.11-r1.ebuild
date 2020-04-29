@@ -566,7 +566,7 @@ pkg_preinst() {
 	if use driver && use kernel_linux; then
 		linux-mod_pkg_preinst
 
-		local videogroup="$(egetent group video | cut -d ':' -f 3)"
+		local videogroup="$(getent group video | cut -d ':' -f 3)"
 		if [ -z "${videogroup}" ]; then
 			eerror "Failed to determine the video group gid"
 			die "Failed to determine the video group gid"

@@ -1,6 +1,6 @@
 # About the DXVK and Wine-Staging ebuilds
 
-## Wine-Staging
+## Wine-Staging ebuilds
 
 The `wine-staging` ebuilds are based on the wine-vanilla ebuild from [bobwya's overlay](https://github.com/bobwya/bobwya), but have the dependences from wine-staging added.
 
@@ -12,11 +12,11 @@ These ebuilds require bobwya's overlay to be enabled. `# layman -a bobwya`
 I've also added a `mingw` useflag to `wine-staging` which uses the `--with-mingw` configure
 option in wine to build some DLLs as Windows native PE files.
 [(Requires a mingw toolchain)](#setting-up-mingw-in-gentoo)\
-More info on this can be found in [Wine's 5.0 announcement.](https://www.winehq.org/announce/5.0)
+More info on PE DLLs can be found in [Wine's 5.0 announcement.](https://www.winehq.org/announce/5.0)
 
 By default `mingw` is off which will use `--without-mingw`.\
 
-## DXVK
+## DXVK ebuilds
 
 The DXVK ebuilds are based on [pchome's dxvk-gentoo-overlay](https://github.com/pchome/dxvk-gentoo-overlay).
 
@@ -51,10 +51,12 @@ In order to setup a mingw toolchain you'll need to install `crossdev` first.
 
 Then we can create a `i686-w64-mingw32` and `x86_64-w64-mingw32` toolchain like so.
 
-`# crossdev -S -t i686-w64-mingw32`\
-`# crossdev -S -t x86_64-w64-mingw32`
+`# crossdev -S --libc ">=7.0.0" -t i686-w64-mingw32`\
+`# crossdev -S --libc ">=7.0.0" -t x86_64-w64-mingw32`
 
-If you want to use unstable version's of (binutils, glibc, gcc) you can exclude `-S` from the commands above.
+The `-S` option tells crossdev to install stable versions of binutils, gcc, etc.\
+`--libc ">=7.0.0"` tells crossdev to install libc versions that are newer, or equal to 7.0.0 in this case the libc is `mingw64-runtime`.\
+The `-t` option stands for target.
 
 Now in order for our new toolchains to build DXVK we need to enable pthread support.\
 We'll also go ahead and enable `dwarf2` for better performance in 32-bit DXVK.

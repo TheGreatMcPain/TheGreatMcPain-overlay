@@ -46,36 +46,6 @@ fi
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 
-pkg_pretend() {
-	ewarn ""
-	ewarn "This is the winelib version of dxvk."
-	ewarn "As of version after 1.6.1 winelib has been completely"
-	ewarn "removed from upstream, and is no longer supported."
-	ewarn ""
-	ewarn "This ebuild restores winelib builds after 1.6.1."
-	ewarn "So, if you run into any build related problems"
-	ewarn "DO NOT REPORT THEM TO UPSTREAM."
-	ewarn ""
-	ewarn "You may report winelib build issues to my gentoo overlay at:"
-	ewarn "<https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay>"
-	ewarn ""
-}
-
-pkg_setup() {
-	ewarn ""
-	ewarn "This is the winelib version of dxvk."
-	ewarn "As of version after 1.6.1 winelib has been completely"
-	ewarn "removed from upstream, and is no longer supported."
-	ewarn ""
-	ewarn "This ebuild restores winelib builds after 1.6.1."
-	ewarn "So, if you run into any build related problems"
-	ewarn "DO NOT REPORT THEM TO UPSTREAM."
-	ewarn ""
-	ewarn "You may report winelib build issues to my gentoo overlay at:"
-	ewarn "<https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay>"
-	ewarn ""
-}
-
 src_prepare() {
 	if use dxvk-config; then
 		PATCHES+=(
@@ -141,4 +111,24 @@ multilib_src_install_all() {
 	dodoc "${S}/dxvk.conf"
 
 	einstalldocs
+}
+
+pkg_postinst() {
+	ewarn ""
+	ewarn "This is the winelib version of dxvk."
+	ewarn "As of version after 1.6.1 winelib has been completely"
+	ewarn "removed from upstream, and is no longer supported."
+	ewarn ""
+	ewarn "This ebuild restores winelib builds after 1.6.1."
+	ewarn "So, if you run into any build related problems"
+	ewarn "DO NOT REPORT THEM TO UPSTREAM."
+	ewarn ""
+	ewarn "You may report winelib build issues to my gentoo overlay at:"
+	ewarn "<https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay>"
+	ewarn ""
+	elog ""
+	elog "dxvk installed, but not activated. You have to install the DLLs to a WINEPREFIX."
+	elog "To do this you just need to set WINEPREFIX: $ export WINEPREFIX=/path/to/prefix"
+	elog "then run: $ ${PN}-setup --symlink"
+	elog ""
 }

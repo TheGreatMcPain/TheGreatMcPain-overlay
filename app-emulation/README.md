@@ -20,12 +20,10 @@ By default `mingw` is off which will use `--without-mingw`.\
 
 The DXVK ebuilds are based on [pchome's dxvk-gentoo-overlay](https://github.com/pchome/dxvk-gentoo-overlay).
 
-They have been modified so that they are no longer slotted.
-
-The dxvk-config ebuilds are mainly for Proton since Proton's wine-dxgi uses it to read
+The dxvk-config useflag is mainly for Proton since Proton's wine-dxgi uses it to read
 certain dxgi related dxvk.conf options that normally require dxvk's version of dxgi
 (this allows vkd3d and dxvk to co-exist), and I like to use my dxvk ebuilds in self-built
-Proton installations. (I might just add a use flag for this in the dxvk ebuilds.)
+Proton installations.
 
 The mingw variants use Mingw compilers (Which is the upstream supported way to build them),
 and the non-mingw varients will use winelib
@@ -33,7 +31,10 @@ and the non-mingw varients will use winelib
 [1.6.1](https://github.com/doitsujin/dxvk/commit/436357e28096f5e1e25aa8b72fceb77123ea8404))\
 I've added a patch to the ebuilds that restore winelib builds for versions newer than 1.6.1.
 
-DO NOT REPORT WINELIB BUILD BUGS TO UPSTREAM.
+DO NOT REPORT WINELIB BUILD ISSUES TO UPSTREAM.
+
+Please report build issues (preferably) [to the Gitlab repo](https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay), or
+to the [Github mirror](https://github.com/TheGreatMcPain/TheGreatMcPain-overlay).
 
 [See below section on how to setup a mingw toolchain.](#setting-up-mingw-in-gentoo)
 

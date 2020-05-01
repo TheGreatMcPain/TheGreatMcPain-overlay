@@ -1,0 +1,72 @@
+diff --git a/setup_dxvk.sh b/setup_dxvk.sh
+index a9105f75..13f6d7e4 100755
+--- a/setup_dxvk.sh
++++ b/setup_dxvk.sh
+@@ -17,7 +17,7 @@ uninstall)
+   ;;
+ *)
+   echo "Unrecognized action: $action"
+-  echo "Usage: $0 [install|uninstall] [--without-dxgi] [--with-d3d10] [--symlink]"
++  echo "Usage: $0 [install|uninstall] [--without-dxgi] [--with-d3d10] [--with-config] [--symlink]"
+   exit 1
+ esac
+ 
+@@ -26,6 +26,7 @@ shift
+ 
+ with_dxgi=true
+ with_d3d10=false
++with_config=false
+ file_cmd="cp -v"
+ 
+ while (($# > 0)); do
+@@ -36,6 +37,9 @@ while (($# > 0)); do
+   "--with-d3d10")
+     with_d3d10=true
+     ;;
++  "--with-config")
++    with_config=true
++    ;;
+   "--symlink")
+     file_cmd="ln -s -v"
+     ;;
+@@ -123,11 +127,13 @@ installFile() {
+   fi
+ 
+   if [ -n "$1" ]; then
+-    if [ -f "${dstfile}" ] || [ -h "${dstfile}" ]; then
+-      if ! [ -f "${dstfile}.old" ]; then
++    if [ -f "${dstfile}" ] || [ -h "${dstfile}" ] || [ ${3} = "dxvk_config" ]; then
++      if ! [ -f "${dstfile}.old" ] && ! [ ${3} = "dxvk_config" ]; then
+         mv -v "${dstfile}" "${dstfile}.old"
+       else
+-        rm -v "${dstfile}"
++        if ! [ ${3} = "dxvk_config" ]; then
++            rm -v "${dstfile}"
++        fi
+       fi
+       $file_cmd "${srcfile}" "${dstfile}"
+     else
+@@ -157,9 +163,11 @@ uninstallFile() {
+     return 1
+   fi
+ 
+-  if [ -f "${dstfile}.old" ]; then
++  if [ -f "${dstfile}.old" ] || [ ${3} = "dxvk_config" ]; then
+     rm -v "${dstfile}"
+-    mv -v "${dstfile}.old" "${dstfile}"
++    if ! [ ${3} = "dxvk_config" ]; then
++        mv -v "${dstfile}.old" "${dstfile}"
++    fi
+     return 0
+   else
+     return 1
+@@ -209,5 +217,9 @@ if $with_d3d10 || [ "$action" == "uninstall" ]; then
+   $action d3d10_1
+ fi
+ 
++if $with_config || [ "$action" == "uninstall" ]; then
++  $action dxvk_config
++fi
++
+ $action d3d10core
+ $action d3d11

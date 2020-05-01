@@ -22,7 +22,7 @@ fi
 
 LICENSE="ZLIB"
 SLOT=0
-
+IUSE="custom-flags dxvk-config"
 RESTRICT="test strip"
 
 RDEPEND="
@@ -37,9 +37,7 @@ if [[ ${PV} != "9999" ]] ; then
 	S="${WORKDIR}/dxvk-${PV}"
 fi
 
-PATCHES=(
-	"${FILESDIR}/flags.patch"
-)
+PATCHES=()
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
 
@@ -73,6 +71,15 @@ pkg_setup() {
 }
 
 src_prepare() {
+	if use dxvk-config; then
+		PATCHES+=(
+			"${FILESDIR}/add-dxvk_config-mingw-library.patch"
+			"${FILESDIR}/add-dxvk_config-to-setup.patch"
+		)
+	fi
+	if use custom-flags; then
+		PATCHES+=("${FILESDIR}/flags-mingw.patch")
+	fi
 	default
 
 	# For some reason avx is causing issues,
@@ -107,6 +114,9 @@ src_prepare() {
 }
 
 multilib_src_configure() {
+	# If we use portage's strip FEATURE it will
+	# try to use the native strip program, so let meson
+	# do the stripping.
 	local emesonargs=(
 		--cross-file="${S}/build-win$(bits).txt"
 		--libdir="$(get_libdir)/dxvk-mingw"

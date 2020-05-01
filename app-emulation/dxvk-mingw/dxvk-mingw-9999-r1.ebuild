@@ -46,9 +46,14 @@ dxvk_check_mingw() {
 	use abi_x86_64 && categories+=("cross-x86_64-w64-mingw32")
 	use abi_x86_32 && categories+=("cross-i686-w64-mingw32")
 
+	# Check if pthread is enabled on mingw toolchains. (from tastytea's overlay)
+	local thread_model="$(LC_ALL=C ${cat}-gcc -v 2>&1 \
+							| grep 'Thread model' | cut -d' ' -f3)"
+
 	for cat in ${categories[@]}; do
 		if ! has_version -b "${cat}/mingw64-runtime[libraries]" ||
-				! has_version -b "${cat}/gcc"; then
+				! has_version -b "${cat}/gcc" ||
+				[[ "${thread_model}" != "posix" ]]; then
 			eerror "The ${cat} toolchain is not properly installed."
 			eerror "Make sure to install ${cat}/gcc with:"
 			eerror "EXTRA_ECONF=\"--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2\""

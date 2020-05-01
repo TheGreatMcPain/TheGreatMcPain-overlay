@@ -47,7 +47,7 @@ dxvk_check_mingw() {
 	use abi_x86_32 && categories+=("cross-i686-w64-mingw32")
 
 	# Check if pthread is enabled on mingw toolchains. (from tastytea's overlay)
-	local thread_model="$(LC_ALL=C ${cat}-gcc -v 2>&1 \
+	local thread_model="$(LC_ALL=C ${categories//cross-/}-gcc -v 2>&1 \
 							| grep 'Thread model' | cut -d' ' -f3)"
 
 	for cat in ${categories[@]}; do

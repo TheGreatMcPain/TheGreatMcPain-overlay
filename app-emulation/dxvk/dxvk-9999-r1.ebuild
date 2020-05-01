@@ -116,7 +116,7 @@ multilib_src_install_all() {
 pkg_postinst() {
 	ewarn ""
 	ewarn "This is the winelib version of dxvk."
-	ewarn "As of version after 1.6.1 winelib has been completely"
+	ewarn "As of versions greater than 1.6.1 winelib has been completely"
 	ewarn "removed from upstream, and is no longer supported."
 	ewarn ""
 	ewarn "This ebuild restores winelib builds after 1.6.1."

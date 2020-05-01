@@ -22,7 +22,7 @@ fi
 
 LICENSE="ZLIB"
 SLOT=0
-IUSE="custom-flags dxvk-config"
+IUSE="custom-cflags dxvk-config"
 RESTRICT="test"
 
 RDEPEND="
@@ -83,7 +83,7 @@ src_prepare() {
 			"${FILESDIR}/add-dxvk_config-to-setup.patch"
 		)
 	fi
-	if use custom-flags; then
+	if use custom-cflags; then
 		PATCHES+=("${FILESDIR}/flags.patch")
 	fi
 	default

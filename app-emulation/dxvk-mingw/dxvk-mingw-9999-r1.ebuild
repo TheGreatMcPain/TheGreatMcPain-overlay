@@ -12,6 +12,7 @@ HOMEPAGE="https://github.com/doitsujin/dxvk"
 
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"
+	EGIT_BRANCH="master"
 	inherit git-r3
 	SRC_URI=""
 else

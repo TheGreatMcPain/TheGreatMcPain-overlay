@@ -9,20 +9,16 @@ PLOCALE_BACKUP="en"
 
 inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchain-funcs virtualx wine xdg-utils-r1
 
-#if [[ "${WINE_PV}" == "9999" ]]; then
-#	#EGIT_REPO_URI="https://source.winehq.org/git/wine.git"
-#	EGIT_OVERRIDE_BRANCH_LUTRIS_WINE="lutris-5.0-rc3"
-#	EGIT_REPO_URI="https://github.com/lutris/wine.git"
-#	inherit git-r3
-#else
-#	KEYWORDS="-* ~amd64 ~x86"
-#fi
-
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
-EGIT_BRANCH="lutris-fshack-5.6"
-#EGIT_COMMIT="fef11c12242ecaae5b267e42bb5f3856a1d51920"
-KEYWORDS="-* ~amd64 ~x86"
+if [ -z ${EGIT_BRANCH+x} ]; then
+	EGIT_BRANCH="lutris-fshack-5.6"
+fi
+if [[ ${PV} = "9999" ]]; then
+	KEYWORDS=""
+else
+	KEYWORDS="-* ~amd64 ~x86"
+fi
 
 DESCRIPTION="Free implementation of Windows(tm) on Unix, Staging patchset."
 HOMEPAGE="https://www.winehq.org/"
@@ -370,4 +366,20 @@ multilib_src_install_all() {
 	fi
 
 	wine_make_variant_wrappers
+}
+
+pkg_postinst() {
+	einfo ""
+	einfo "This ebuild pulls it's sources from ${EGIT_REPO_URI}."
+	einfo "Which is the sources that are used for the lutris wine runtimes."
+	einfo ""
+	einfo "By default we are using the ${EGIT_BRANCH} branch."
+	einfo "If you want you can change branches by setting the EGIT_BRANCH variable"
+	einfo "to a different branch using 'package.env'."
+	einfo "I would recommend using the '9999' version for that though."
+	einfo ""
+	einfo "The reason I use version numbers rather than just a '9999'"
+	einfo "version is to prevent smart-live-rebuild from wanting to rebuild"
+	einfo "wine-staging every time it checks for updates."
+	einfo ""
 }

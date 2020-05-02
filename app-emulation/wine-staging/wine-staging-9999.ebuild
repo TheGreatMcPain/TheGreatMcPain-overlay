@@ -369,6 +369,7 @@ multilib_src_install_all() {
 }
 
 pkg_postinst() {
+	wine_pkg_postinst
 	einfo ""
 	einfo "This ebuild pulls it's sources from ${EGIT_REPO_URI}."
 	einfo "Which is the sources that are used for the lutris wine runtimes."

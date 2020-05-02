@@ -376,10 +376,9 @@ pkg_postinst() {
 	einfo "By default we are using the ${EGIT_BRANCH} branch."
 	einfo "If you want you can change branches by setting the EGIT_BRANCH variable"
 	einfo "to a different branch using 'package.env'."
-	einfo "I would recommend using the '9999' version for that though."
 	einfo ""
-	einfo "The reason I use version numbers rather than just a '9999'"
-	einfo "version is to prevent smart-live-rebuild from wanting to rebuild"
-	einfo "wine-staging every time it checks for updates."
+	einfo "Since this ebuild uses bobwya's wine-eselect it is possible to"
+	einfo "add this wine-staging ebuild to your own local overlay,"
+	einfo "and name it 'wine-staging-9999_p1.ebuild' to have multiple slotted '9999' versions."
 	einfo ""
 }

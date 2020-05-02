@@ -11,5 +11,9 @@
 		<flag name="clang">Enable c-family semantic completion via libclang.</flag>
 		<flag name="rust">Enable rust semantic completion via rls.</flag>
 		<flag name="go">Enable Go semantic completion via <pkg>dev-go/gopls</pkg>.</flag>
+		<flag name="typescript">
+			Enable TypeScript semantic completion via <pkg>dev-node/typescript</pkg>.
+			(Also works with JavaScript.)
+		</flag>
 	</use>
 </pkgmetadata>

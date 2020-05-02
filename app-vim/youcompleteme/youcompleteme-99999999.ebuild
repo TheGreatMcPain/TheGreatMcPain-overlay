@@ -42,7 +42,7 @@ EGIT_SUBMODULES=(
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS=""
-IUSE="clang doc test rust go"
+IUSE="clang doc test rust go typescript"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 COMMON_DEPEND="
@@ -83,6 +83,9 @@ DEPEND="
 	)
 	go? (
 		dev-go/gopls
+	)
+	typescript? (
+		dev-node/typescript
 	)
 	test? (
 		$(python_gen_cond_dep '
@@ -141,6 +144,11 @@ src_compile() {
 	if use go ; then
 		cd "${S}"/third_party/ycmd || die "Failed to move to ycmd directory"
 		patch -p1 -i "${FILESDIR}"/go.patch || die "Failed to apply go.patch"
+	fi
+
+	if use typescript; then
+		cd "${S}"/third_party/ycmd || die "Failed to move to ycmd directory"
+		patch -p1 -i "${FILESDIR}"/typescript.patch || die "Failed to apply typescript.patch"
 	fi
 }
 

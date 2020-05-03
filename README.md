@@ -11,7 +11,7 @@ This overlay also has the profile: `thegreatmcpain:default/linux/amd64/17.1/desk
 Bobwya's overlay is required since my wine-staging is based on their wine-vanilla ebuild.\
 (which currently pulls from [lutris' wine repo.](https://github.com/lutris/wine/tree/lutris-fshack-5.6))
 
-It can be install via: `layman -a bobwya`
+It can be installed via: `layman -a bobwya`
 
 #### Layman
 

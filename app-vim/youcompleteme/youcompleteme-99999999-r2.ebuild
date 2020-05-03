@@ -7,6 +7,11 @@ PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit eutils cmake-utils git-r3 multilib python-single-r1 vim-plugin
 
+# Store Current Eclipse JDT Langauge Server Version
+# that will be compared with ycmd during src_prepare().
+JDTLS_MILESTONE="0.54.0"
+JDTLS_BUILD_STAMP="202004152304"
+
 DESCRIPTION="vim plugin: a code-completion engine for Vim"
 HOMEPAGE="http://valloric.github.io/YouCompleteMe/"
 EGIT_REPO_URI="https://github.com/Valloric/YouCompleteMe.git"
@@ -39,11 +44,23 @@ EGIT_SUBMODULES=(
 	'-third_party/python-future'
 )
 
-LICENSE="GPL-3"
+LICENSE="
+	GPL-3
+	java? (
+		EPL-2.0
+	)
+"
 SLOT="0"
 KEYWORDS=""
-IUSE="clang doc test rust go typescript mono"
+IUSE="clang doc rust go typescript mono java"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
+RESTRICT="test"
+
+SRC_URI="
+	java? (
+		http://download.eclipse.org/jdtls/snapshots/jdt-language-server-${JDTLS_MILESTONE}-${JDTLS_BUILD_STAMP}.tar.gz
+	)
+"
 
 COMMON_DEPEND="
 	${PYTHON_DEPS}
@@ -90,13 +107,8 @@ DEPEND="
 	mono? (
 		dev-dotnet/omnisharp-roslyn-http-bin
 	)
-	test? (
-		$(python_gen_cond_dep '
-			>=dev-python/mock-1.0.1[${PYTHON_MULTI_USEDEP}]
-			>=dev-python/nose-1.3.0[${PYTHON_MULTI_USEDEP}]
-			dev-cpp/gmock
-			dev-cpp/gtest
-		')
+	java? (
+		>=virtual/jdk-1.8
 	)
 "
 
@@ -107,13 +119,50 @@ VIM_PLUGIN_HELPFILES="${PN}"
 
 src_unpack() {
 	git-r3_src_unpack
+	if use java; then
+		mkdir -p "${WORKDIR}/jdt-language-server"
+		cd "${WORKDIR}/jdt-language-server"
+		unpack "jdt-language-server-${JDTLS_MILESTONE}-${JDTLS_BUILD_STAMP}.tar.gz"
+		local JDTLS_LOCATION="${S}/third_party/ycmd/third_party/eclipse.jdt.ls/target/repository"
+		elog "Copying JDT files to YouCompleteMe."
+		mkdir -p "${JDTLS_LOCATION}"
+		cp -r "${WORKDIR}"/jdt-language-server/{config_linux,features,plugins} "${JDTLS_LOCATION}"
+	fi
 }
 
 src_prepare() {
 	default
 
-	if ! use test ; then
-		sed -i '/^add_subdirectory( tests )/d' third_party/ycmd/cpp/ycm/CMakeLists.txt || die
+	if use java; then
+		# taken from vim-youcompleteme-git AUR package.
+		elog "Checking Eclipse JDT Language Server version."
+		local milestone_current=$(egrep '^JDTLS_MILESTONE' "${S}/third_party/ycmd/build.py" | sed -e "s/.* = //g" -e "s/'//g")
+		local buildstamp_current=$(egrep '^JDTLS_BUILD_STAMP' "${S}/third_party/ycmd/build.py" | sed -e "s/.* = //g" -e "s/'//g")
+		local outofdate=0
+
+		# Check if JDTLS_MILESTONE, and JDTLS_BUILD_STAMP match up with ycmd's build.py
+		if [ ${JDTLS_BUILD_STAMP} != ${buildstamp_current} ]; then
+			eerror ""
+			eerror "JDTLS_BUILD_STAMP is out of date."
+			eerror "Please change JDTLS_BUILD_STAMP to '${buildstamp_current}' in the ebuild."
+			eerror ""
+			outofdate=1
+		fi
+		if [ ${JDTLS_MILESTONE} != ${milestone_current} ]; then
+			eerror ""
+			eerror "JDTLS_MILESTONE is out of date."
+			eerror "Please change JDTLS_MILESTONE to '${milestone_current}' in the ebuild."
+			eerror ""
+			outofdate=2
+		fi
+
+		if [ $outofdate -eq 1 ]; then
+			die "JDTLS_BUILD_STAMP doesn't match ycmd's 'build.py'."
+		fi
+
+		if [ $outofdate -eq 2 ]; then
+			die "JDTLS_MILESTONE and JDTLS_BUILD_STAMP don't match with ycmd's 'build.py'."
+		fi
 	fi
 
 	# sed -i '/^#! python3.7/d' third_party/ycmd/third_party/cregex/tools/build_regex_unicode.py
@@ -160,19 +209,6 @@ src_compile() {
 	fi
 }
 
-src_test() {
-	cd "${S}/third_party/ycmd/cpp/ycm/tests"
-	LD_LIBRARY_PATH="${EROOT}"/usr/$(get_libdir)/llvm \
-		./ycm_core_tests || die
-
-	cd "${S}"/python/ycm
-
-	local dirs=( "${S}"/third_party/*/ "${S}"/third_party/ycmd/third_party/*/ )
-	local -x PYTHONPATH=${PYTHONPATH}:$(IFS=:; echo "${dirs[*]}")
-
-	nosetests --verbose || die
-}
-
 src_install() {
 	use doc && dodoc *.md third_party/ycmd/*.md
 	dodoc *.md third_party/ycmd/*.md
@@ -184,6 +220,12 @@ src_install() {
 	use clang && (rm third_party/ycmd/third_party/clang/lib/libclang.so* || die)
 
 	vim-plugin_src_install
+
+	if use java; then
+		# Force the java completion engine to create its workspace at /tmp instead which is writable
+		# to everyone. (taken from AUR package.)
+		dosym /tmp "/usr/share/vim/vimfiles/third_party/ycmd/third_party/eclipse.jdt.ls/workspace"
+	fi
 
 	python_optimize "${ED}"
 	python_fix_shebang "${ED}"

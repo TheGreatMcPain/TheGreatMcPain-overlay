@@ -18,5 +18,8 @@
 		<flag name="mono">
 			Enable C# semantic completion via <pkg>dev-dotnet/omnisharp-roslyn-http-bin</pkg>.
 		</flag>
+		<flag name="java">
+			Enable Java semantic completion via Eclipse JDT Language Server.
+		</flag>
 	</use>
 </pkgmetadata>

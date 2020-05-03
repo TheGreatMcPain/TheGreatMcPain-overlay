@@ -15,5 +15,8 @@
 			Enable TypeScript semantic completion via <pkg>dev-node/typescript</pkg>.
 			(Also works with JavaScript.)
 		</flag>
+		<flag name="mono">
+			Enable C# semantic completion via <pkg>dev-dotnet/omnisharp-roslyn-http-bin</pkg>.
+		</flag>
 	</use>
 </pkgmetadata>

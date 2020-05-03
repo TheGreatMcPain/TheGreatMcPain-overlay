@@ -10,7 +10,7 @@ index a80e6989..00fe03f7 100644
 -  os.path.abspath( os.path.dirname( __file__ ) ),
 -  '..', '..', '..', 'third_party', 'omnisharp-roslyn'
 -)
-+PATH_TO_ROSLYN_OMNISHARP = os.path.join('/','opt','omnisharp-roslyn-http')
++PATH_TO_ROSLYN_OMNISHARP = os.path.join('/','opt','omnisharp-roslyn-http-bin')
  PATH_TO_OMNISHARP_ROSLYN_BINARY = os.path.join(
 -  PATH_TO_ROSLYN_OMNISHARP, 'Omnisharp.exe' )
 +  PATH_TO_ROSLYN_OMNISHARP, 'OmniSharp.exe' )

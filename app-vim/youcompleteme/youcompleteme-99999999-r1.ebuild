@@ -42,7 +42,7 @@ EGIT_SUBMODULES=(
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS=""
-IUSE="clang doc test rust go typescript"
+IUSE="clang doc test rust go typescript mono"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 COMMON_DEPEND="
@@ -86,6 +86,9 @@ DEPEND="
 	)
 	typescript? (
 		dev-node/typescript
+	)
+	mono? (
+		dev-dotnet/omnisharp-roslyn-http-bin
 	)
 	test? (
 		$(python_gen_cond_dep '
@@ -149,6 +152,11 @@ src_compile() {
 	if use typescript; then
 		cd "${S}"/third_party/ycmd || die "Failed to move to ycmd directory"
 		patch -p1 -i "${FILESDIR}"/typescript.patch || die "Failed to apply typescript.patch"
+	fi
+
+	if use mono; then
+		cd "${S}"/third_party/ycmd || die "Failed to move to ycmd directory"
+		patch -p1 -i "${FILESDIR}"/omnisharp.patch || die "Failed to apply omnisharp.patch"
 	fi
 }
 

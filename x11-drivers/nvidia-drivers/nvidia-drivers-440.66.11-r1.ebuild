@@ -86,6 +86,9 @@ QA_PREBUILT="opt/* usr/lib*"
 S=${WORKDIR}/
 PATCHES=(
 	"${FILESDIR}"/${PN}-440.26-locale.patch
+	# Taken from AUR package which took from:
+	# https://gitlab.com/snippets/1945940
+	"${FILESDIR}"/vulkan-kernel-5.6.patch
 )
 nvidia_drivers_versions_check() {
 	CONFIG_CHECK=""

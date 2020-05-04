@@ -24,7 +24,7 @@ fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE=""
+IUSE="video_cards_nvidia"
 
 DEPEND="
 	dev-python/mako[${PYTHON_USEDEP}]
@@ -32,6 +32,9 @@ DEPEND="
 	dev-util/vulkan-headers
 	media-libs/vulkan-loader[${MULTILIB_USEDEP}]
 	media-libs/libglvnd[$MULTILIB_USEDEP]
+	video_cards_nvidia? (
+		x11-drivers/nvidia-drivers[${MULTILIB_USEDEP},static-libs]
+	)
 "
 
 RDEPEND="${DEPEND}"
@@ -56,6 +59,7 @@ multilib_src_configure() {
 		-Dappend_libdir_mangohud=false
 		-Duse_system_vulkan=enabled
 		-Dinclude_doc=false
+		-Dwith_xnvctrl=$(usex video_cards_nvidia true false)
 	)
 	meson_src_configure
 }

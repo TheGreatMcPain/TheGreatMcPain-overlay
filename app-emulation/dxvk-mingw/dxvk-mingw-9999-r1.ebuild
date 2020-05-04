@@ -149,6 +149,6 @@ pkg_postinst() {
 	elog ""
 	elog "dxvk installed, but not activated. You have to install the DLLs to a WINEPREFIX."
 	elog "To do this you just need to set WINEPREFIX: $ export WINEPREFIX=/path/to/prefix"
-	elog "then run: $ ${PN}-setup --symlink"
+	elog "then run: $ ${PN}-setup install --symlink"
 	elog ""
 }

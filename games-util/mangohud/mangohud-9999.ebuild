@@ -59,7 +59,7 @@ multilib_src_configure() {
 		-Dappend_libdir_mangohud=false
 		-Duse_system_vulkan=enabled
 		-Dinclude_doc=false
-		-Dwith_xnvctrl=$(usex video_cards_nvidia true false)
+		-Dwith_xnvctrl=$(usex video_cards_nvidia enabled disabled)
 	)
 	meson_src_configure
 }

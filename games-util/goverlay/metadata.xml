@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sixsupersonic@gmail.com</email>
+	</maintainer>
+	<use>
+		<flag name="vulkan">Use <pkg>dev-util/vulkan-tools</pkg> for vulkan preview.</flag>
+		<flag name="opengl">Use <pkg>x11-apps/mesa-progs</pkg> for opengl preview.</flag>
+		<flag name="mangohud">Install <pkg>games-util/mangohud</pkg>.</flag>
+	</use>
+</pkgmetadata>

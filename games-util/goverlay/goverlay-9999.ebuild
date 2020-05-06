@@ -5,8 +5,8 @@ EAPI=7
 
 inherit desktop xdg-utils
 
-DESCRIPTION=""
-HOMEPAGE=""
+DESCRIPTION="GOverlay is an opensource project that aims to create a Graphical UI to help manage Linux overlays."
+HOMEPAGE="https://github.com/benjamimgois/goverlay"
 if [[ ${PV} = "9999" ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/benjamimgois/goverlay.git"
@@ -16,7 +16,7 @@ else
 	KEYWORDS="~amd64 ~x86"
 fi
 
-LICENSE=""
+LICENSE="GPL-3"
 SLOT="0"
 IUSE="opengl vulkan mangohud"
 

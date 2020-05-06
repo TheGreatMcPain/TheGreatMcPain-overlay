@@ -60,13 +60,15 @@ The `-S` option tells crossdev to install stable versions of binutils, gcc, etc.
 `--libc ">=7.0.0"` tells crossdev to install libc versions that are newer, or equal to 7.0.0 in this case the libc is `mingw64-runtime`. The `-t` option stands for target.
 
 Now in order for our new toolchains to build DXVK we need to enable pthread support.\
-We'll also go ahead and enable `dwarf2` for better performance in 32-bit DXVK.
+We'll also go ahead and enable `dwarf2` in i686-w64-mingw32 for better performance in 32-bit DXVK.
 
 `# mkdir /etc/portage/{env,package.env}`
 
 `# echo EXTRA_ECONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2" > /etc/portage/env/mingw32_threads_dwarf2`
 
-`# echo -e 'cross-i686-w64-mingw32/gcc mingw32_threads_dwarf2\ncross-x86_64-w64-mingw32/gcc mingw32_threads_dwarf2' > /etc/portage/package.env/mingw32_threads_dwarf2`
+`# echo EXTRA_ECONF="--enable-threads=posix" > /etc/portage/env/mingw32_threads`
+
+`# echo -e 'cross-i686-w64-mingw32/gcc mingw32_threads_dwarf2\ncross-x86_64-w64-mingw32/gcc mingw32_threads' > /etc/portage/package.env/mingw32`
 
 Will also need to enable the `libraries` useflag in `mingw64-runtime`.
 

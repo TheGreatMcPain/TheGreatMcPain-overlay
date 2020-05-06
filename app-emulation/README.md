@@ -64,9 +64,9 @@ We'll also go ahead and enable `dwarf2` in i686-w64-mingw32 for better performan
 
 `# mkdir /etc/portage/{env,package.env}`
 
-`# echo EXTRA_ECONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2" > /etc/portage/env/mingw32_threads_dwarf2`
+`# echo 'EXTRA_ECONF=\"--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2\"' > /etc/portage/env/mingw32_threads_dwarf2`
 
-`# echo EXTRA_ECONF="--enable-threads=posix" > /etc/portage/env/mingw32_threads`
+`# echo 'EXTRA_ECONF=\"--enable-threads=posix\"' > /etc/portage/env/mingw32_threads`
 
 `# echo -e 'cross-i686-w64-mingw32/gcc mingw32_threads_dwarf2\ncross-x86_64-w64-mingw32/gcc mingw32_threads' > /etc/portage/package.env/mingw32`
 

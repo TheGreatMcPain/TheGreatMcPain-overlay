@@ -4,8 +4,6 @@ Just a bunch of stuff I wanted to install which were not available in other over
 
 You may want to read about the stuff in [app-emulation](app-emulation/README.md) though.
 
-This overlay also has the profile: `thegreatmcpain:default/linux/amd64/17.1/desktop/systemd`
-
 ### Installation
 
 Bobwya's overlay is required since my wine-staging is based on their wine-vanilla ebuild.\

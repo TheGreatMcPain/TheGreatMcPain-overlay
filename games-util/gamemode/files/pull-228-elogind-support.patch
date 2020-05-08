@@ -197,7 +197,7 @@ index 99380e7..fbf325e 100644
  # The daemon can be disabled if necessary, allowing multilib builds of the
  # main library
 -if with_daemon == true
-+if sd_bus_provider != 'no-dameon'
++if sd_bus_provider != 'no-daemon'
      # inih currently only needed by the daemon
      inih_dependency = dependency(
          'inih',

@@ -89,8 +89,6 @@ multilib_src_configure() {
 	else
 		local emesonargs=(
 			-Dwith-sd-bus-provider="no-daemon"
-			-Dwith-util=false
-			-Dwith-examples=false
 		)
 	fi
 

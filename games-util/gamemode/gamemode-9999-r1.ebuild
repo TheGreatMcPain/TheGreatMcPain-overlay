@@ -41,6 +41,8 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 
+PATCHES=("${FILESDIR}/pull-228-elogind-support.patch")
+
 pkg_pretend() {
 	elog
 	elog "GameMode needs a kernel capable of SCHED_ISO to use its soft realtime"
@@ -72,13 +74,6 @@ pkg_pretend() {
 	elog "For more info look at:"
 	elog "https://github.com/FeralInteractive/gamemode/blob/${GAMEMODE_GIT_PTR}/README.md"
 	elog
-}
-
-src_prepare() {
-	if use elogind; then
-		PATCHES=("${FILESDIR}/pull-228-elogind-support.patch")
-	fi
-	default
 }
 
 multilib_src_configure() {

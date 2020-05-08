@@ -33,7 +33,7 @@ RDEPEND="
 		>=sys-apps/systemd-236[${MULTILIB_USEDEP}]
 	)
 	elogind? (
-		sys-auth/elogind[${MULTILIB_USEDEP}]
+		sys-auth/elogind
 	)
 	sys-auth/polkit
 	acct-group/gamemode

@@ -22,12 +22,22 @@ fi
 
 LICENSE="BSD"
 SLOT="0"
-IUSE=""
+IUSE="systemd elogind"
+
+REQUIRED_USE="
+	?? ( elogind systemd )
+"
 
 RDEPEND="
-	>=sys-apps/systemd-236[${MULTILIB_USEDEP}]
+	systemd? (
+		>=sys-apps/systemd-236[${MULTILIB_USEDEP}]
+	)
+	elogind? (
+		sys-auth/elogind[${MULTILIB_USEDEP}]
+	)
 	sys-auth/polkit
 	acct-group/gamemode
+	dev-libs/inih[${MULTILIB_USEDEP}]
 "
 DEPEND="${RDEPEND}"
 
@@ -64,7 +74,26 @@ pkg_pretend() {
 	elog
 }
 
+src_prepare() {
+	if use elogind; then
+		PATCHES=("${FILESDIR}/pull-228-elogind-support.patch")
+	fi
+	default
+}
+
 multilib_src_configure() {
+	if multilib_is_native_abi; then
+		local emesonargs=(
+			-Dwith-sd-bus-provider=$(usex systemd "systemd" "elogind")
+		)
+	else
+		local emesonargs=(
+			-Dwith-sd-bus-provider="no-daemon"
+			-Dwith-util=false
+			-Dwith-examples=false
+		)
+	fi
+
 	meson_src_configure
 }
 

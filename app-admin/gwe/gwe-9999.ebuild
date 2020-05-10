@@ -37,7 +37,7 @@ RDEPEND="
 	$(python_gen_cond_dep '
 		dev-python/injector[${PYTHON_MULTI_USEDEP}]
 		dev-python/matplotlib[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/peewee-3.13.1[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/peewee-3.13.2[${PYTHON_MULTI_USEDEP}]
 		dev-python/py3nvml[${PYTHON_MULTI_USEDEP}]
 		dev-python/pygobject:3[${PYTHON_MULTI_USEDEP}]
 		>=dev-python/python-xlib-0.26[${PYTHON_MULTI_USEDEP}]

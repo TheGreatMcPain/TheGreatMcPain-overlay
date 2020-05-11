@@ -18,7 +18,7 @@ fi
 
 LICENSE="GPL-3"
 SLOT="0"
-IUSE="opengl vulkan mangohud"
+IUSE="opengl vulkan mangohud vkbasalt"
 
 DEPEND="
 	opengl? (
@@ -29,6 +29,9 @@ DEPEND="
 	)
 	mangohud? (
 		games-util/mangohud
+	)
+	vkbasalt? (
+		games-util/vkbasalt
 	)
 "
 

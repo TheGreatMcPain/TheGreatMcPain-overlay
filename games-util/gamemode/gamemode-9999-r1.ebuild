@@ -105,8 +105,9 @@ pkg_postinst() {
 	elog "# gpasswd -a USER gamemode  # with USER = your user name"
 	elog
 
-	elog "Enable and start the daemon in your systemd user instance, then add"
-	elog "LD_PRELOAD=\$LD_PRELOAD:/usr/\$LIB/libgamemodeauto.so %command%"
+	elog "Enable and start the daemon in your systemd user instance,"
+	elog "or simply run 'gamemoded -d' if using OpenRC, then add"
+	elog "gamemoderun %command%"
 	elog "to the start options of any steam game to enable the performance"
 	elog "governor as you start the game."
 	elog

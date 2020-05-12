@@ -40,6 +40,7 @@ if [[ "${PVINT}" -gt "161" ]]; then
 	PATCHES+=(
 		"${FILESDIR}/dxvk-restore-winelib.patch"
 		"${FILESDIR}/dxvk-restore-spec-files.patch"
+		"${FILESDIR}/dxvk-revert-remove-vulkanfn.patch"
 	)
 fi
 

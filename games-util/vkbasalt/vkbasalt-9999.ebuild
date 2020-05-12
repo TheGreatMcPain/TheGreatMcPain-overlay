@@ -31,9 +31,9 @@ RDEPEND="!<media-libs/vulkan-loader-1.1:=[${MULTILIB_USEDEP},layers]
 
 BDEPEND="!<dev-util/vulkan-headers-1.1
 	dev-util/glslang
-	>=dev-util/reshade-fx-4.5.4
+	>=dev-util/reshade-fx-4.5.4[${MULTILIB_USEDEP}]
 	>=dev-util/meson-0.49
-	x11-libs/libX11"
+	x11-libs/libX11[${MULTILIB_USEDEP}]"
 
 DEPEND="${RDEPEND}"
 

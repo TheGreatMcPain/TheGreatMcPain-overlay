@@ -22,8 +22,8 @@ headers = [
   'source/effect_token.hpp',
 ]
 
-# Static lib
-static_library('reshade-fx', sources, include_directories: [ '/usr/include/spirv/unified1' ], install: true)
+# Shared lib
+shared_library('reshade-fx', sources, include_directories: [ '/usr/include/spirv/unified1' ], install: true)
 
 # Headers
 install_headers(headers, subdir : 'reshade')

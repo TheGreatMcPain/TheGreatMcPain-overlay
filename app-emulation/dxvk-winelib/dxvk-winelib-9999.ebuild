@@ -54,7 +54,7 @@ src_prepare() {
 		)
 	fi
 	if use custom-cflags; then
-		PATCHES+=("${FILESDIR}/flags.patch")
+		PATCHES+=("${FILESDIR}/flags-winelib.patch")
 	fi
 	default
 
@@ -67,12 +67,12 @@ src_prepare() {
 	replace-flags "-O3" "-O3 -fno-stack-protector"
 
 	# Create versioned setup script
-	cp "setup_dxvk.sh" "dxvk-setup"
-	sed -e "s#basedir=.*#basedir=\"${EPREFIX}/usr\"#" -i "dxvk-setup" || die
+	cp "setup_dxvk.sh" "${PN}-setup"
+	sed -e "s#basedir=.*#basedir=\"${EPREFIX}/usr\"#" -i "${PN}-setup" || die
 
 	bootstrap_dxvk() {
 		# Set DXVK location for each ABI
-		sed -e "s#x$(bits)#$(get_libdir)/dxvk#" -i "${S}/dxvk-setup" || die
+		sed -e "s#x$(bits)#$(get_libdir)/${PN}#" -i "${S}/${PN}-setup" || die
 
 		# Add *FLAGS to cross-file
 		sed -i \
@@ -86,17 +86,21 @@ src_prepare() {
 
 	# Clean missed ABI in setup script
 	sed -e "s#.*x32.*##" -e "s#.*x64.*##" \
-		-i "dxvk-setup" || die
+		-i "${PN}-setup" || die
 }
 
 multilib_src_configure() {
 	local emesonargs=(
 		--cross-file="${S}/build-wine$(bits).txt"
-		--libdir="$(get_libdir)/dxvk"
-		--bindir="$(get_libdir)/dxvk/bin"
+		--libdir="$(get_libdir)/${PN}"
+		--bindir="$(get_libdir)/${PN}/bin"
 		-Denable_tests=false
 	)
 	meson_src_configure
+}
+
+multilib_src_compile() {
+	meson_src_compile
 }
 
 multilib_src_install() {
@@ -106,7 +110,7 @@ multilib_src_install() {
 multilib_src_install_all() {
 	# create combined setup helper
 	exeinto /usr/bin
-	doexe "${S}/dxvk-setup"
+	doexe "${S}/${PN}-setup"
 
 	dodoc "${S}/dxvk.conf"
 

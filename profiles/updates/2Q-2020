@@ -1,0 +1,2 @@
+move app-emulation/dxvk app-emulation/dxvk-winelib
+move app-emulation/dxvk-mingw app-emulation/dxvk

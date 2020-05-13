@@ -134,7 +134,7 @@ index 00000000..3e207d9b
 +  override_options    : ['cpp_std='+dxvk_cpp_std])
 +
 +install_headers('dxvk_config.h',
-+  subdir              : 'dxvk-mingw')
++  subdir              : 'dxvk-winelib')
 +
 +dxvk_config_dep = declare_dependency(
 +  link_with           : [ dxvk_config_dll ],

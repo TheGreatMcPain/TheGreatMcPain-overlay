@@ -53,8 +53,10 @@ In order to setup a mingw toolchain you'll need to install `crossdev` first.
 
 Then we can create a `i686-w64-mingw32` and `x86_64-w64-mingw32` toolchain like so.
 
-`# crossdev -S --libc ">=7.0.0" -t i686-w64-mingw32`\
-`# crossdev -S --libc ">=7.0.0" -t x86_64-w64-mingw32`
+```
+# crossdev -S --libc ">=7.0.0" -t i686-w64-mingw32
+# crossdev -S --libc ">=7.0.0" -t x86_64-w64-mingw32
+```
 
 The `-S` option tells crossdev to install stable versions of binutils, gcc, etc.\
 `--libc ">=7.0.0"` tells crossdev to install libc versions that are newer, or equal to 7.0.0 in this case the libc is `mingw64-runtime`. The `-t` option stands for target.
@@ -62,29 +64,37 @@ The `-S` option tells crossdev to install stable versions of binutils, gcc, etc.
 Now in order for our new toolchains to build DXVK we need to enable pthread support.\
 We'll also go ahead and enable `dwarf2` in i686-w64-mingw32 for better performance in 32-bit DXVK.
 
-`# mkdir /etc/portage/{env,package.env}`
+```
+# mkdir /etc/portage/{env,package.env}
 
-`# echo 'EXTRA_ECONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2"' > /etc/portage/env/mingw32_threads_dwarf2`
+# echo 'EXTRA_ECONF="--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2"' > /etc/portage/env/mingw32_threads_dwarf2
 
-`# echo 'EXTRA_ECONF="--enable-threads=posix"' > /etc/portage/env/mingw32_threads`
+# echo 'EXTRA_ECONF="--enable-threads=posix"' > /etc/portage/env/mingw32_threads
 
-`# echo -e 'cross-i686-w64-mingw32/gcc mingw32_threads_dwarf2\ncross-x86_64-w64-mingw32/gcc mingw32_threads' > /etc/portage/package.env/mingw32`
+# echo -e 'cross-i686-w64-mingw32/gcc mingw32_threads_dwarf2\ncross-x86_64-w64-mingw32/gcc mingw32_threads' > /etc/portage/package.env/mingw32
+```
 
 Will also need to enable the `libraries` useflag in `mingw64-runtime`.
 
-`# echo -e 'cross-i686-mingw32/mingw64-runtime libraries\ncross-x86_64-mingw32/mingw64-runtime libraries' > /etc/portage/package.use/mingw64-runtime`
+```
+# echo -e 'cross-i686-mingw32/mingw64-runtime libraries\ncross-x86_64-mingw32/mingw64-runtime libraries' > /etc/portage/package.use/mingw64-runtime
+```
 
 Now we need to recompile `mingw64-runtime` first then `gcc`, because `mingw64-runtime` with the `libraries` useflag provides `pthread.h` which is needed to compile `gcc` with POSIX threads.
 
-`emerge -1va {cross-i686-w64-mingw32,cross-x86_64-w64-mingw32}/mingw64-runtime`\
-`emerge -1va {cross-i686-w64-mingw32,cross-x86_64-w64-mingw32}/gcc`
+```
+emerge -1va {cross-i686-w64-mingw32,cross-x86_64-w64-mingw32}/mingw64-runtime
+emerge -1va {cross-i686-w64-mingw32,cross-x86_64-w64-mingw32}/gcc
+```
 
 If everything emerged okay the final result should be:
 
-`# i686-w64-mingw32-gcc -v`\
-`# x86_64-w64-mingw32-gcc -v`\
-`...`\
-`Thread model: posix`\
-`...`
+```
+# i686-w64-mingw32-gcc -v
+# x86_64-w64-mingw32-gcc -v
+...
+Thread model: posix
+...
+```
 
 You should now be able to emerge `dxvk-mingw`, and use the `mingw` useflag in `wine-staging` without issue.

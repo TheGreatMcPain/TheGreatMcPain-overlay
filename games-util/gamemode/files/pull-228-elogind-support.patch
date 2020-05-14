@@ -1,4 +1,4 @@
-From caa046de5ce9ad9fcc7a9d9d76f6d2b84ace3c52 Mon Sep 17 00:00:00 2001
+From 1136b9b485979f6adbcbb121e993f566302a7062 Mon Sep 17 00:00:00 2001
 From: Stephan Lachnit <stephanlachnit@protonmail.com>
 Date: Sat, 25 Apr 2020 00:08:31 +0200
 Subject: [PATCH 1/2] Add option to use elogind
@@ -12,14 +12,14 @@ Signed-off-by: Stephan Lachnit <stephanlachnit@protonmail.com>
  4 files changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/daemon/gamemode-dbus.c b/daemon/gamemode-dbus.c
-index f3ba4e2..2767d8e 100644
+index f3ba4e2..839961b 100644
 --- a/daemon/gamemode-dbus.c
 +++ b/daemon/gamemode-dbus.c
 @@ -36,8 +36,13 @@ POSSIBILITY OF SUCH DAMAGE.
  #include "common-logging.h"
  #include "common-pidfds.h"
  
-+#if USE_ELOGIND
++#ifdef USE_ELOGIND
 +#include <elogind/sd-bus.h>
 +#include <elogind/sd-daemon.h>
 +#else
@@ -30,11 +30,11 @@ index f3ba4e2..2767d8e 100644
  #include <assert.h>
  #include <errno.h>
 diff --git a/daemon/meson.build b/daemon/meson.build
-index 5109db3..466204d 100644
+index d6f1a72..d328122 100644
 --- a/daemon/meson.build
 +++ b/daemon/meson.build
 @@ -17,6 +17,7 @@ gamemoded_includes += config_h_dir
- executable(
+ gamemoded = executable(
      'gamemoded',
      sources: daemon_sources,
 +    c_args: elogind_args,
@@ -42,12 +42,12 @@ index 5109db3..466204d 100644
          link_daemon_common,
          dep_threads,
 diff --git a/meson.build b/meson.build
-index a4fe817..99380e7 100644
+index 370c4d9..5334f28 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -78,9 +78,22 @@ path_includedir = join_paths(path_prefix, get_option('includedir'))
- path_libdir = join_paths(path_prefix, get_option('libdir'))
+@@ -79,9 +79,22 @@ path_libdir = join_paths(path_prefix, get_option('libdir'))
  path_libexecdir = join_paths(path_prefix, get_option('libexecdir'))
+ path_sysconfdir = join_paths(path_prefix, get_option('sysconfdir'))
  
 -# Find systemd via pkgconfig
 +# Find systemd / elogind via pkgconfig
@@ -71,7 +71,7 @@ index a4fe817..99380e7 100644
  # For the client, libdbus is used
  dep_dbus = dependency('dbus-1')
 diff --git a/meson_options.txt b/meson_options.txt
-index ef329a3..faee820 100644
+index 609036b..1c4b85c 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -1,12 +1,12 @@
@@ -88,27 +88,27 @@ index ef329a3..faee820 100644
 +option('with-elogind', type: 'boolean', description: 'Use elogind\'s Dbus library', value: false)
  option('with-dbus-service-dir', type: 'string', description: 'Explicitly set the D-BUS session directory')
  
- # General options
+ # lib dir in gamemoderun
 
-From a4b58f81e5d9dffb8e456bddd4218787268526fd Mon Sep 17 00:00:00 2001
+From 185943ac98f57880e20664f69ffe6e1e11b82a57 Mon Sep 17 00:00:00 2001
 From: Stephan Lachnit <stephanlachnit@protonmail.com>
 Date: Mon, 27 Apr 2020 10:20:49 +0200
 Subject: [PATCH 2/2] combine no-daemon, elogind and systemd option
 
 Signed-off-by: Stephan Lachnit <stephanlachnit@protonmail.com>
 ---
- daemon/meson.build |  6 +++---
+ daemon/meson.build |  4 ++--
  data/meson.build   |  2 +-
  meson.build        | 33 +++++++++++++--------------------
  meson_options.txt  |  6 +++---
- 4 files changed, 20 insertions(+), 27 deletions(-)
+ 4 files changed, 19 insertions(+), 26 deletions(-)
 
 diff --git a/daemon/meson.build b/daemon/meson.build
-index 466204d..41e6c40 100644
+index d328122..c9ab0b9 100644
 --- a/daemon/meson.build
 +++ b/daemon/meson.build
 @@ -17,11 +17,11 @@ gamemoded_includes += config_h_dir
- executable(
+ gamemoded = executable(
      'gamemoded',
      sources: daemon_sources,
 -    c_args: elogind_args,
@@ -121,18 +121,11 @@ index 466204d..41e6c40 100644
          inih_dependency,
          libdl,
      ],
-@@ -29,4 +29,4 @@ executable(
-         gamemoded_includes,
-     ],
-     install: true,
--)
-\ No newline at end of file
-+)
 diff --git a/data/meson.build b/data/meson.build
-index 3062d40..282d1d5 100644
+index bb3d014..f2f01f5 100644
 --- a/data/meson.build
 +++ b/data/meson.build
-@@ -10,7 +10,7 @@ config_example = run_command(
+@@ -18,7 +18,7 @@ config_example = run_command(
  ).stdout().strip()
  data_conf.set('GAMEMODE_EXAMPLE_CONFIG', config_example)
  
@@ -142,11 +135,11 @@ index 3062d40..282d1d5 100644
      configure_file(
          input: 'gamemoded.service.in',
 diff --git a/meson.build b/meson.build
-index 99380e7..fbf325e 100644
+index 5334f28..9648757 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -79,20 +79,15 @@ path_libdir = join_paths(path_prefix, get_option('libdir'))
- path_libexecdir = join_paths(path_prefix, get_option('libexecdir'))
+@@ -80,20 +80,15 @@ path_libexecdir = join_paths(path_prefix, get_option('libexecdir'))
+ path_sysconfdir = join_paths(path_prefix, get_option('sysconfdir'))
  
  # Find systemd / elogind via pkgconfig
 -with_systemd = get_option('with-systemd')
@@ -175,7 +168,7 @@ index 99380e7..fbf325e 100644
  endif
  
  # For the client, libdbus is used
-@@ -105,7 +100,7 @@ dep_threads = dependency('threads')
+@@ -106,7 +101,7 @@ dep_threads = dependency('threads')
  libdl = cc.find_library('dl', required: false)
  
  # Determine the location for the systemd unit
@@ -184,7 +177,7 @@ index 99380e7..fbf325e 100644
      # If the path isn't explicitly set, ask systemd for the systemd user unit directory
      path_systemd_unit_dir = get_option('with-systemd-user-unit-dir')
      if path_systemd_unit_dir == ''
-@@ -136,7 +131,6 @@ endif
+@@ -137,7 +132,6 @@ endif
  
  path_polkit_action_dir = join_paths(path_datadir, 'polkit-1', 'actions')
  
@@ -192,7 +185,7 @@ index 99380e7..fbf325e 100644
  with_examples = get_option('with-examples')
  with_util = get_option('with-util')
  
-@@ -168,7 +162,7 @@ endif
+@@ -169,7 +163,7 @@ endif
  
  # The daemon can be disabled if necessary, allowing multilib builds of the
  # main library
@@ -201,7 +194,7 @@ index 99380e7..fbf325e 100644
      # inih currently only needed by the daemon
      inih_dependency = dependency(
          'inih',
-@@ -199,7 +193,7 @@ report = [
+@@ -200,7 +194,7 @@ report = [
      '    includedir:                             @0@'.format(path_includedir),
  ]
  
@@ -210,7 +203,7 @@ index 99380e7..fbf325e 100644
  report += [
      '    systemd user unit directory:            @0@'.format(path_systemd_unit_dir),
  ]
-@@ -215,10 +209,9 @@ report += [
+@@ -216,10 +210,9 @@ report += [
      '    Options:',
      '    ========',
      '',
@@ -223,10 +216,10 @@ index 99380e7..fbf325e 100644
  
  # Output some stuff to validate the build config
 diff --git a/meson_options.txt b/meson_options.txt
-index faee820..e3cf976 100644
+index 1c4b85c..2afb767 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -1,15 +1,15 @@
+@@ -1,12 +1,13 @@
  # limits.d
  option('with-pam-group', type: 'string', description: 'Install the limits.d configuration file to allow renicing as an unpriviledged user being part of the specified group')
  
@@ -240,6 +233,9 @@ index faee820..e3cf976 100644
  # Not using systemd
 -option('with-elogind', type: 'boolean', description: 'Use elogind\'s Dbus library', value: false)
  option('with-dbus-service-dir', type: 'string', description: 'Explicitly set the D-BUS session directory')
+ 
+ # lib dir in gamemoderun
+@@ -14,5 +15,4 @@ option('with-gamemoderun-lib-dir', type: 'string', value: 'default', description
  
  # General options
  option('with-examples', type: 'boolean', description: 'Build sample programs', value: 'true')

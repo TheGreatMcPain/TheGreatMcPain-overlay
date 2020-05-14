@@ -33,7 +33,6 @@ REQUIRED_USE="
 "
 
 COMMON="
-	app-eselect/eselect-opencl
 	driver? ( kernel_linux? ( acct-group/video ) )
 	kernel_linux? ( >=sys-libs/glibc-2.6.1 )
 	tools? (
@@ -71,6 +70,7 @@ RDEPEND="
 	${COMMON}
 	acpi? ( sys-power/acpid )
 	tools? ( !media-video/nvidia-settings )
+	uvm? ( >=virtal/opencl-3 )
 	wayland? ( dev-libs/wayland[${MULTILIB_USEDEP}] )
 	X? (
 		<x11-base/xorg-server-1.20.99:=
@@ -262,7 +262,8 @@ src_install() {
 		# This file is tweaked with the appropriate video group in
 		# pkg_preinst, see bug #491414
 		insinto /etc/modprobe.d
-		newins "${FILESDIR}"/nvidia-169.07 nvidia.conf
+		newins "${FILESDIR}"/nvidia-430.conf nvidia.conf
+
 		if use uvm; then
 			doins "${FILESDIR}"/nvidia-rmmod.conf
 			udev_newrules "${FILESDIR}"/nvidia-uvm.udev-rule 99-nvidia-uvm.rules
@@ -402,6 +403,11 @@ src_install() {
 	fi
 
 	dobin ${NV_OBJ}/nvidia-bug-report.sh
+
+	systemd_dounit *.service
+	dobin nvidia-sleep.sh
+	exeinto $(systemd_get_utildir)/system-sleep
+	doexe nvidia
 
 	if has_multilib_profile && use multilib; then
 		local OABI=${ABI}
@@ -554,7 +560,6 @@ pkg_postinst() {
 	if ! use libglvnd; then
 		use X && "${ROOT}"/usr/bin/eselect opengl set --use-old nvidia
 	fi
-	"${ROOT}"/usr/bin/eselect opencl set --use-old nvidia
 
 	readme.gentoo_print_elog
 
@@ -574,6 +579,15 @@ pkg_postinst() {
 		elog "media-video/nvidia-settings"
 		elog
 	fi
+
+	elog "To enable nvidia sleep services under systemd, run these commands:"
+	elog "	systemctl enable nvidia-suspend.service"
+	elog "	systemctl enable nvidia-hibernate.service"
+	elog "	systemctl enable nvidia-resume.service"
+	elog "Set the NVreg_TemporaryFilePath kernel module parameter to a"
+	elog "suitable path in case the default of /tmp does not work for you"
+	elog "For more information see:"
+	elog "${ROOT}/usr/share/doc/${PF}/html/powermanagement.html"
 }
 
 pkg_prerm() {

@@ -7,4 +7,7 @@
 	<upstream>
 		<remote-id type="github">DadSchoorse/vkBasalt</remote-id>
 	</upstream>
+	<use>
+		<flag name="reshade-shaders">Install <pkg>dev-util/reshade-shaders</pkg>.</flag>
+	</use>
 </pkgmetadata>

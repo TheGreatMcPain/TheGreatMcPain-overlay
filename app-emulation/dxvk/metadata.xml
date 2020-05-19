@@ -10,10 +10,11 @@
   <use>
     <flag name="custom-cflags">Patches meson crossfiles to accept custom CFLAGS/CXXFLAGS.</flag>
     <flag name="dxvk-config">
-      Install Valve Proton's 'dxvk_config.dll' which is used to load some of DXVK's
-      'dxgi' into Proton's wine 'dxgi.dll'. This is for custom Proton installations,
-      but if you want to use it outside of Proton your wine build would need to be
-      patched with this commit from Valve's wine repository.:
+      Install Valve Proton's 'dxvk_config.dll' which is used to load 'dxvk.conf'
+      options 'dxgi.customVendorId', 'dxgi.customDeviceId', and 'dxgi.nvapiHack'
+      into wine without the need for DXVK's 'dxgi.dll'. This is for custom Proton
+      installations but if you want to use it outside of Proton your wine build
+      would need to be patched with this commit from Valve's wine repository.:
       https://github.com/ValveSoftware/wine/commit/84d73a7fa55c13ed797b2b2f6cfb9071dceac800#diff-fcca5e3c4012a42cc338e49e90a5bd29
     </flag>
   </use>

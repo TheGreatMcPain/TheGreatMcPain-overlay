@@ -14,17 +14,15 @@ IMGUI_COMMIT="96a2c4619b0c8009f684556683b2e1b6408bb0dc"
 if [[ ${PV} == "9999" ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/flightlessmango/MangoHud.git"
-	EGIT_SUBMODULES=("-*")
-	SRC_URI="https://github.com/flightlessmango/imgui/archive/${IMGUI_COMMIT}.tar.gz"
+	SRC_URI=""
 else
-	SRC_URI="https://github.com/flightlessmango/MangoHud/archive/v${PV}.tar.gz \
-		https://github.com/flightlessmango/imgui/archive/${IMGUI_COMMIT}.tar.gz"
+	SRC_URI="https://github.com/flightlessmango/MangoHud/releases/download/v${PV}/MangoHud-v${PV}-Source.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="-* ~amd64 ~x86"
 fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="video_cards_nvidia"
+IUSE="xnvctrl"
 
 DEPEND="
 	dev-python/mako[${PYTHON_USEDEP}]
@@ -32,26 +30,23 @@ DEPEND="
 	dev-util/vulkan-headers
 	media-libs/vulkan-loader[${MULTILIB_USEDEP}]
 	media-libs/libglvnd[$MULTILIB_USEDEP]
-	video_cards_nvidia? (
+	xnvctrl? (
 		x11-drivers/nvidia-drivers[${MULTILIB_USEDEP},static-libs]
 	)
 "
 
 RDEPEND="${DEPEND}"
 
-if ! [[ ${PV} == "9999" ]]; then
-	S="${WORKDIR}"/"MangoHud-${PV}"
-fi
-
 src_unpack() {
-	default
+	if [[ -n ${A} ]]; then
+		mkdir "${P}"
+		cd "${P}"
+		unpack ${A}
+	fi
 
 	if [[ ${PV} == "9999" ]]; then
 		git-r3_src_unpack
 	fi
-
-	mv "${WORKDIR}"/imgui-"${IMGUI_COMMIT}"/* \
-		"${S}/modules/ImGui/src/"
 }
 
 multilib_src_configure() {
@@ -59,7 +54,7 @@ multilib_src_configure() {
 		-Dappend_libdir_mangohud=false
 		-Duse_system_vulkan=enabled
 		-Dinclude_doc=false
-		-Dwith_xnvctrl=$(usex video_cards_nvidia enabled disabled)
+		-Dwith_xnvctrl=$(usex xnvctrl enabled disabled)
 	)
 	meson_src_configure
 }
@@ -76,4 +71,15 @@ multilib_src_install_all() {
 	dodoc "${S}/bin/MangoHud.conf"
 
 	einstalldocs
+}
+
+pkg_postinst() {
+	if ! use xnvctrl; then
+		einfo ""
+		einfo "If mangohud can't get GPU load, or other GPU information,"
+		einfo "and you have an older Nvidia device."
+		einfo ""
+		einfo "Try enabling the 'xnvctrl' useflag."
+		einfo ""
+	fi
 }

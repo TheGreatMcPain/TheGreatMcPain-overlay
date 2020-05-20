@@ -41,8 +41,6 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 
-PATCHES=("${FILESDIR}/pull-228-elogind-support.patch")
-
 pkg_pretend() {
 	elog
 	elog "GameMode needs a kernel capable of SCHED_ISO to use its soft realtime"

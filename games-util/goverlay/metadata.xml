@@ -7,7 +7,5 @@
 	<use>
 		<flag name="vulkan">Use <pkg>dev-util/vulkan-tools</pkg> for vulkan preview.</flag>
 		<flag name="opengl">Use <pkg>x11-apps/mesa-progs</pkg> for opengl preview.</flag>
-		<flag name="mangohud">Install <pkg>games-util/mangohud</pkg>.</flag>
-		<flag name="vkbasalt">Install <pkg>games-util/vkbasalt</pkg>.</flag>
 	</use>
 </pkgmetadata>

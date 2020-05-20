@@ -18,7 +18,7 @@ fi
 
 LICENSE="GPL-3"
 SLOT="0"
-IUSE="opengl vulkan mangohud vkbasalt"
+IUSE="opengl vulkan"
 
 DEPEND="
 	opengl? (
@@ -26,12 +26,6 @@ DEPEND="
 	)
 	vulkan? (
 		dev-util/vulkan-tools
-	)
-	mangohud? (
-		games-util/mangohud
-	)
-	vkbasalt? (
-		games-util/vkbasalt
 	)
 "
 
@@ -51,10 +45,20 @@ src_prepare() {
 }
 
 src_compile() {
+
 	lazbuild \
 		--lazarusdir="${WORKDIR}/lazarus" \
 		--build-all \
-		"${PN}.lpi" || die "Failed to compile."
+		"${PN}.lpi" || local failed=1
+
+	if ! [ -z $failed ]; then
+		eerror ""
+		eerror "If there was an Access Violation error just run emerge on"
+		eerror "this package again. I'm not sure what's causing it, but"
+		eerror "it will actually build after a few trys."
+		eerror ""
+		die "Failed to compile (please try again if Access Violation error)."
+	fi
 }
 
 src_install() {
@@ -72,6 +76,13 @@ pkg_postinst() {
 	xdg_icon_cache_update
 	xdg_desktop_database_update
 	xdg_mimeinfo_database_update
+
+	einfo ""
+	einfo "Goverlay is a GUI program for configuring MangoHUD, and vkBasalt."
+	einfo ""
+	einfo "MangoHUD can be installed via the pkg <games-util/mangohud>."
+	einfo "vkBasalt can be installed via the pkg <games-util/vkbasalt>."
+	einfo ""
 }
 
 pkg_postrm() {

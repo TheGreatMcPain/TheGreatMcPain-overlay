@@ -4,4 +4,7 @@
 	<maintainer type="person">
 		<email>sixsupersonic@gmail.com</email>
 	</maintainer>
+	<use>
+		<flag name="xnvctrl">"Use XNVctrl as fall back for older Nvidia devices."</flag>
+	</use>
 </pkgmetadata>

@@ -44,6 +44,7 @@ DEPEND="
 	>=media-libs/mesa-10.2.8[gles2]
 	media-libs/libwebp
 	media-libs/opus
+	media-libs/opusfile
 	net-libs/enet:=
 	>=net-libs/libasyncns-0.8-r3
 	net-libs/mbedtls
@@ -72,8 +73,8 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 pkg_setup() {
-	python-any-r1_pkg_setup
 	llvm_pkg_setup
+	python-any-r1_pkg_setup
 }
 
 src_configure() {

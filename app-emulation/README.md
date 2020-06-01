@@ -14,7 +14,7 @@ option in wine to build some DLLs as Windows native PE files.
 [(Requires a mingw toolchain)](#setting-up-mingw-in-gentoo)\
 More info on PE DLLs can be found in [Wine's 5.0 announcement.](https://www.winehq.org/announce/5.0)
 
-By default `mingw` is off which will use `--without-mingw`.\
+By default `mingw` is off which will use `--without-mingw`.
 
 ## DXVK ebuilds
 

@@ -24,10 +24,10 @@ The dxvk-config useflag is mainly for Proton since Proton's wine-dxgi uses it to
 certain dxgi related dxvk.conf options that normally require dxvk's version of dxgi
 (this allows vkd3d and dxvk to co-exist), and I like to use my dxvk ebuilds in self-built
 Proton installations. If you with to use dxvk\_config.dll separately from Proton, I have
-added the option `--with-config` to the setup scripts.
+added the option `--with-config` to the dxvk-setup scripts.
 
-The mingw variants use Mingw compilers (Which is the upstream supported way to build them),
-and the non-mingw varients will use winelib
+The `app-emulation/dxvk` ebuild will use Mingw compilers (Which is supported upstream),
+and the `app-emulation/dxvk-winelib` ebuild will use winegcc
 (Which has been completely removed after
 [1.6.1](https://github.com/doitsujin/dxvk/commit/436357e28096f5e1e25aa8b72fceb77123ea8404))\
 I've added a patch to the ebuilds that restore winelib builds for versions newer than 1.6.1.
@@ -39,7 +39,7 @@ to the [Github mirror](https://github.com/TheGreatMcPain/TheGreatMcPain-overlay)
 
 [See the section below on how to setup a mingw toolchain.](#setting-up-mingw-in-gentoo)
 
-Each dxvk ebuild will have it's own setup script `dxvk-setup`, and `dxvk-mingw-setup`.
+Each dxvk ebuild will have it's own setup script `dxvk-setup`, and `dxvk-winelib-setup`.
 
 DXVK's DLLs will be installed in `/usr/lib(64)/dxvk*`
 

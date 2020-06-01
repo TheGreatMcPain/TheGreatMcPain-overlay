@@ -47,6 +47,39 @@ DXVK's DLLs will be installed in `/usr/lib(64)/dxvk*`
 
 [This guide is based on this blog post. (Not Mine)](https://blog.christiansegundo.com/eng/2018-8-1-dxvk-gentoo/)
 
+### Some requirements
+
+#### For GentooLTO users
+
+Make sure your `/etc/portage/package.cflags` has a file with these lines.
+```
+cross-x86_64-w64-mingw32/mingw64-runtime *FLAGS-=-flto*
+cross-i686-w64-mingw32/mingw64-runtime *FLAGS-=-flto*
+```
+Without these entries you'll end up with build errors.
+
+#### If your planning on using binutils-2.34
+
+Currently building DXVK with binutils-2.34 causes DXVK to crash.
+
+To workaround this you'll need to apply [this patch](https://sourceware.org/bugzilla/attachment.cgi?id=12545&format=raw) to binutils-2.34.
+
+First create the directory `/etc/portage/patches/cross-x86_64-w64-mingw32/binutils-2.34-r1`
+```
+mkdir -pv "/etc/portage/patches/cross-x86_64-w64-mingw32/binutils-2.34-r1"
+```
+Then symlink `cross-x86_64-w64-mingw32` to `cross-i686-w64-mingw32`
+```
+cd "/etc/portage/patches"
+ln -sv cross-x86_64-w64-mingw32 cross-i686-w64-mingw32
+```
+Now you can download the patch.
+```
+wget "https://sourceware.org/bugzilla/attachment.cgi?id=12545&format=raw" -O "/etc/portage/patches/cross-x86_64-w64-mingw32/binutils-2.34-r1/fix-dxvk-crash.patch"
+```
+
+### Creating the toolchain
+
 In order to setup a mingw toolchain you'll need to install `crossdev` first.
 
 `# emerge -av crossdev`

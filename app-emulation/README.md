@@ -110,7 +110,7 @@ We'll also go ahead and enable `dwarf2` in i686-w64-mingw32 for better performan
 Will also need to enable the `libraries` useflag in `mingw64-runtime`.
 
 ```
-# echo -e 'cross-i686-mingw32/mingw64-runtime libraries\ncross-x86_64-mingw32/mingw64-runtime libraries' > /etc/portage/package.use/mingw64-runtime
+# echo -e 'cross-i686-w64-mingw32/mingw64-runtime libraries\ncross-x86_64-w64-mingw32/mingw64-runtime libraries' > /etc/portage/package.use/mingw64-runtime
 ```
 
 Now we need to recompile `mingw64-runtime` first then `gcc`, because `mingw64-runtime` with the `libraries` useflag provides `pthread.h` which is needed to compile `gcc` with POSIX threads.

@@ -6,7 +6,7 @@ EAPI=7
 DESCRIPTION="Post-processing shaders written in the ReShade FX shader language"
 HOMEPAGE="https://github.com/crosire/reshade-shaders"
 
-PV_COMMIT=b7f24f02b06c2d2f8f56cef5094e4221d9781cd6
+PV_COMMIT=323bca357dec59e147cb9b00150b66c144965c6d
 SRC_URI="https://github.com/crosire/reshade-shaders/archive/${PV_COMMIT}.zip -> reshade-shaders-${PV}.zip"
 
 # Since reshade is under BSD I'm going to assume BSD, because

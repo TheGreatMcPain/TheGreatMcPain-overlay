@@ -25,6 +25,9 @@ NPM_BINS="
 	js-beautify.js => js-beautify
 "
 
+# Requires 'src' directory
+NPM_PKG_DIRS="src"
+
 S="${WORKDIR}/package"
 
 inherit npmv1
@@ -35,4 +38,12 @@ src_unpack() {
 	default
 
 	mv "${S}"/js/* "${S}"
+}
+
+src_install() {
+	npmv1_src_install
+
+	# Might not be needed
+	insinto "${NPM_PACKAGEDIR}"
+	doins "${S}"/index.js
 }

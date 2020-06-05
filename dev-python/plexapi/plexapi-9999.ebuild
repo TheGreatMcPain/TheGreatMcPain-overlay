@@ -13,7 +13,7 @@ if [[ ${PV} = *9999* ]]; then
 	KEYWORDS=""
 else
 	KEYWORDS="~amd64"
-	EGIT_COMMIT="v${PV}"
+	EGIT_COMMIT="${PV}"
 	SRC_URI="https://github.com/pkkid/python-plexapi/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	S=${WORKDIR}/python-${P}
 fi

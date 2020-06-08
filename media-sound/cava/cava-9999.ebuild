@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit linux-info git-r3 eutils autotools
+inherit linux-info git-r3 eutils autotools flag-o-matic
 
 DESCRIPTION="Console-based Audio Visualizer for ALSA (=CAVA)"
 HOMEPAGE="https://github.com/karlstav/cava"
@@ -15,7 +15,7 @@ KEYWORDS=""
 IUSE="debug"
 
 DEPEND="sci-libs/fftw:*
-		dev-libs/iniparser:0
+		dev-libs/iniparser:4
 		sys-libs/ncurses"
 RDEPEND="${DEPEND}"
 
@@ -32,6 +32,13 @@ pkg_setup() {
 
 src_prepare() {
 	eapply_user
+	if [[ "${PV}" = "9999" ]]; then
+		git describe --always --tags --dirty > version
+	else
+		echo ${PV} > version
+	fi
+	# Make sure we use iniparser:4
+	append-cppflags -I/usr/include/iniparser4
 	eautoreconf
 }
 
@@ -42,7 +49,7 @@ src_configure() {
 }
 
 src_compile() {
-	emake SYSTEM_LIBINIPARSER=1 VERSION=${PV}
+	emake SYSTEM_LIBINIPARSER=1
 }
 
 src_install() {

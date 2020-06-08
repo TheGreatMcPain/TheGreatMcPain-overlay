@@ -80,7 +80,7 @@ RDEPEND="
 		dev-python/bottle[${PYTHON_MULTI_USEDEP}]
 		dev-python/future[${PYTHON_MULTI_USEDEP}]
 		dev-python/regex[${PYTHON_MULTI_USEDEP}]
-		dev-python/jedi[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/jedi-0.17.0[${PYTHON_MULTI_USEDEP}]
 		dev-python/parso[${PYTHON_MULTI_USEDEP}]
 		dev-python/requests[${PYTHON_MULTI_USEDEP}]
 		dev-python/sh[${PYTHON_MULTI_USEDEP}]

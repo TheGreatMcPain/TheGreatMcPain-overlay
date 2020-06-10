@@ -89,6 +89,9 @@ PATCHES=(
 	# Taken from AUR package which took from:
 	# https://gitlab.com/snippets/1945940
 	"${FILESDIR}"/vulkan-kernel-5.6.patch
+
+	# https://gitlab.com/snippets/1965550
+	"${FILESDIR}"/vulkan-kernel-5.7.patch
 )
 nvidia_drivers_versions_check() {
 	CONFIG_CHECK=""

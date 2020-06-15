@@ -21,7 +21,7 @@ DEPEND="
 	media-libs/freetype
 	sys-libs/zlib
 	qt5? (
-		dev-qt/qtbase:5=
+		dev-qt/qtcore:5=
 		dev-qt/qtdeclarative:5=
 		dev-qt/qtmultimedia:5=[widgets]
 	)

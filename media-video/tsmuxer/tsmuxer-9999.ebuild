@@ -5,7 +5,7 @@ EAPI=7
 
 inherit cmake
 
-DESCRIPTION=""
+DESCRIPTION="tsMuxer is a transport stream muxer for remuxing/muxing elementary streams"
 HOMEPAGE="https://github.com/justdan96/tsMuxer"
 
 inherit git-r3

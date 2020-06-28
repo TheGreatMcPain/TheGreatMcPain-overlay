@@ -3,6 +3,8 @@
 
 EAPI=7
 
+inherit flag-o-matic
+
 DESCRIPTION="Stereoscopic media player"
 HOMEPAGE="http://www.sview.ru"
 
@@ -35,12 +37,20 @@ DEPEND="
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
-PATCHES=(
+PATCHES="
 	"${FILESDIR}/respect-flags.patch"
-)
+"
 
 src_prepare() {
 	default
-	sed "s/EXTRA_CFLAGS\ \ \ =/EXTRA_CFLAGS\ \ \ =\ ${CFLAGS}/" -i Makefile
-	sed "s/EXTRA_CXXFLAGS\ =\ -DAPP_PREFIX=\"\\\"$\(APP_PREFIX\)\\\"\"/EXTRA_CXXFLAGS\ =\ ${CXXFLAGS}\ -DAPP_PREFIX=\"\\\"$\(APP_PREFIX\)\\\"\"/" -i Makefile
+
+	echo $(get_libdir)
+}
+
+src_compile() {
+	emake MY_CFLAGS="${CFLAGS}" MY_CXXFLAGS="${CXXFLAGS}" MY_LDFLAGS="${LDFLAGS}" USR_LIB="$(get_libdir)"
+}
+
+src_install() {
+	emake DESTDIR="${D}" USR_LIB="$(get_libdir)" install
 }

@@ -1,7 +1,20 @@
 diff --git a/Makefile b/Makefile
-index d413ebc0..eaa812be 100644
+index d413ebc0..c4fa3862 100644
 --- a/Makefile
 +++ b/Makefile
+@@ -139,9 +139,9 @@ STRIPFLAGS = --strip-unneeded
+ 
+ LDSTRIP = -s
+ LDZDEF = -z defs
+-EXTRA_CFLAGS   =
+-EXTRA_CXXFLAGS = -DAPP_PREFIX="\"$(APP_PREFIX)\""
+-EXTRA_LDFLAGS  =
++EXTRA_CFLAGS   = ${MY_CFLAGS}
++EXTRA_CXXFLAGS = ${MY_CXXFLAGS} -DAPP_PREFIX="\"$(APP_PREFIX)\""
++EXTRA_LDFLAGS  = ${MY_LDFLAGS}
+ ifeq ($(TARGET_OS),osx)
+ LDZDEF =
+ endif
 @@ -226,7 +226,7 @@ endif
  
  INC =  -I$(SRCDIR)/3rdparty/include -I$(SRCDIR)/include

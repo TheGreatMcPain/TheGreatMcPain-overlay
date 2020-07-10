@@ -239,7 +239,7 @@ readonly _WINE_IS_STAGING
 # @ECLASS-VARIABLE: WINE_EBUILD_COMMON_P
 # @DESCRIPTION:
 # Full name and version for current: gentoo-wine-ebuild-common; tarball.
-WINE_EBUILD_COMMON_P="gentoo-wine-ebuild-common-20200414"
+WINE_EBUILD_COMMON_P="gentoo-wine-ebuild-common-20200629"
 readonly WINE_EBUILD_COMMON_P
 
 # @ECLASS-VARIABLE: WINE_EBUILD_COMMON_PN
@@ -253,47 +253,6 @@ readonly WINE_EBUILD_COMMON_PN
 # Version only, for current: gentoo-wine-ebuild-common; tarball.
 WINE_EBUILD_COMMON_PV="${WINE_EBUILD_COMMON_P##*-}"
 readonly WINE_EBUILD_COMMON_PV
-
-# @ECLASS-VARIABLE: WINE_ESYNC_P
-# @DESCRIPTION:
-# Full name and version for current: gentoo-wine-esync; tarball.
-WINE_ESYNC_P="gentoo-wine-esync-20200423"
-readonly WINE_ESYNC_P
-
-# @ECLASS-VARIABLE: WINE_ESYNC_PN
-# @DESCRIPTION:
-# Name only, for current: gentoo-wine-esync; tarball.
-WINE_ESYNC_PN="${WINE_ESYNC_P%-*}"
-# shellcheck disable=SC2034
-readonly WINE_ESYNC_PN
-
-# @ECLASS-VARIABLE: WINE_ESYNC_PV
-# @DESCRIPTION:
-# Version only, for current: gentoo-wine-esync; tarball.
-WINE_ESYNC_PV="${WINE_ESYNC_P##*-}"
-# shellcheck disable=SC2034
-readonly WINE_ESYNC_PV
-
-# wine-pba support
-# @ECLASS-VARIABLE: WINE_PBA_P
-# @DESCRIPTION:
-# Full name and version for current: gentoo-wine-pba; tarball.
-WINE_PBA_P="gentoo-wine-pba-20181119"
-readonly WINE_PBA_P
-
-# @ECLASS-VARIABLE: WINE_PBA_PN
-# @DESCRIPTION:
-# Name only, for current: gentoo-wine-pba; tarball.
-WINE_PBA_PN="${WINE_PBA_P%-*}"
-# shellcheck disable=SC2034
-readonly WINE_PBA_PN
-
-# @ECLASS-VARIABLE: WINE_PBA_PV
-# @DESCRIPTION:
-# Version only, for current: gentoo-wine-pba; tarball.
-WINE_PBA_PV="${WINE_PBA_P##*-}"
-# shellcheck disable=SC2034
-readonly WINE_PBA_PV
 
 # @ECLASS-VARIABLE: WINE_PV
 # @DESCRIPTION:
@@ -406,7 +365,7 @@ _WINE_STAGING_SUFFIX=""
 	1.8.[1-6])
 		_WINE_STAGING_SUFFIX="-unofficial"
 		;;
-	3.13.1)
+	3.13.1|5.12.1)
 		_WINE_STAGING_REVISION=".${WINE_PV##*.}"
 		WINE_PV="${WINE_PV%${_WINE_STAGING_REVISION}}"
 		;;
@@ -496,6 +455,12 @@ WINE_MANDIR="${WINE_DATADIR}/man"
 # Should be set externally.
 [[ -z "${PATCHES_BIN}" ]] && PATCHES_BIN=()
 
+# @ECLASS-VARIABLE: PATCHES_REVERT
+# @DESCRIPTION:
+# PATCHES_REVERT is an array variable for storing patches to revert.
+# Should be set externally.
+[[ -z "${PATCHES_REVERT}" ]] && PATCHES_REVERT=()
+
 # @ECLASS-VARIABLE: WINE_GIT_COMMIT_DATE
 # @DESCRIPTION:
 # Git commit date, of the Wine Git Source tree current HEAD.
@@ -510,7 +475,7 @@ WINE_MANDIR="${WINE_DATADIR}/man"
 
 # @ECLASS-VARIABLE: SRC_URI
 # @DESCRIPTION:
-# Set base SRC_URI components (excluding: wine-esync, wine-pba components)
+# Set base SRC_URI components
 SRC_URI="https://github.com/bobwya/${WINE_EBUILD_COMMON_PN}/archive/${WINE_EBUILD_COMMON_PV}.tar.gz -> ${WINE_EBUILD_COMMON_P}.tar.gz"
 if [[ "${WINE_PV}" != "9999" ]]; then
 	if (( !_WINE_IS_STAGING && _WINE_IS_STABLE && WINE_IS_RC_VERSION && !_WINE_IS_STABLE_BASE )); then
@@ -642,6 +607,41 @@ _wine_git_is_commit_in_range() {
 	popd >/dev/null || die "popd failed"
 
 	return $((!_in_commit_range))
+}
+
+# @FUNCTION:  function _wine_git_is_commit_in_tree()
+# @INTERNAL
+# @USAGE:  <_git_directory> <_committed> <_commit>
+# @RETURN:
+# _committed=1 => 0='not in tree' 1='in tree'
+# _committed=0 => 1='not in tree' 0='in tree'
+# @DESCRIPTION:
+# For the specified git repository (_git_directory) check if the current branch
+# HEAD commit contains the specified: _commit.
+# <git_directory> must reference a valid Git repository root directory.
+_wine_git_is_commit_in_tree() {
+	(($# == 3)) || die "${FUNCNAME[0]}(): invalid parameter count: ${#} (3)"
+
+	local	 _git_directory="${1%/}"  _committed="${2}" \
+		_commit="${3}" _return_value=0
+
+	if [[ ! -d "${_git_directory}/.git" ]]; then
+		die "${FUNCNAME[0]}(): argument (1): path '${_git_directory}' is not a valid Git repository directory"
+	elif [[ ! "${_committed}" =~ [01] ]]; then
+		die "${FUNCNAME[0]}(): argument (2):  is not valid (${_committed} != 0 or 1)"
+	elif [[ ! "${_commit}" =~ ${_WINE_SHA1_REGEXP} ]]; then
+		die "${FUNCNAME[0]}(): argument (3): is not a valid git commit (${_commit})"
+	fi
+
+	pushd "${_git_directory}" >/dev/null || die "pushd failed"
+	if git merge-base --is-ancestor "${_commit}" HEAD; then
+		((_committed==1)) && _return_value=1
+	else
+		((_committed==0)) && _return_value=1
+	fi
+	popd >/dev/null || die "popd failed"
+
+	return $((_return_value))
 }
 
 # @FUNCTION: _wine_get_pruned_git_log
@@ -962,8 +962,8 @@ _wine_display_closest_commit_message() {
 	eerror
 }
 
-# @FUNCTION: _wine_prune_commited_patches_from_array
-# @USAGE: <git_directory> <array[0]>* [... <array[N-1]>*]
+# @FUNCTION: _wine_prune_patches_from_array
+# @USAGE: <_git_directory> <_committed> <array[0]>* [... <array[N-1]>*]
 # @RETURN: patch_array[i] via <_patch_array_reference[i]>*)
 #          (* passed-by-reference)
 # @DESCRIPTION:
@@ -979,20 +979,19 @@ _wine_display_closest_commit_message() {
 # on contiguous lines at the head of each patch file)
 #
 # These Git commit hashes are individually tested to see if they have been committed to HEAD, of the Git Source
-# directory tree. If a Git commit hash is in tree then delete the current array entry.
-# <git_directory> must reference a valid Git repository root directory.
-_wine_prune_commited_patches_from_array() {
-	(($# >= 2))  || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (2-)"
+# directory tree. If a Git commit hash is in tree and _committed=1, then delete the current array entry.
+# This operation is reversed when _committed=0. So when a Git commit hash is NOT in the tree,
+# the current array entry is deleted.
+# <_git_directory> must reference a valid Git repository root directory.
+_wine_prune_patches_from_array() {
+	(($# >= 3))  || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (3-)"
 
-	local _commit_hash _git_directory _i_arg=1 _i_array _line _patch_array_reference _patch_file
+	local _commit_hash _committed _git_directory _i_arg=1 _i_array _line _patch_array_reference _patch_file
 
 	_git_directory="${1%/}"
-	if [[ ! -d "${_git_directory}/.git" ]]; then
-		die "${FUNCNAME[0]}(): argument (1): path '${_git_directory}' is not a valid Git repository directory"
-	fi
+	_committed="${2}"
 
-	shift 1
-	pushd "${_git_directory}" >/dev/null || die "pushd failed"
+	shift 2
 	for _patch_array_reference; do
 		if [[ ! "${_patch_array_reference}" =~ ${_WINE_VARIABLE_NAME_REGEXP} ]]; then
 			die "${FUNCNAME[0]}(): argument ($((_i_arg+=1))): invalid reference name: '${_patch_array_reference}'"
@@ -1001,7 +1000,9 @@ _wine_prune_commited_patches_from_array() {
 		declare -n patch_array="${_patch_array_reference}"
 		for _i_array in "${!patch_array[@]}"; do
 			if [[ "${patch_array[_i_array]}" =~ ${_WINE_SHA1_REGEXP} ]]; then
-				git merge-base --is-ancestor "${patch_array[_i_array]}" HEAD && unset -v 'patch_array[_i_array]'
+				if ! _wine_git_is_commit_in_tree "${_git_directory}" "${_committed}" "${patch_array[_i_array]}"; then
+					unset -v 'patch_array[_i_array]'
+				fi
 				continue
 			fi
 
@@ -1013,8 +1014,7 @@ _wine_prune_commited_patches_from_array() {
 				_commit_hash="$( sed -n -e "${_line}"'s/^.*\([[:xdigit:]]\{40\}\).*$/\1/p' "${patch_array[_i_array]}" )"
 				[[ "${_commit_hash}" =~ ${_WINE_SHA1_REGEXP} ]]
 			do
-				git merge-base --is-ancestor "${_commit_hash}" HEAD || continue
-
+				_wine_git_is_commit_in_tree "${_git_directory}" "${_committed}" "${_commit_hash}" && continue
 				_patch_file="$(basename "${patch_array[_i_array]}")"
 				einfo "Excluding patch ${_patch_file} ... parent of (HEAD) Git commit: ${_commit_hash}"
 				unset -v 'patch_array[_i_array]'
@@ -1022,7 +1022,6 @@ _wine_prune_commited_patches_from_array() {
 			done
 		done
 	done
-	popd >/dev/null || die "popd failed"
 }
 
 # EXTERNAL HELPER wine.eclass Git support function definitions
@@ -1375,7 +1374,7 @@ wine_src_prepare_git() {
 	if use faudio; then
 		local -a _pruned_faudio_commit=( "3e390b1aafff47df63376a8ca4293c515d74f4ba" )
 
-		_wine_prune_commited_patches_from_array "${S}" "_pruned_faudio_commit"
+		_wine_prune_patches_from_array "${S}" "1" "_pruned_faudio_commit"
 		# shellcheck disable=SC2068
 		if ((${#_pruned_faudio_commit[@]})); then
 			_WINE_USE_DISABLED+=( "faudio" )
@@ -1387,7 +1386,8 @@ wine_src_prepare_git() {
 		fi
 	fi
 
-	_wine_prune_commited_patches_from_array "${S}" "PATCHES" "PATCHES_BIN"
+	_wine_prune_patches_from_array "${S}" "1" "PATCHES" "PATCHES_BIN"
+	_wine_prune_patches_from_array "${S}" "0" "PATCHES_REVERT"
 }
 
 # @FUNCTION: wine_staging_src_prepare_git
@@ -1399,7 +1399,7 @@ wine_src_prepare_git() {
 # app-emulation/wine-staging patchset, for the ffmpeg (external) library.
 wine_staging_src_prepare_git() {
 	local -a _pruned_ffmpeg_commit=( "6a04cf4a69205ddf6827fb2a4b97862fd1947c62" )
-	_wine_prune_commited_patches_from_array "${S}" "_pruned_ffmpeg_commit"
+	_wine_prune_patches_from_array "${S}" "1" "_pruned_ffmpeg_commit"
 	if use ffmpeg; then
 		if ((${#_pruned_ffmpeg_commit[@]})); then
 			use faudio && _WINE_USE_DISABLED+=( "faudio" )
@@ -1433,6 +1433,7 @@ wine_staging_patchset_support_test() {
 # global array variable: PATCHES_BIN
 wine_eapply_bin() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
+	((${#PATCHES_BIN[@]} == 0)) && return
 
 	local _patch_file _patch_path
 	# shellcheck disable=SC2068
@@ -1450,6 +1451,24 @@ wine_eapply_bin() {
 	done
 }
 
+# @FUNCTION: wine_eapply_revert
+# @DESCRIPTION:
+# Use patch eapply to revert patches from the
+# global array variable: PATCHES_REVERT
+wine_eapply_revert() {
+	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
+	((${#PATCHES_REVERT[@]} == 0)) && return
+
+	((${#PATCHES_REVERT[@]} == 1)) && einfo "Reverting ${#PATCHES_REVERT[@]} patch ..."
+	((${#PATCHES_REVERT[@]} >= 2)) && einfo "Reverting ${#PATCHES_REVERT[@]} patches ..."
+
+	local _patch_path
+	# shellcheck disable=SC2068
+	for _patch_path in ${PATCHES_REVERT[@]}; do
+		eapply -R "${_patch_path}"
+	done
+}
+
 # @FUNCTION: wine_eapply_staging_patchset
 # @DESCRIPTION:
 # This function applies the Wine Staging patchset, for the package:
@@ -1462,6 +1481,9 @@ wine_eapply_staging_patchset() {
 	local -a _staging_exclude_patchsets \
 		_eventfd_synchronization_dir_change_fix_range=(
 			"f883c66e40ada01c4413c5f33912339f88bd8073" "c48811407e3c9cb2d6a448d6664f89bacd9cc36f"
+		) \
+		_ntdll_forcebottomupalloc_fix_range=(
+			"8648971fa855c92e9bd73a7d5163a4d2c1d0f9a3" "044cb930662d61f401a5d1bdd7b8e75d59cea5ea"
 		)
 
 	ewarn "Applying the Wine Staging patchset. Any bug reports to Wine Bugzilla"
@@ -1479,10 +1501,7 @@ wine_eapply_staging_patchset() {
 		_staging_exclude_patchsets+=( "wined3d-buffer_create" )
 	fi
 
-	if has esync ${IUSE} && use esync; then
-		_staging_exclude_patchsets+=( "msvfw32-ICGetDisplayFormat" )
-	fi
-
+	# shellcheck disable=SC2086
 	if has faudio ${IUSE} && use faudio; then
 		# https://bugs.gentoo.org/681218
 		_staging_exclude_patchsets+=( "xaudio2_7-CreateFX-FXEcho" "xaudio2_7-WMA_support" "xaudio2_CommitChanges" "winepulse-PulseAudio_Support" "xaudio2-revert" )
@@ -1518,10 +1537,15 @@ wine_eapply_staging_patchset() {
 		4.7)
 			eapply "${DISTDIR}/${PN}-4.7_c48811407e3c9cb2d6a448d6664f89bacd9cc36f_eventfd_synchronization_fix.patch"
 			;;
+		5.10)
+			eapply "${DISTDIR}/${PN}-5.10_044cb930662d61f401a5d1bdd7b8e75d59cea5ea_ntdll_forcebottomupalloc_fix.patch"
+			;;
 		9999)
 			# shellcheck disable=SC2068
 			if _wine_git_is_commit_in_range "${_WINE_STAGING_DIR}" ${_eventfd_synchronization_dir_change_fix_range[@]}; then
 				eapply "${DISTDIR}/${PN}-4.7_c48811407e3c9cb2d6a448d6664f89bacd9cc36f_eventfd_synchronization_fix.patch"
+			elif _wine_git_is_commit_in_range "${_WINE_STAGING_DIR}" ${_ntdll_forcebottomupalloc_fix_range[@]}; then
+				eapply "${DISTDIR}/${PN}-5.10_044cb930662d61f401a5d1bdd7b8e75d59cea5ea_ntdll_forcebottomupalloc_fix.patch"
 			fi
 			;;
 		*)
@@ -1545,306 +1569,6 @@ wine_eapply_staging_patchset() {
 		source "${_staging_patches_dir}/patchinstall.sh"
 	)
 	eend
-
-}
-
-# @FUNCTION: wine_eapply_esync_patchset
-# @USAGE: <esync_patchset_directory>
-# @DESCRIPTION:
-# This function supports the packages: app-emulation/wine-staging app-emulation/wine-vanilla
-# This function applies the wine-esync patchset to the PWD - typically "${S}".
-# <esync_patchset_directory> should be set to the root directory of the unpacked esync
-# tarball.
-# See: https://github.com/zfigura/wine/blob/esync/README.esync
-wine_eapply_esync_patchset() {
-	(($# == 1)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (1)"
-
-	local _apply_sed_fix _esync_patchsets_base_directory="${1%/}" \
-		_i_array _esync_error=0 _esync_patchset_directory _min_rebase_commit _max_rebase_commit \
-		_rebased_patchset _max_rebased_patchset
-	local -a _esync_patchset_commits _pruned_esync_patchset_commits
-	if [[ ! -d "${_esync_patchsets_base_directory}" ]]; then
-		die "${FUNCNAME[0]}(): argument (1): path '${_esync_patchsets_base_directory}' is not a valid directory"
-	fi
-
-	_esync_patchset_commits=(
-		"f8e0bd1b0d189d5950dc39082f439cd1fc9569d5" "12276796c95007fc12eb38a41ca25b4daee7e1b3"
-		"a7aa192a78d02d28f2bbae919a3f5c726e4e9e60" "c61c33ee66ea0e97450ac793ebc4ac41a1ccc793"
-		"433788736bcb68b43a35749c28d6272e4041c857" "57212f64f8e4fef0c63c633940e13d407c0f2069"
-		"24f47812165a5dcb2b22825e47ccccbbd7437b8b" "2f17e0112dc0af3f0b246cf377e2cb8fd7a6cf58"
-		"2600ecd4edfdb71097105c74312f83845305a4f2" "d3660e5901914daab38c95f6b2a7a43dfe6d3eee"
-		"7ba361b47bc95df624eac83c170d6c1a4041d8f8" "817fb9755cbf48162fe1b7d37e77d7e25afa7520"
-		"b2a546c92dabee8ab1c3d5b9fecc84d99caf0e76" "0decadd62a76b968abf75c9943dd0869249ec716"
-		"b3c8d5d36850e484b5cc84ab818a75db567a06a3" "8268c47462544baf5bc7e5071c0a9f2d00c5c2cb"
-		"4c0e81728f6db575d9cbd8feb8a5374f1adec9bb" "19bf03ed4b48b398236c8a998394089c93b50891"
-		"f534fbd3e3c83df49c7c6b8e608a99f2af65adc0" "07c2e8581a2745725cd7ce4282eedb9a8084a1e4"
-		"bf174815ba8529bfbbda8697503d3c2539f82359" "781dd9a145d0ef8e4465f78b8916ea0861b5e161"
-		"29914d583fe098521472332687b8da69fc692690" "5ddcfa019d027d9d690c98151c708eb4e7d5f72b"
-		"e2411ebecb13b1005c4d0a528056c9b8a1719049" "d1a7b681ead5fdf10bc2001d9841b7ad9b09423b"
-		"461b5e56f95eb095d97e4af1cb1c5fd64bb2862a" "608d086f1b1bb7168e9322c65224c23f34e75f29"
-		"4538a137e089240f1981f0d6f82fb8d63a65f4f6" "b934f6626ed7cb8a6cc18b261550d363a0068141"
-		"fc17535eb98a4b200d6a418337a7e280568c7cfd" "f181d5ce82470639459555cd59a076963861a61d"
-		"d637640f9af4ccfb6639361fc548d4bbeaafeb6f" "b664ae8e60e08224cdc3025c28a37cb22356aaa4"
-		"9bfbb4866231f9c2e6e22e23037c54c5702dd634" "6d2d3595c0ea08d915df5fef506fe3679ffa8051"
-		"321d26cbb4404ee63df439759cbc5a546434dde6" "87012607688f730755ee91de14620e6e3b78395c"
-	)
-
-	case "${WINE_PV}" in
-		3.0.[1-5]-rc[1-9]|3.0.[1-5]|3.0-rc[1-6]|3.[0-2])
-			_rebased_patchset="f8e0bd1b0d189d5950dc39082f439cd1fc9569d5"
-			;;
-		3.[3-5])
-			_rebased_patchset="a7aa192a78d02d28f2bbae919a3f5c726e4e9e60"
-			;;
-		3.[6-8])
-			_rebased_patchset="c61c33ee66ea0e97450ac793ebc4ac41a1ccc793"
-			;;
-		3.9|3.1[0-3])
-			_rebased_patchset="433788736bcb68b43a35749c28d6272e4041c857"
-			;;
-		3.1[4-6])
-			_rebased_patchset="57212f64f8e4fef0c63c633940e13d407c0f2069"
-			;;
-		3.1[7-8])
-			_rebased_patchset="24f47812165a5dcb2b22825e47ccccbbd7437b8b"
-			;;
-		3.19)
-			_rebased_patchset="2f17e0112dc0af3f0b246cf377e2cb8fd7a6cf58"
-			;;
-		3.2[0-1]|4.[0-3]|4.0.1-rc*|4.0.1|4.0.2-rc*|4.0.2|4.0.3-rc*|4.0.3|4.0.4-rc*|4.0.4)
-			_rebased_patchset="2600ecd4edfdb71097105c74312f83845305a4f2"
-			;;
-		4.4)
-			_rebased_patchset="817fb9755cbf48162fe1b7d37e77d7e25afa7520"
-			;;
-		4.5)
-			_rebased_patchset="0decadd62a76b968abf75c9943dd0869249ec716"
-			;;
-		4.6)
-			_rebased_patchset="4c0e81728f6db575d9cbd8feb8a5374f1adec9bb"
-			;;
-		4.7)
-			_rebased_patchset="bf174815ba8529bfbbda8697503d3c2539f82359"
-			;;
-		4.8)
-			_rebased_patchset="29914d583fe098521472332687b8da69fc692690"
-			;;
-		4.9|4.10)
-			_rebased_patchset="5ddcfa019d027d9d690c98151c708eb4e7d5f72b"
-			;;
-		4.1[1-3]|4.12.1)
-			_rebased_patchset="e2411ebecb13b1005c4d0a528056c9b8a1719049"
-			;;
-		4.1[4-9])
-			_rebased_patchset="d1a7b681ead5fdf10bc2001d9841b7ad9b09423b"
-			;;
-		4.20)
-			_rebased_patchset="608d086f1b1bb7168e9322c65224c23f34e75f29"
-			;;
-		4.21)
-			_rebased_patchset="b934f6626ed7cb8a6cc18b261550d363a0068141"
-			;;
-		5.0-rc[1-6]|5.[0-4])
-			_rebased_patchset="fc17535eb98a4b200d6a418337a7e280568c7cfd"
-			;;
-		5.5)
-			_rebased_patchset="d637640f9af4ccfb6639361fc548d4bbeaafeb6f"
-			;;
-		5.6)
-			_rebased_patchset="321d26cbb4404ee63df439759cbc5a546434dde6"
-			;;
-		5.[7-9]|5.1[0-9])
-			_rebased_patchset="87012607688f730755ee91de14620e6e3b78395c"
-			;;
-		9999)
-			if ((_WINE_IS_STAGING)); then
-				_min_rebase_commit="f9e1dbb83d850a2f7cb17079e02de139e2f8b920"
-				_max_rebase_commit="8268c47462544baf5bc7e5071c0a9f2d00c5c2cb"
-				_max_rebased_patchset="15"
-			else
-				_min_rebase_commit="f8e0bd1b0d189d5950dc39082f439cd1fc9569d5"
-				_max_rebase_commit="master"
-				_max_rebased_patchset="0"
-			fi
-			_pruned_esync_patchset_commits=( "${_esync_patchset_commits[@]}" )
-			_wine_prune_commited_patches_from_array "${S}" "_pruned_esync_patchset_commits"
-			for _i_array in "${!_esync_patchset_commits[@]}"; do
-				# shellcheck disable=SC2068
-				has "${_esync_patchset_commits[_i_array]}" ${_pruned_esync_patchset_commits[@]} && break
-
-				_rebased_patchset="${_esync_patchset_commits[_i_array]}"
-			done
-			# shellcheck disable=SC2068
-			if [[ -z "${_rebased_patchset}" ]] || ((_max_rebased_patchset)) && ! has "${_esync_patchset_commits[_max_rebased_patchset]}" ${_pruned_esync_patchset_commits[@]}; then
-				ewarn "The esync patchset is only supported for Wine Git commit range: ['${_min_rebase_commit}'-${_max_rebase_commit})"
-				ewarn "The esync patchset cannot be applied on Wine Git commit: '${WINE_GIT_COMMIT_HASH}'"
-				_esync_error=1
-			fi
-			;;
-		*)
-			ewarn "The esync patchset is unsupported for package: =${CATEGORY}/${P}"
-			_esync_error=1
-			;;
-	esac
-
-	# Fixups for wine-stable
-	if ((_WINE_IS_STABLE)); then
-		ewarn "using wine-stable"
-		case "${WINE_PV}" in
-			4.0.3-rc*|4.0.3|4.0.4-rc*|4.0.4)
-				_apply_sed_fix=1
-				;;
-			9999)
-				_esync_patchset_commits=( "0a77cef2eef6fcb17cfecaa21ae7aed5cae535b9" )
-				_wine_prune_commited_patches_from_array "${S}" "_esync_patchset_commits"
-				_apply_sed_fix=$((! ${#_esync_patchset_commits[@]}))
-				;;
-			*)
-				_apply_sed_fix=0
-				;;
-		esac
-		if ((_apply_sed_fix)); then
-			einfo "Applying wine-stable wine-esync sed fix to 'wine-esync-dlls-kernel32-tests-sync_c.patch'"
-			sed -i -e 's/test_srwlock_example();$/test_alertable_wait();/g' \
-				-e 's/test_alertable_wait();$/test_apc_deadlock();/g' \
-				-e 's/test_apc_deadlock();$/test_crit_section();/g' \
-				"${_esync_patchsets_base_directory}/${PN}/${_rebased_patchset}/wine-esync-dlls-kernel32-tests-sync_c.patch" \
-				|| die "sed failed"
-		fi
-	fi
-
-	if ((_esync_error)); then
-		ewarn "USE +esync will be omitted for this build."
-		return 1
-	fi
-
-	einfo "Using esync rebase revision: '${_rebased_patchset}'"
-	_esync_patchset_directory="${_esync_patchsets_base_directory}/${PN}/${_rebased_patchset}"
-	ewarn "Applying the wine-esync patchset."
-	ewarn "Note: this third-party patchset is not officially supported!"
-
-	# Pre-exclude SERVER_PROTOCOL_VERSION from the patch hunk context of all esync patches.
-	# This variable updates every Wine release - so is too hard to track.
-	# shellcheck disable=SC1003
-	sed -i -e '/^#define SERVER_PROTOCOL_VERSION /i\' "include/wine/server_protocol.h" \
-		|| die "sed failed"
-
-	eapply "${_esync_patchset_directory}"
-}
-
-# @FUNCTION: wine_eapply_pba_patchset()
-# @USAGE: <pba_patchset_directory>
-# @DESCRIPTION:
-# This function supports the packages: app-emulation/wine-staging app-emulation/wine-vanilla
-# This function applies the wine-pba patchset to the PWD - typically "${S}".
-# <pba_patchset_directory> should be set to the root directory of the unpacked gentoo_wine_pba
-# tarball.
-# See: https://github.com/acomminos/wine-pba
-wine_eapply_pba_patchset() {
-	(($# == 1)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (1)"
-
-	local _rebased_patchset_directory="${1%/}" _i_array _pba_error=0 _rebased_patchset _max_rebased_patchset
-	if [[ ! -d "${_rebased_patchset_directory}" ]]; then
-		die "${FUNCNAME[0]}(): argument (1): path '${_rebased_patchset_directory}' is not a valid directory"
-	fi
-	declare -a _rebased_patchset_commits _pruned_rebased_patchset_commits
-
-	((_WINE_IS_STAGING)) && case "${WINE_PV}" in
-		3.[34])
-			_rebased_patchset="9ae8b8c00f2cca205fdf4ce76e221778b7dfbea7"
-			;;
-		3.[5-9]|3.1[0-3])
-			_rebased_patchset="be002fd92b9d72163bf130ab8ade8aa4d9cdbad0"
-			;;
-		3.1[4-6])
-			_rebased_patchset="c698682b3286d72cc7c4c4624b4d14b03dbe6908"
-			;;
-		3.1[78])
-			_rebased_patchset="f11563c65fa50e2f8b7e39cade34bb7a998b26f7"
-			;;
-		9999)
-			_max_rebased_patchset="6"
-			_rebased_patchset_commits=(
-				"9ae8b8c00f2cca205fdf4ce76e221778b7dfbea7" "afef57f872433bcd3032c2ccbc0453bef5b62178"
-				"5946973021285dd6ecb8df224956fea4817f8fed" "be002fd92b9d72163bf130ab8ade8aa4d9cdbad0"
-				"c698682b3286d72cc7c4c4624b4d14b03dbe6908" "f11563c65fa50e2f8b7e39cade34bb7a998b26f7"
-				"82dbf75dc064bb03b5dfc5d8a82b9782a7272ce2" "d279bc24934fd1b68324017ae1b9e70975640a0a"
-				"853351698842c92db62bddedd2f531b7c5e745d1" "3d5a2567977455d04e4896368a71db74e7b9074b"
-			)
-			;;
-		*)
-			_pba_error=1
-			;;
-	esac
-
-	((_WINE_IS_STAGING)) || case "${WINE_PV}" in
-		3.0.[1-4]|3.0.[1-4]-rc[1-9]|3.[01]|3.0-rc[1-6])
-			_rebased_patchset="429e0c913087bdc2c183f74f346a9438278ec960"
-			;;
-		3.2)
-			_rebased_patchset="f08342f5737c2bb3f965059f930e5d9a25ff6268"
-			;;
-		3.[34])
-			_rebased_patchset="6eb562210cb154749b1da5c399a69320d87365e6"
-			;;
-		3.[56])
-			_rebased_patchset="1251fe692165077f9ee38992ac33a999bf26b69d"
-			;;
-		3.[7-9]|3.1[0-3])
-			_rebased_patchset="ea7186348f48a749ab28ecc405fb56601c56e4f8"
-			;;
-		3.1[4-6])
-			_rebased_patchset="cf9536b6bfbefbf5003c7633446a91f6e399c4de"
-			;;
-		3.1[78])
-			_rebased_patchset="580ea44bc65472c0304d74b7e873acfb7f680b85"
-			;;
-		9999)
-			_max_rebased_patchset="9"
-			_rebased_patchset_commits=(
-				"429e0c913087bdc2c183f74f346a9438278ec960" "7772c4fdbf33507b2262da375b465d4c2cbc316d"
-				"f08342f5737c2bb3f965059f930e5d9a25ff6268" "6eb562210cb154749b1da5c399a69320d87365e6"
-				"1251fe692165077f9ee38992ac33a999bf26b69d" "0e9f94ec1c201c56442124eb8754be1e30840299"
-				"ea7186348f48a749ab28ecc405fb56601c56e4f8" "cf9536b6bfbefbf5003c7633446a91f6e399c4de"
-				"580ea44bc65472c0304d74b7e873acfb7f680b85" "944e92ba06ecadeb933d95e30035323483dfe7c7"
-				"12b5c9148588464d621131e80a2b751e7dbce55b" "b579afd30ae48fef03c9333e31c1349d54ed681a"
-				"22b3a4f044036e62104a6994828d18d3536b3d78" "45bf95278d669779e6ca3cde9215556a043a8cf8"
-			)
-			;;
-		*)
-			_pba_error=1
-			;;
-	esac
-
-	if [[ "${WINE_PV}" == "9999" ]]; then
-		_pruned_rebased_patchset_commits=( "${_rebased_patchset_commits[@]}" )
-		_wine_prune_commited_patches_from_array "${S}" "_pruned_rebased_patchset_commits"
-		for _i_array in "${!_rebased_patchset_commits[@]}"; do
-			# shellcheck disable=SC2068
-			has "${_rebased_patchset_commits[_i_array]}" ${_pruned_rebased_patchset_commits[@]} && break
-
-			_rebased_patchset="${_rebased_patchset_directory}/${_rebased_patchset_commits[_i_array]}"
-		done
-		# shellcheck disable=SC2068
-		if [[ -z "${_rebased_patchset}" ]] || ! has "${_rebased_patchset_commits[_max_rebased_patchset]}" ${_pruned_rebased_patchset_commits[@]}; then
-			ewarn "The PBA patchset is only supported for Wine Git commit range: ['${_rebased_patchset_commits[0]}'-'${_rebased_patchset_commits[_max_rebased_patchset]}')"
-			ewarn "The PBA patchset cannot be applied on Wine Git commit: '${WINE_GIT_COMMIT_HASH}'"
-			_pba_error=1
-		fi
-	fi
-
-	unset -v _rebased_patchset_commits _pruned_rebased_patchset_commits
-
-	if ((_pba_error)); then
-		[[ "${WINE_PV}" != "9999" ]] && ewarn "The PBA patchset is unsupported for package: =${CATEGORY}/${P}"
-		ewarn "USE +pba will be omitted for this build."
-		return 1
-	fi
-
-	ewarn "Applying the wine-pba patchset."
-	ewarn "Note: this third-party patchset is not officially supported!"
-
-	eapply "${_rebased_patchset_directory}/${_rebased_patchset}"
 }
 
 # @FUNCTION: wine_add_stock_gentoo_patches
@@ -1869,7 +1593,7 @@ wine_add_stock_gentoo_patches() {
 	esac
 
 	case "${WINE_PV}" in
-		1.8|1.8.[1-3]|1.9.[0-8]|1.9.1[0-2]|9999)
+		1.8|1.8.[1-3]|1.9.[0-9]|1.9.1[0-2]|9999)
 			# https://bugs.gentoo.org/587028
 			PATCHES+=( "${_patch_directory}/wine-1.9.13-gnutls-3.5-compat.patch" )
 			;;
@@ -1936,6 +1660,22 @@ wine_add_stock_gentoo_patches() {
 			PATCHES+=( "${_patch_directory}/wine-1.8-gstreamer-1.0_"{01,02,03,04,05,06,07,08,09,10,11}".patch" )
 			;;
 		*)
+			;;
+	esac
+
+	case "${WINE_PV}" in
+		1.8|1.8.[1-7]|1.9.[0-9]|9999)
+			PATCHES+=( "${_patch_directory}/wine-1.8-disable_gnu_dirent.patch" )
+			;;
+		*)
+			;;
+	esac
+
+	case "${WINE_PV}" in
+		1.8|1.8.*|1.9.*|2.*|3.*|4.*|5.[0-8]|5.0.[1-9])
+			;;
+		*)
+			PATCHES_REVERT+=( "${_patch_directory}/revert/wine-5.9-makedep_install_also_generated_typelib_for_installed_idl.patch" )
 			;;
 	esac
 }
@@ -2196,8 +1936,30 @@ wine_src_configure() {
 	_wine_gcc_specific_pretests || die "_wine_gcc_specific_pretests() failed"
 	_wine_generic_compiler_pretests || die "_wine_generic_compiler_pretests() failed"
 
+	local -r _gcc_10_fcommon_fix_commit="c13d58780f78393571dfdeb5b4952e3dcd7ded90"
 	export LDCONFIG="/bin/true"
 	use custom-cflags || strip-flags
+
+	[[ "$(tc-getCC)" == *gcc* ]] && case "${WINE_PV}" in
+		1.*|2.*|3.*|4.*|5.0-rc[1-6]|5.0)
+			append-cflags -fcommon
+			;;
+		9999)
+			_wine_git_is_commit_in_tree "${S}" 1 "${_gcc_10_fcommon_fix_commit}" && append-cflags -fcommon
+			;;
+		*)
+			;;
+	esac
+
+	# See: https://bugs.winehq.org/show_bug.cgi?id=49208
+	case "${WINE_PV}" in
+		1.9.*|3.*|4.*|5.[0-9]|9999)
+			sed -i -e '/EXTRADLLFLAGS = .*/{s/0x7b400000/0x7b600000/g}' "${S}/dlls/kernel32/Makefile.in" \
+				|| die "sed failed"
+			;;
+		*)
+			;;
+	esac
 
 	multilib-minimal_src_configure
 }

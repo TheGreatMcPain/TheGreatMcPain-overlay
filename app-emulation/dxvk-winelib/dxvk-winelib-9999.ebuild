@@ -36,12 +36,21 @@ DEPEND="${RDEPEND}
 PVINT=$(echo "${PV//./}")
 # Restore winelib builds that were removed after 1.6.1.
 PATCHES=()
+if [[ "${PV}" == "9999" ]]; then
+	# Recent changes to upstream required a patch rebase.
+	PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+else
+	PATCHES+=("${FILESDIR}/dxvk-restore-winelib.patch")
+fi
 if [[ "${PVINT}" -gt "161" ]]; then
 	PATCHES+=(
-		"${FILESDIR}/dxvk-restore-winelib.patch"
 		"${FILESDIR}/dxvk-restore-spec-files.patch"
 		"${FILESDIR}/dxvk-revert-remove-vulkanfn.patch"
 	)
+fi
+
+if [[ ${PV} != "9999" ]] ; then
+	S="${WORKDIR}/dxvk-${PV}"
 fi
 
 bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }

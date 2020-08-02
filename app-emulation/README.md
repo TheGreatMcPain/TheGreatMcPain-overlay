@@ -53,29 +53,11 @@ DXVK's DLLs will be installed in `/usr/lib(64)/dxvk*`
 
 ## Setting up Mingw in Gentoo
 
+### Automated installation
+
+[I wrote a script that's based on this tutorial.](https://gitlab.com/TheGreatMcPain/gentoo-mingw-toolchain-installer)
+
 [This guide is based on this blog post. (Not Mine)](https://blog.christiansegundo.com/eng/2018-8-1-dxvk-gentoo/)
-
-### Some requirements
-
-#### If your planning on using binutils-2.34
-
-Currently building DXVK with binutils-2.34 causes DXVK to crash.
-
-To workaround this you'll need to apply [this patch](https://sourceware.org/bugzilla/attachment.cgi?id=12545&format=raw) to binutils-2.34.
-
-First create the directory `/etc/portage/patches/cross-x86_64-w64-mingw32/binutils-2.34-r1`
-```
-mkdir -pv "/etc/portage/patches/cross-x86_64-w64-mingw32/binutils-2.34-r1"
-```
-Then symlink `cross-x86_64-w64-mingw32` to `cross-i686-w64-mingw32`
-```
-cd "/etc/portage/patches"
-ln -sv cross-x86_64-w64-mingw32 cross-i686-w64-mingw32
-```
-Now you can download the patch.
-```
-wget "https://sourceware.org/bugzilla/attachment.cgi?id=12545&format=raw" -O "/etc/portage/patches/cross-x86_64-w64-mingw32/binutils-2.34-r1/fix-dxvk-crash.patch"
-```
 
 ### Creating the toolchain
 
@@ -92,6 +74,15 @@ Then we can create a `i686-w64-mingw32` and `x86_64-w64-mingw32` toolchain like 
 
 The `-S` option tells crossdev to install stable versions of binutils, gcc, etc.\
 `--libc ">=7.0.0"` tells crossdev to install libc versions that are newer, or equal to 7.0.0 in this case the libc is `mingw64-runtime`. The `-t` option stands for target.
+
+If you want to use unstable versions of `binutils` and `gcc` then just use.
+
+```
+# crossdev -t i686-w64-mingw32
+# crossdev -t x86_64-w64-mingw32
+```
+
+*Warning: binutils-2.34-r1 will cause DXVK to crash! binutils 2.33.1 and 2.34-r2 will work.*\
 
 Now in order for our new toolchains to build DXVK we need to enable pthread support.\
 We'll also go ahead and enable `dwarf2` in i686-w64-mingw32 for better performance in 32-bit DXVK.

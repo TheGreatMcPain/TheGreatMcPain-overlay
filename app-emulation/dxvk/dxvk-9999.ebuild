@@ -63,6 +63,15 @@ dxvk_check_mingw() {
 			einfo
 			die "${cat} toolchain required."
 		fi
+
+		if has_version -b "=${cat}/binutils-2.34-r1"; then
+			eerror "Building DXVK with =${cat}/binutils-2.34-r1 will cause DXVK to crash."
+			eerror "For more info see: https://github.com/doitsujin/dxvk/issues/1625"
+			einfo
+			einfo "The patch that fixes this is included with binutils-2.34-r2."
+			einfo
+			die "Unsupported ${cat}/binutils version."
+		fi
 	done
 }
 

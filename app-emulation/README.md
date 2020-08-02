@@ -57,15 +57,6 @@ DXVK's DLLs will be installed in `/usr/lib(64)/dxvk*`
 
 ### Some requirements
 
-#### For GentooLTO users
-
-Make sure your `/etc/portage/package.cflags` has a file with these lines.
-```
-cross-x86_64-w64-mingw32/mingw64-runtime *FLAGS-=-flto*
-cross-i686-w64-mingw32/mingw64-runtime *FLAGS-=-flto*
-```
-Without these entries you'll end up with build errors.
-
 #### If your planning on using binutils-2.34
 
 Currently building DXVK with binutils-2.34 causes DXVK to crash.

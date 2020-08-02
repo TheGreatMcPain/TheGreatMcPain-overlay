@@ -4,8 +4,16 @@
 
 The `wine-staging` ebuilds are based on the wine-vanilla ebuild from [bobwya's overlay](https://github.com/bobwya/bobwya), but have the dependences from wine-staging added.
 
-This is so that I can point the ebuild's EGIT\_REPO\_URI to pre-patched `wine-staging` repositories.\
-(such as [lutris' wine builds](https://github.com/lutris/wine))
+They've also been modified to pull from [lutris's wine repository,](https://github.com/lutris/wine)\
+and each ebuild points to a different branch from that repository.
+
+Here's the current ebuild versions, and there respective lutris wine branch.
+
+| wine-staging version | lutris wine branch |
+| --- |:--- |
+| 5.7 | [lutris-fshack-5.7](https://github.com/lutris/wine/tree/lutris-fshack-5.7) (includes Proton's fullscreen hacks) |
+| 5.7\_p1 | [lutris-5.7-9](https://github.com/lutris/wine/tree/lutris-5.7-9) |
+| 5.5 | [lutris-eac-testing-5.5-2](https://github.com/lutris/wine/tree/lutris-eac-testing-5.5-2) (EasyAntiCheat testing "Not for normal use!") |
 
 These ebuilds require bobwya's overlay to be enabled. `# layman -a bobwya`
 

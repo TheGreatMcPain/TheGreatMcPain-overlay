@@ -7,7 +7,7 @@ inherit pax-utils
 
 DESCRIPTION="OmniSharp server (HTTP) based on Roslyn workspaces"
 HOMEPAGE="https://github.com/OmniSharp/omnisharp-roslyn"
-SRC_URI="https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v${PV}/omnisharp.http-mono.tar.gz"
+SRC_URI="https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v${PV}/omnisharp.http-mono.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"

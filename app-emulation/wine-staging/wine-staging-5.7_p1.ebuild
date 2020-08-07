@@ -12,7 +12,7 @@ inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchai
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
 if [ -z ${EGIT_BRANCH+x} ]; then
-	EGIT_BRANCH="lutris-5.7-9"
+	EGIT_BRANCH="lutris-5.7-8"
 fi
 if [[ ${PV} = "9999" ]]; then
 	KEYWORDS=""

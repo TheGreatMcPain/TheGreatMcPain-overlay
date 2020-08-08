@@ -24,7 +24,7 @@ HOMEPAGE="http://liquorix.net/"
 LIQUORIX_VERSION="${GIT_COMMIT/_p[0-9]*}"
 LIQUORIX_FILE="${LIQUORIX_VERSION}${COMPRESSTYPE}"
 LIQUORIX_URI="https://github.com/damentz/liquorix-package/archive/${LIQUORIX_FILE}"
-SRC_URI="${KERNEL_URI} ${LIQUORIX_URI} -> ${P}.${COMPRESSTYPE}";
+SRC_URI="${KERNEL_URI} ${LIQUORIX_URI}";
 
 KEYWORDS="-* ~amd64 ~ppc ~ppc64 ~x86"
 IUSE=""

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sixsupersonic@gmail.com</email>
+		<name>James McClain</name>
+	</maintainer>
+	<longdescription>
+		Extracts subtitle depth values from MVC/H264 streams found on 3D Blu-rays
+		and puts them into OFS files that can be used with Blu-ray authoring software.
+	</longdescription>
+</pkgmetadata>

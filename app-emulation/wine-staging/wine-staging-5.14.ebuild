@@ -10,9 +10,9 @@ PLOCALE_BACKUP="en"
 inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchain-funcs virtualx wine xdg-utils-r1
 
 inherit git-r3
-EGIT_REPO_URI="https://github.com/lutris/wine.git"
+EGIT_REPO_URI="https://github.com/telans/wine.git"
 if [ -z ${EGIT_BRANCH+x} ]; then
-	EGIT_BRANCH="lutris-5.7-8"
+	EGIT_BRANCH="5.14"
 fi
 if [[ ${PV} = "9999" ]]; then
 	KEYWORDS=""
@@ -27,11 +27,10 @@ SRC_URI="${SRC_URI}"
 LICENSE="LGPL-2.1"
 SLOT="${PV}"
 
-IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio ffmpeg +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap mingw +mono mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks +unwind v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml"
+IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap mingw +mono mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks +unwind v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml"
 REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )
 	X? ( truetype )
 	elibc_glibc? ( threads )
-	faudio? ( !ffmpeg )
 	osmesa? ( opengl )
 	test? ( abi_x86_32 )
 	vkd3d? ( vulkan )" #286560 osmesa-opengl  #551124 X-truetype
@@ -55,7 +54,6 @@ COMMON_DEPEND="
 	capi? ( net-libs/libcapi[${MULTILIB_USEDEP}] )
 	cups? ( net-print/cups:=[${MULTILIB_USEDEP}] )
 	faudio? ( app-emulation/faudio[${MULTILIB_USEDEP}] )
-	ffmpeg? ( media-video/ffmpeg:=[${MULTILIB_USEDEP}] )
 	fontconfig? ( media-libs/fontconfig:=[${MULTILIB_USEDEP}] )
 	gcrypt? ( dev-libs/libgcrypt:=[${MULTILIB_USEDEP}] )
 	gphoto2? ( media-libs/libgphoto2:=[${MULTILIB_USEDEP}] )
@@ -222,12 +220,12 @@ src_prepare() {
 	#551124 Only build wineconsole, if either of X or ncurses is installed
 	use X || use ncurses || wine_src_prepare_disable_tools wineconsole
 
+	# apply / revert patches
 	default
-
 	wine_eapply_bin
+	wine_eapply_revert
 
 	wine_winecfg_about_enhancement
-	wine_fix_block_scope_compound_literals
 
 	eautoreconf
 
@@ -267,6 +265,7 @@ multilib_src_configure() {
 		"$(use_with lcms cms)"
 		"$(use_with cups)"
 		"$(use_with ncurses curses)"
+		"$(use_with faudio)"
 		"$(use_with fontconfig)"
 		"$(use_with ssl gnutls)"
 		"$(use_enable gecko mshtml)"
@@ -301,7 +300,7 @@ multilib_src_configure() {
 		"$(use_with unwind)"
 		"$(use_with udisks dbus)"
 		"$(use_with v4l v4l2)"
-		"$(use_with vaapi va)"
+		"$(usex vaapi '' --without-va)"
 		"$(use_with vkd3d)"
 		"$(use_with vulkan)"
 		"$(use_with X x)"
@@ -312,12 +311,6 @@ multilib_src_configure() {
 		"$(use_with xml)"
 		"$(use_with xml xslt)"
 	)
-
-	if use ffmpeg; then
-		myconf+=( "$(use_with ffmpeg)" )
-	else
-		myconf+=( "$(use_with faudio)" )
-	fi
 
 	# This will make sure our [C/LD]FLAGS are also applied when compiling with mingw.
 	local CROSSCFLAGS CROSSLDFLAGS
@@ -372,7 +365,6 @@ pkg_postinst() {
 	wine_pkg_postinst
 	einfo
 	einfo "This ebuild pulls it's sources from ${EGIT_REPO_URI}."
-	einfo "Which is the sources that are used for the lutris wine runtimes."
 	einfo
 	einfo "By default we are using the ${EGIT_BRANCH} branch."
 	einfo "If you want you can change branches by setting the EGIT_BRANCH variable"

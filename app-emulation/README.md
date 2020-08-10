@@ -15,6 +15,8 @@ Here's the current ebuild versions, and there respective lutris wine branch.
 | 5.7\_p1 | [lutris-5.7-8](https://github.com/lutris/wine/tree/lutris-5.7-9) |
 | 5.5 | [lutris-eac-testing-5.5-2](https://github.com/lutris/wine/tree/lutris-eac-testing-5.5-2) (EasyAntiCheat testing "Not for normal use!") |
 
+`wine-staging-5.14` Points to [telans' wine repository](https://github.com/telans/wine) which is a pre-patched version of wine-tkg.
+
 These ebuilds require bobwya's overlay to be enabled. `# layman -a bobwya`
 
 I've also added a `mingw` useflag to `wine-staging` which uses the `--with-mingw` configure

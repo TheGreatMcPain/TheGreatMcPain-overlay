@@ -5,13 +5,14 @@ EAPI=7
 
 MULTILIB_COMPAT=( abi_x86_{32,64} )
 
-inherit meson multilib-minimal flag-o-matic
+inherit flag-o-matic meson multilib-minimal ninja-utils
 
 DESCRIPTION="A Vulkan-based translation layer for Direct3D 10/11"
 HOMEPAGE="https://github.com/doitsujin/dxvk"
 
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"
+	EGIT_BRANCH="master"
 	inherit git-r3
 	SRC_URI=""
 else
@@ -21,16 +22,27 @@ fi
 
 LICENSE="ZLIB"
 SLOT=0
-IUSE="custom-cflags dxvk-config"
+IUSE="custom-cflags dxvk-config video_cards_nvidia"
+REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )"
+
 RESTRICT="test"
 
 RDEPEND="
 	|| (
-		>=app-emulation/wine-vanilla-3.14:*[${MULTILIB_USEDEP},vulkan]
-		>=app-emulation/wine-staging-3.14:*[${MULTILIB_USEDEP},vulkan]
+		video_cards_nvidia? ( >=x11-drivers/nvidia-drivers-440.41 )
+		>=media-libs/mesa-19.2
+	)
+	|| (
+		>=app-emulation/wine-vanilla-4.5:*[${MULTILIB_USEDEP},vulkan]
+		>=app-emulation/wine-staging-4.5:*[${MULTILIB_USEDEP},vulkan]
 	)"
+
 DEPEND="${RDEPEND}
-	dev-util/glslang"
+	dev-util/glslang
+	dev-util/vulkan-headers"
+
+BDEPEND="
+	>=dev-util/meson-0.46"
 
 # Convert PV to not doted integer
 PVINT=$(echo "${PV//./}")
@@ -53,7 +65,10 @@ if [[ ${PV} != "9999" ]] ; then
 	S="${WORKDIR}/dxvk-${PV}"
 fi
 
-bits() { [[ ${ABI} = amd64 ]] && echo 64 || echo 32; }
+bits() {
+	[[ ${ABI} = "amd64" ]] && echo 64
+	[[ ${ABI} = "x86" ]]   && echo 32
+}
 
 src_prepare() {
 	if use dxvk-config; then
@@ -65,37 +80,47 @@ src_prepare() {
 	if use custom-cflags; then
 		PATCHES+=("${FILESDIR}/flags-winelib.patch")
 	fi
-	default
 
-	# For some reason avx is causing issues,
-	# so disable it if '-march' is used.
-	if [ $(is-flag "-march=*") = "true" ]; then
-		append-flags "-mno-avx"
-	fi
+	# From bobwya's dxvk ebuild.
+	filter-flags "-Wl,--hash-style*"
+	[[ "$(is-flag "-march=*")" == "true" ]] && append-flags "-mno-avx"
 
 	replace-flags "-O3" "-O3 -fno-stack-protector"
 
-	# Create versioned setup script
-	cp "setup_dxvk.sh" "${PN}-setup"
-	sed -e "s#basedir=.*#basedir=\"${EPREFIX}/usr\"#" -i "${PN}-setup" || die
+	default
+
+	# Rename final setup script in README.md
+	sed -i -e "s|./setup_dxvk.sh|${PV}-setup|g" "${S}/README.md" \
+		|| die "sed failed"
+	sed -i -e "s#basedir=.*#basedir=\"${EPREFIX}/usr\"#" "${S}/setup_dxvk.sh" \
+		|| die "sed failed"
+
+	# From bobwya's dxvk ebuild.
+	# Delete installation instructions for unused ABIs.
+	if use abi_x86_32; then
+		sed -i '\|installFile "$win32_sys_path"|d' "${S}/setup_dxvk.sh" \
+			|| die "sed failed"
+	fi
+	if use abi_x86_64; then
+		sed -i '\|installFile "$win64_sys_path"|d' "${S}/setup_dxvk.sh" \
+			|| die "sed failed"
+	fi
 
 	bootstrap_dxvk() {
 		# Set DXVK location for each ABI
-		sed -e "s#x$(bits)#$(get_libdir)/${PN}#" -i "${S}/${PN}-setup" || die
+		sed -e "s#x$(bits)#$(get_libdir)/${PN}#" -i "${S}/setup_dxvk.sh" \
+			|| die "sed failed"
 
 		# Add *FLAGS to cross-file
 		sed -i \
 			-e "s!@CFLAGS@!$(_meson_env_array "${CFLAGS}" -fpermissive)!" \
 			-e "s!@CXXFLAGS@!$(_meson_env_array "${CXXFLAGS}" -fpermissive)!" \
 			-e "s!@LDFLAGS@!$(_meson_env_array "${LDFLAGS}")!" \
-			build-wine$(bits).txt || die
+			build-wine$(bits).txt \
+			|| die "sed failed"
 	}
 
 	multilib_foreach_abi bootstrap_dxvk
-
-	# Clean missed ABI in setup script
-	sed -e "s#.*x32.*##" -e "s#.*x64.*##" \
-		-i "${PN}-setup" || die
 }
 
 multilib_src_configure() {
@@ -108,18 +133,12 @@ multilib_src_configure() {
 	meson_src_configure
 }
 
-multilib_src_compile() {
-	meson_src_compile
-}
-
 multilib_src_install() {
 	meson_src_install
 }
 
 multilib_src_install_all() {
-	# create combined setup helper
-	exeinto /usr/bin
-	doexe "${S}/${PN}-setup"
+	newbin "setup_dxvk.sh" "${PN}-setup"
 
 	dodoc "${S}/dxvk.conf"
 

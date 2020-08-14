@@ -7,7 +7,7 @@ EAPI=7
 PLOCALES="ar ast bg ca cs da de el en en_US eo es fa fi fr he hi hr hu it ja ko lt ml nb_NO nl or pa pl pt_BR pt_PT rm ro ru si sk sl sr_RS@cyrillic sr_RS@latin sv ta te th tr uk wa zh_CN zh_TW"
 PLOCALE_BACKUP="en"
 
-inherit autotools flag-o-matic l10n multilib multilib-minimal pax-utils toolchain-funcs virtualx wine xdg-utils-r1
+inherit autotools l10n multilib multilib-minimal pax-utils toolchain-funcs virtualx wine xdg-utils
 
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
@@ -20,14 +20,14 @@ else
 	KEYWORDS="-* ~amd64 ~x86"
 fi
 
-DESCRIPTION="Free implementation of Windows(tm) on Unix, Staging patchset."
+DESCRIPTION="Free implementation of Windows(tm) on Unix, with Wine Staging patchset"
 HOMEPAGE="https://www.winehq.org/"
 SRC_URI="${SRC_URI}"
 
 LICENSE="LGPL-2.1"
 SLOT="${PV}"
 
-IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio ffmpeg +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap mingw +mono mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks +unwind v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml"
+IUSE="+abi_x86_32 +abi_x86_64 +alsa capi cups custom-cflags dos elibc_glibc faudio ffmpeg +fontconfig +gcrypt +gecko gphoto2 gsm gstreamer +jpeg kerberos kernel_FreeBSD +lcms ldap +mono mingw mp3 ncurses netapi nls odbc openal opencl +opengl osmesa oss pcap +perl pipelight +png prelink prefix pulseaudio +realtime +run-exes samba scanner sdl2 selinux +ssl test themes +threads +truetype udev +udisks +unwind v4l vaapi vkd3d vulkan +X +xcomposite xinerama +xml"
 REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )
 	X? ( truetype )
 	elibc_glibc? ( threads )
@@ -146,39 +146,6 @@ DEPEND="${COMMON_DEPEND}
 S="${WORKDIR}/${WINE_P}"
 [[ "${WINE_PV}" == "9999" ]] && EGIT_CHECKOUT_DIR="${S}"
 
-check_mingw() {
-	local -a categories
-	use abi_x86_64 && categories+=("cross-x86_64-w64-mingw32")
-	use abi_x86_32 && categories+=("cross-i686-w64-mingw32")
-
-	for cat in ${categories[@]}; do
-		if ! has_version -b "${cat}/mingw64-runtime[libraries]" ||
-				! has_version -b "${cat}/gcc"; then
-			eerror "The ${cat} toolchain is not properly installed."
-			eerror "Make sure to install ${cat}/gcc with:"
-			eerror "EXTRA_ECONF=\"--enable-threads=posix --disable-sjlj-exceptions --with-dwarf2\""
-			eerror "and ${cat}/mingw64-runtime with USE=\"libraries\"."
-			einfo
-			einfo "For a short guide please go to the link below.:"
-			einfo "<https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay/-/tree/master/app-emulation#setting-up-mingw-in-gentoo>"
-			einfo
-			die "${cat} toolchain required."
-		fi
-	done
-}
-
-pkg_pretend() {
-	if use mingw; then
-		check_mingw
-	fi
-}
-
-pkg_setup() {
-	if use mingw; then
-		check_mingw
-	fi
-}
-
 src_unpack() {
 	# Fully Mirror git tree, Wine, so we can access commits in all branches
 	[[ "${WINE_PV}" == "9999" ]] && EGIT_MIN_CLONE_TYPE="mirror"
@@ -261,7 +228,6 @@ multilib_src_configure() {
 		"--localstatedir=${WINE_LOCALSTATEDIR}"
 		"--mandir=${WINE_MANDIR}"
 		"--sysconfdir=/etc/wine"
-		"$(use_with mingw)"
 		"$(use_with alsa)"
 		"$(use_with capi)"
 		"$(use_with lcms cms)"
@@ -279,6 +245,7 @@ multilib_src_configure() {
 		"$(use_with kerberos gssapi)"
 		"$(use_with kerberos krb5)"
 		"$(use_with ldap)"
+		"$(use_with mingw)"
 		"$(use_enable mono mscoree)"
 		"$(use_with mp3 mpg123)"
 		"$(use_with netapi)"

@@ -51,9 +51,12 @@ PATCHES=()
 if [[ "${PV}" == "9999" ]]; then
 	# Recent changes to upstream required a patch rebase.
 	PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+elif [[ "${PV}" == "1.7.1" ]]; then
+	PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.7.1.patch")
 else
 	PATCHES+=("${FILESDIR}/dxvk-restore-winelib.patch")
 fi
+
 if [[ "${PVINT}" -gt "161" ]]; then
 	PATCHES+=(
 		"${FILESDIR}/dxvk-restore-spec-files.patch"

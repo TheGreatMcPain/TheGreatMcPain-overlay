@@ -13,7 +13,7 @@ DESCRIPTION="Reactive Extensions for Python"
 HOMEPAGE="http://reactivex.io/"
 SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${PN}-${MY_PV}.tar.gz"
 
-LICENSE="Apache-2.0"
+LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 

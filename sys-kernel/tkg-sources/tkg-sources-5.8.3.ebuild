@@ -15,10 +15,6 @@ SRC_URI="${KERNEL_URI}";
 KEYWORDS="-* ~amd64 ~ppc ~ppc64 ~x86"
 IUSE=""
 
-PATCHES="
-	"${FILESDIR}"/4567_distro-Gentoo-Kconfig.patch
-	"${FILESDIR}"/tkg-sources-5.8.3.patch.xz"
-
 pkg_setup(){
 	ewarn
 	ewarn "${PN} is *not* supported by the Gentoo Kernel Project in any way."
@@ -31,6 +27,21 @@ pkg_setup(){
 
 src_unpack() {
 	kernel-2_src_unpack
+
+	# Unpack tkg patch
+	unpack "${FILESDIR}/tkg-sources-5.8.3.patch.xz"
+}
+
+src_prepare() {
+	kernel-2_src_prepare
+
+	# Apply unpacked patch
+	eapply "${S}/tkg-sources-5.8.3.patch"
+
+	# Adds Gentoo Config options
+	eapply "${FILESDIR}/4567_distro-Gentoo-Kconfig.patch"
+
+	eapply_user
 }
 
 src_install() {

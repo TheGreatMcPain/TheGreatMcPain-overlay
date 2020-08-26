@@ -5,12 +5,11 @@ EAPI=6
 ETYPE="sources"
 
 inherit kernel-2
-#detect_version
-K_NOSETEXTRAVERSION="don't_set_it"
+detect_version
 
 DESCRIPTION="Kernel Sources based on linux-tkg v5.x"
 HOMEPAGE="https://github.com/Frogging-Family/linux-tkg"
-SRC_URI="${KERNEL_URI}";
+SRC_URI="${KERNEL_URI} https://gitlab.com/TheGreatMcPain/tkg-sources-patches/-/raw/master/tkg-sources-${PV}.patch"
 
 KEYWORDS="-* ~amd64 ~ppc ~ppc64 ~x86"
 IUSE=""
@@ -27,16 +26,13 @@ pkg_setup(){
 
 src_unpack() {
 	kernel-2_src_unpack
-
-	# Unpack tkg patch
-	unpack "${FILESDIR}/tkg-sources-5.8.3.patch.xz"
 }
 
 src_prepare() {
 	kernel-2_src_prepare
 
 	# Apply unpacked patch
-	eapply "${S}/tkg-sources-5.8.3.patch"
+	eapply "${DISTDIR}/tkg-sources-5.8.3.patch"
 
 	# Adds Gentoo Config options
 	eapply "${FILESDIR}/4567_distro-Gentoo-Kconfig.patch"

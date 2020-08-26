@@ -15,6 +15,7 @@ RDEPEND="
 		sys-kernel/vanilla-sources
 		sys-kernel/ck-sources
 		sys-kernel/liquorix-sources
+		sys-kernel/tkg-sources
 		sys-kernel/git-sources
 		sys-kernel/mips-sources
 		sys-kernel/pf-sources

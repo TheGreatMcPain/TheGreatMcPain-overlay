@@ -62,6 +62,8 @@ pkg_setup() {
 
 	if use amd64; then
 		BTSTRP=${BTSTRP_AMD64}
+	elif use arm; then
+		BTSTRP=${BTSTRP_ARM}
 	else
 		BTSTRP=${BTSTRP_X86}
 	fi

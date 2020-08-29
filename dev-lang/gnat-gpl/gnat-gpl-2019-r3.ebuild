@@ -93,7 +93,9 @@ src_unpack() {
 
 	toolchain_src_unpack
 	if use bootstrap; then
-		rm ${BTSTRP}/libexec/gcc/*/4.7.4/ld || die
+		if ! use arm; then
+			rm ${BTSTRP}/libexec/gcc/*/4.7.4/ld || die
+		fi
 	fi
 }
 

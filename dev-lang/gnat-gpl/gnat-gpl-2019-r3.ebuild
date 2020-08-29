@@ -69,7 +69,11 @@ pkg_setup() {
 	fi
 
 	if use bootstrap; then
-		GCC="${WORKDIR}"/${BTSTRP}/bin/gcc
+		if ! use arm; then
+			GCC="${WORKDIR}"/${BTSTRP}/bin/gcc
+		else
+			GCC="${WORKDIR}"/${BTSTRP}/bin/arm-eabi-gcc
+		fi
 	else
 		GCC=${ADA:-$(tc-getCC)}
 	fi

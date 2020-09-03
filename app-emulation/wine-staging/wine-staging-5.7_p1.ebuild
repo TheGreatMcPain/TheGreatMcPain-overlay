@@ -12,7 +12,7 @@ inherit autotools l10n multilib multilib-minimal pax-utils toolchain-funcs virtu
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
 if [ -z ${EGIT_BRANCH+x} ]; then
-	EGIT_BRANCH="lutris-5.7-8"
+	EGIT_BRANCH="lutris-5.7-9"
 fi
 if [[ ${PV} = "9999" ]]; then
 	KEYWORDS=""

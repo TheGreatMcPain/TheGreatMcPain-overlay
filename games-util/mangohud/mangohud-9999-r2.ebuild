@@ -45,17 +45,9 @@ DEPEND="
 
 RDEPEND="${DEPEND}"
 
-src_unpack() {
-	if [[ -n ${A} ]]; then
-		mkdir "${P}"
-		cd "${P}"
-		unpack ${A}
-	fi
-
-	if [[ ${PV} == "9999" ]]; then
-		git-r3_src_unpack
-	fi
-}
+if ! [[ ${PV} == "9999" ]]; then
+	S="${WORKDIR}"/MangoHud-${PV}
+fi
 
 multilib_src_configure() {
 	local emesonargs=(

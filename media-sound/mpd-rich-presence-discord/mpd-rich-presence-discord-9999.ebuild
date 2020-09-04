@@ -6,9 +6,9 @@ EAPI=7
 inherit cmake git-r3
 
 DESCRIPTION="Broadcast your MPD state using discord rich presence!"
-HOMEPAGE="https://github.com/SSStormy/mpd-rich-presence-discord"
+HOMEPAGE="https://github.com/justas-d/mpd-rich-presence-discord"
 
-EGIT_REPO_URI="https://github.com/SSStormy/mpd-rich-presence-discord.git"
+EGIT_REPO_URI="https://github.com/justas-d/mpd-rich-presence-discord.git"
 EGIT_SUBMODULES=(
 	"-*"
 )

@@ -1,11 +1,11 @@
 # Copyright 2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 PYTHON_COMPAT=( python3_{6,7,8} )
 
-inherit eutils cmake-utils git-r3 multilib python-single-r1 vim-plugin
+inherit eutils cmake git-r3 multilib python-single-r1 vim-plugin
 
 # Store Current Eclipse JDT Langauge Server Version
 # that will be compared with ycmd during src_prepare().
@@ -94,7 +94,7 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 	rust? (
-		dev-lang/rust[rls]
+		dev-util/rust-analyzer
 	)
 	go? (
 		dev-go/gopls
@@ -169,7 +169,7 @@ src_prepare() {
 	# 	rm -r "${S}"/third_party/${third_party_module} || die "Failed to remove third party module ${third_party_module}"
 	# done
 	rm -r "${S}"/third_party/ycmd/cpp/BoostParts || die "Failed to remove bundled boost"
-	cmake-utils_src_prepare
+	cmake_src_prepare
 }
 
 src_configure() {
@@ -178,11 +178,11 @@ src_configure() {
 		-DEXTERNAL_LIBCLANG_PATH="$(usex clang $(clang --print-file-name=libclang.so) '')"
 		-DUSE_SYSTEM_BOOST=ON
 	)
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 src_compile() {
-	cmake-utils_src_compile
+	cmake_src_compile
 
 	# Apply patches that force YouCompleteMe to use system
 	# versions of 'rls', and 'gopls'.

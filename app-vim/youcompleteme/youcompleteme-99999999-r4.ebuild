@@ -41,7 +41,6 @@ EGIT_SUBMODULES=(
 	'-third_party/requests_deps/requests'
 	'-third_party/requests_deps/urllib3'
 	'-third_party/requests-futures'
-	'-third_party/python-future'
 )
 
 LICENSE="
@@ -87,7 +86,6 @@ RDEPEND="
 		dev-python/waitress[${PYTHON_MULTI_USEDEP}]
 		dev-python/requests-futures[${PYTHON_MULTI_USEDEP}]
 		dev-python/watchdog[${PYTHON_MULTI_USEDEP}]
-		virtual/python-futures[${PYTHON_MULTI_USEDEP}]
 	')
 "
 

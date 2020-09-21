@@ -5,7 +5,7 @@ EAPI=7
 
 PYTHON_COMPAT=( python3_{6,7,8} )
 
-inherit eutils cmake git-r3 multilib python-single-r1 vim-plugin
+inherit eutils cmake git-r3 multilib python-single-r1 vim-plugin vcs-clean
 
 # Store Current Eclipse JDT Langauge Server Version
 # that will be compared with ycmd during src_prepare().

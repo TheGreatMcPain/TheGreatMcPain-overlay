@@ -206,3 +206,7 @@ src_unpack() {
 		mv -T "${PN}-${MY_PV}" "${P}" || die
 	fi
 }
+
+src_install() {
+	cargo_src_install --path "./crates/rust-analyzer"
+}

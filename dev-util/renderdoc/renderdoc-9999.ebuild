@@ -1,11 +1,11 @@
 # Copyright 2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI="7"
 
 PYTHON_COMPAT=( python3_{6,7,8} )
 
-inherit qmake-utils cmake-multilib eutils python-single-r1 git-r3 xdg-utils
+inherit qmake-utils cmake eutils python-single-r1 git-r3 xdg-utils
 
 SWIG_VERSION="7"
 SWIG_ZIP_FILENAME="${PN}_swig_modified-${SWIG_VERSION}.zip"
@@ -23,7 +23,7 @@ export QT_SELECT="qt5"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="~amd64"
 IUSE="+qt5 +python"
 
 RDEPEND="${PYTHON_DEPS}
@@ -54,28 +54,21 @@ PATCHES="
 "
 
 src_prepare() {
-	default
+	cmake_src_prepare
 	# Force vulkan layer to be multilib.
 	sed "${S}"/renderdoc/driver/vulkan/renderdoc.json \
 		-e 's|@VULKAN_LAYER_MODULE_PATH@|librenderdoc.so|g' \
 		-i || die
 }
 
-multilib_src_configure() {
-	if ! multilib_is_native_abi; then
-		local mycmakeargs=(
-			-DENABLE_QRENDERDOC=OFF
-			-DENABLE_PYRENDERDOC=OFF
-		)
-	else
-		local mycmakeargs=(
-			-DRENDERDOC_SWIG_PACKAGE="${DISTDIR}/${SWIG_ZIP_FILENAME}"
-		)
-	fi
-	cmake-utils_src_configure
+src_configure() {
+	local mycmakeargs=(
+		-DRENDERDOC_SWIG_PACKAGE="${DISTDIR}/${SWIG_ZIP_FILENAME}"
+	)
+	cmake_src_configure
 }
 
-multilib_src_install_all() {
+src_install() {
 	cp "${S}"/util/LINUX_DIST_README "${S}"/README || die
 	dodoc README
 	dodoc LICENSE.md

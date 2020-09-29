@@ -28,7 +28,7 @@ KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror"
 EMULTILIB_PKG="true"
 
-IUSE="acpi compat +driver gtk3 kernel_FreeBSD kernel_linux +kms libglvnd multilib static-libs systemd +tools uvm wayland +X"
+IUSE="compat +driver gtk3 kernel_FreeBSD kernel_linux +kms libglvnd multilib static-libs systemd +tools uvm wayland +X"
 REQUIRED_USE="
 	tools? ( X )
 	static-libs? ( tools )
@@ -70,7 +70,6 @@ DEPEND="
 "
 RDEPEND="
 	${COMMON}
-	acpi? ( sys-power/acpid )
 	tools? ( !media-video/nvidia-settings )
 	uvm? ( >=virtual/opencl-3 )
 	wayland? ( dev-libs/wayland[${MULTILIB_USEDEP}] )

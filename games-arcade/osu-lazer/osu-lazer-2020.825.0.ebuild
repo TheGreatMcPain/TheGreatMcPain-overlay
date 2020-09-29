@@ -14,14 +14,13 @@ if [[ ${PV} = "9999" ]]; then
 	KEYWORDS=""
 else
 	SRC_URI="https://github.com/ppy/osu/archive/${PV}.tar.gz"
-	KEYWORDS="~amd64 ~x86"
+	KEYWORDS="~amd64"
 fi
 
 LICENSE="MIT CC-BY-NC-4.0"
 SLOT="0"
 IUSE=""
-# dotnet needs to download some nuget packages to build osu-lazer
-RESTRICT="network-sandbox test"
+RESTRICT="test"
 
 DEPEND="
 	media-video/ffmpeg
@@ -38,6 +37,21 @@ output="./osu.Desktop/bin/Release/netcoreapp$dotnet_ver/linux-x64"
 if ! [[ ${PV} = "9999" ]]; then
 	S="${WORKDIR}/osu-${PV}"
 fi
+
+pkg_setup() {
+	if has network-sandbox $FEATURES; then
+		eerror
+		eerror "This ebuild requires that FEATURE 'network-sandbox'"
+		eerror "be disabled, because 'dotnet restore' needs to download"
+		eerror "dependencies for osu-lazer."
+		eerror
+		einfo
+		einfo "Just add 'FEATURES=\"-network-sandbox\" games-arcade/osu-lazer'"
+		einfo "into package.env."
+		einfo
+		die "network-sandbox is enabled"
+	fi
+}
 
 src_compile() {
 	if [[ ${PV} = "9999" ]]; then

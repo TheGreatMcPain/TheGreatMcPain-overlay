@@ -51,6 +51,9 @@ PATCHES=()
 if [[ "${PV}" == "9999" ]]; then
 	# Recent changes to upstream required a patch rebase.
 	PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+	# Recent patch which fixes non-ascii chars on windows breaks
+	# winelib build.
+	PATCHES+=("${FILESDIR}/dxvk-revert-handle-non-ascii.patch")
 elif [[ "${PV}" == "1.7.1" ]]; then
 	PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.7.1.patch")
 else

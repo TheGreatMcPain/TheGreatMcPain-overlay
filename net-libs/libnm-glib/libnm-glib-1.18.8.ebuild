@@ -15,13 +15,14 @@ HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
 LICENSE="GPL-2+"
 SLOT="0" # add subslot if libnm-util.so.2 or libnm-glib.so.4 bumps soname version
 
-IUSE="elogind gnutls +introspection +nss systemd vala"
+IUSE="elogind gnutls +introspection +minimal +nss systemd vala"
 RESTRICT="test"
 
 REQUIRED_USE="
 	vala? ( introspection )
 	|| ( nss gnutls )
 	?? ( systemd elogind )
+	minimal? ( !vala )
 "
 
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc ~x86"
@@ -152,19 +153,21 @@ multilib_src_compile() {
 	)
 
 	# Extra bits
-	if multilib_is_native_abi; then
-		targets+=(
-			libnm-util/NetworkManager-1.0.gir
-			libnm-util/NetworkManager-1.0.typelib
-			libnm-glib/NMClient-1.0.gir
-			libnm-glib/NMClient-1.0.typelib
-		)
-
-		if use vala; then
+	if ! use minimal; then
+		if multilib_is_native_abi; then
 			targets+=(
-				vapi/libnm-glib.vapi
-				vapi/libnm-util.vapi
+				libnm-util/NetworkManager-1.0.gir
+				libnm-util/NetworkManager-1.0.typelib
+				libnm-glib/NMClient-1.0.gir
+				libnm-glib/NMClient-1.0.typelib
 			)
+
+			if use vala; then
+				targets+=(
+					vapi/libnm-glib.vapi
+					vapi/libnm-util.vapi
+				)
+			fi
 		fi
 	fi
 
@@ -175,42 +178,44 @@ multilib_src_compile() {
 # lets just manually install the files.
 multilib_src_install() {
 	# Install extra bits.
-	if multilib_is_native_abi; then
-		dodir "/usr/$(get_libdir)/girepository-1.0"
-		insinto "/usr/$(get_libdir)/girepository-1.0"
-		doins libnm-util/NetworkManager-*.typelib
-		doins libnm-glib/NMClient-*.typelib
+	if ! use minimal; then
+		if multilib_is_native_abi; then
+			dodir "/usr/$(get_libdir)/girepository-1.0"
+			insinto "/usr/$(get_libdir)/girepository-1.0"
+			doins libnm-util/NetworkManager-*.typelib
+			doins libnm-glib/NMClient-*.typelib
 
-		dodir "/usr/share/gir-1.0"
-		insinto "/usr/share/gir-1.0"
-		doins libnm-util/NetworkManager-*.gir
-		doins libnm-glib/NMClient-*.gir
+			dodir "/usr/share/gir-1.0"
+			insinto "/usr/share/gir-1.0"
+			doins libnm-util/NetworkManager-*.gir
+			doins libnm-glib/NMClient-*.gir
 
-		if use vala; then
-			dodir "/usr/share/vala/vapi"
-			insinto "/usr/share/vala/vapi"
-			doins vapi/libnm-*
+			if use vala; then
+				dodir "/usr/share/vala/vapi"
+				insinto "/usr/share/vala/vapi"
+				doins vapi/libnm-*
+			fi
 		fi
+
+		# Install headers
+		dodir "/usr/include/libnm-glib"
+		insinto "/usr/include/libnm-glib"
+		doins libnm-glib/nm-glib-enum-types.h
+		doins "${S}"/libnm-glib/*.h
+
+		dodir "/usr/include/NetworkManager"
+		insinto "/usr/include/NetworkManager"
+		doins libnm-util/nm-utils-enum-types.h
+		doins "${S}"/libnm-util/*.h
+
+		# Install pkgconfig files
+		dodir "/usr/$(get_libdir)/pkgconfig"
+		insinto "/usr/$(get_libdir)/pkgconfig"
+		doins meson-private/NetworkManager*.pc
+		doins meson-private/libnm-*.pc
 	fi
-
-	# Install headers
-	dodir "/usr/include/libnm-glib"
-	insinto "/usr/include/libnm-glib"
-	doins libnm-glib/nm-glib-enum-types.h
-	doins "${S}"/libnm-glib/*.h
-
-	dodir "/usr/include/NetworkManager"
-	insinto "/usr/include/NetworkManager"
-	doins libnm-util/nm-utils-enum-types.h
-	doins "${S}"/libnm-util/*.h
 
 	# Install libraries
 	dolib libnm-glib/libnm-*.so*
 	dolib libnm-util/libnm-*.so*
-
-	# Install pkgconfig files
-	dodir "/usr/$(get_libdir)/pkgconfig"
-	insinto "/usr/$(get_libdir)/pkgconfig"
-	doins meson-private/NetworkManager*.pc
-	doins meson-private/libnm-*.pc
 }

@@ -6,5 +6,6 @@
 	</maintainer>
 	<use>
 		<flag name="nss">Use <pkg>dev-libs/nss</pkg> for cryptography</flag>
+		<flag name="minimal">Only install library files</flag>
 	</use>
 </pkgmetadata>

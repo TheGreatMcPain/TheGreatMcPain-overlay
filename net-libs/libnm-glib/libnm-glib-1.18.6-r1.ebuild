@@ -7,7 +7,7 @@ GNOME2_LA_PUNT="yes"
 VALA_USE_DEPEND="vapigen"
 PYTHON_COMPAT=( python{3_6,3_7} )
 
-inherit bash-completion-r1 gnome2 multilib python-any-r1 readme.gentoo-r1 vala udev multilib-minimal
+inherit gnome2 meson multilib python-any-r1 vala udev multilib-minimal
 
 DESCRIPTION="NetworkManager client library (legacy)"
 HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
@@ -15,8 +15,8 @@ HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
 LICENSE="GPL-2+"
 SLOT="0" # add subslot if libnm-util.so.2 or libnm-glib.so.4 bumps soname version
 
-IUSE="elogind gnutls +introspection +nss systemd test vala"
-RESTRICT="!test? ( test )"
+IUSE="elogind gnutls +introspection +nss systemd vala"
+RESTRICT="test"
 
 REQUIRED_USE="
 	vala? ( introspection )
@@ -62,11 +62,6 @@ DEPEND="${COMMON_DEPEND}
 		dev-libs/libxslt
 	)
 	vala? ( $(vala_depend) )
-	test? (
-		$(python_gen_any_dep '
-			dev-python/dbus-python[${PYTHON_USEDEP}]
-			dev-python/pygobject:3[${PYTHON_USEDEP}]')
-	)
 "
 
 PATCHES=(
@@ -78,74 +73,71 @@ python_check_deps() {
 	if use introspection; then
 		has_version "dev-python/pygobject:3[${PYTHON_USEDEP}]" || return
 	fi
-	if use test; then
-		has_version "dev-python/dbus-python[${PYTHON_USEDEP}]" &&
-		has_version "dev-python/pygobject:3[${PYTHON_USEDEP}]"
-	fi
 }
 
 pkg_setup() {
-	if use introspection || use test; then
+	if use introspection; then
 		python-any-r1_pkg_setup
 	fi
 }
 
 src_prepare() {
-	DOC_CONTENTS="To modify system network connections without needing to enter the
-		root password, add your user account to the 'plugdev' group."
-
 	use vala && vala_src_prepare
 	gnome2_src_prepare
 }
 
 multilib_src_configure() {
-	local myconf=(
-		--disable-more-warnings
-		--disable-static
-		--localstatedir=/var
-		--disable-lto
-		--disable-config-plugin-ibft
-		--disable-qt
-		--without-netconfig
-		--with-dbus-sys-dir=/etc/dbus-1/system.d
+	local emesonargs=(
+		-Dmore_asserts="no"
+		-Dmore_logging=false
+		-Dqt=false
+		-Dnetconfig="no"
+		-Ddbus_conf_dir="/etc/dbus-1/system.d"
 		# We need --with-libnm-glib (and dbus-glib dep) as reverse deps are
 		# still not ready for removing that lib, bug #665338
-		--with-libnm-glib
-		--without-nmcli
-		--with-udev-dir="$(get_udevdir)"
-		--with-config-plugins-default=keyfile
-		--with-iptables=/sbin/iptables
-		--with-ebpf=yes
-		--disable-concheck
-		--with-crypto=$(usex nss nss gnutls)
-		--with-session-tracking=$(multilib_native_usex systemd systemd $(multilib_native_usex elogind elogind no))
+		-Dlibnm_glib=true
+		-Dnmcli=false
+		-Dudev_dir="$(get_udevdir)"
+		-Dconfig_plugins_default="keyfile"
+		-Diptables="/sbin/iptables"
+		-Debpf="true"
+		-Dconcheck=false
+		-Dcrypto="$(usex nss nss gnutls)"
+		-Dsession_tracking_consolekit=false
+		-Dsession_tracking="$(multilib_native_usex systemd systemd $(multilib_native_usex elogind elogind no))"
 		# There is no off switch, use elogind be default.
-		--with-suspend-resume=$(multilib_native_usex systemd systemd $(multilib_native_usex elogind elogind consolekit))
-		--without-libaudit
-		--disable-bluez5-dun
-		--without-dhclient
-		--without-dhcpcd
-		$(multilib_native_use_enable introspection)
-		--disable-json-validation
-		--disable-ppp
-		--without-libpsl
-		--without-modem-manager-1
-		--without-nmtui
-		--without-ofono
-		--disable-ovs
-		--disable-polkit
-		--disable-polkit-agent
-		--without-resolvconf
-		--without-selinux
-		--without-systemd-journal
-		--disable-teamdctl
-		$(multilib_native_use_enable test tests)
-		$(multilib_native_use_enable vala)
-		--without-valgrind
-		--without-iwd
-		--without-wext
-		--disable-wifi
+		-Dsuspend_resume="$(multilib_native_usex systemd systemd $(multilib_native_usex elogind elogind consolekit))"
+		-Dlibaudit="no"
+		-Dbluez5_dun=false
+		-Ddhclient="no"
+		-Ddhcpcd="no"
+		-Dintrospection=$(multilib_native_usex introspection true false)
+		-Djson_validation=false
+		-Dppp=false
+		-Dlibpsl=false
+		-Dmodem_manager=false
+		-Dnmtui=false
+		-Dofono=false
+		-Dovs=false
+		-Dpolkit=false
+		-Dpolkit_agent=false
+		-Dresolveconf="no"
+		-Dselinux=false
+		-Dsystemd_journal=false
+		-Dteamdctl=false
+		-Dtests="no"
+		-Dvapi="$(multilib_native_usex vala true false)"
+		-Dvalgrind="no"
+		-Diwd=false
+		-Dwext=false
+		-Dwifi=false
 	)
+
+	if use systemd; then
+		emesonargs+=( -Dsystemdsystemunitdir="$(systemd_get_systemunitdir)" )
+	else
+		emesonargs+=( -Dsystemdsystemunitdir="no" )
+	fi
 
 	if multilib_is_native_abi; then
 		# work-around man out-of-source brokenness, must be done before configure
@@ -153,28 +145,45 @@ multilib_src_configure() {
 		ln -s "${S}/man" man || die
 	fi
 
-	ECONF_SOURCE=${S} runstatedir="/run" gnome2_src_configure "${myconf[@]}"
+	meson_src_configure
 }
 
 multilib_src_compile() {
-	if multilib_is_native_abi; then
-		emake
-	else
-		local targets=(
-			libnm/libnm.la
-			libnm-util/libnm-util.la
-			libnm-glib/libnm-glib.la
-			libnm-glib/libnm-glib-vpn.la
-		)
-		emake "${targets[@]}"
-	fi
-}
+#	if multilib_is_native_abi; then
+#		meson_src_compile
+#	else
+#		local targets=(
+#			libnm/libnm.so.0.1.0
+#			libnm-util/libnm-util.so.2.7.0
+#			libnm-glib/libnm-glib.so.4.9.0
+#			libnm-glib/libnm-glib-vpn.so.1.2.0
+#		)
+#		meson_src_compile "${targets[@]}"
+#	fi
 
-multilib_src_test() {
-	if use test && multilib_is_native_abi; then
-		python_setup
-		virtx emake check
+	local targets=(
+		libnm-util/libnm-util.so.2.7.0
+		libnm-glib/libnm-glib.so.4.9.0
+		libnm-glib/libnm-glib-vpn.so.1.2.0
+	)
+
+	if multilib_is_native_abi; then
+		targets+=(
+			libnm-util/NetworkManager-1.0.gir
+			libnm-util/NetworkManager-1.0.typelib
+			libnm-glib/NMClient-1.0.gir
+			libnm-glib/NMClient-1.0.typelib
+		)
+
+		if use vala; then
+			targets+=(
+				vapi/libnm-glib.vapi
+				vapi/libnm-util.vapi
+			)
+		fi
 	fi
+
+	meson_src_compile "${targets[@]}"
 }
 
 multilib_src_install() {
@@ -196,19 +205,21 @@ multilib_src_install() {
 		fi
 	fi
 
-	local targets=(
-		install-libLTLIBRARIES
-		install-libnm_glib_libnmvpnHEADERS
-		install-libnm_glib_libnmincludeHEADERS
-		install-libnm_util_libnm_util_includeHEADERS
-		install-nodist_libnm_glib_libnmincludeHEADERS
-		install-nodist_libnm_glib_libnmvpnHEADERS
-		install-nodist_libnm_util_libnm_util_includeHEADERS
-		install-pkgconfigDATA
-	)
-	emake DESTDIR="${D}" "${targets[@]}"
+	dodir "/usr/include/libnm-glib"
+	insinto "/usr/include/libnm-glib"
+	doins libnm-glib/nm-glib-enum-types.h
+	doins "${S}"/libnm-glib/*.h
 
-	# Delete libnm.* library files, and pkgconfig.
-	rm "${ED%/}"/usr/$(get_libdir)/libnm.*
-	rm "${ED%/}"/usr/$(get_libdir)/pkgconfig/libnm.pc
+	dodir "/usr/include/NetworkManager"
+	insinto "/usr/include/NetworkManager"
+	doins libnm-util/nm-utils-enum-types.h
+	doins "${S}"/libnm-util/*.h
+
+	dolib libnm-glib/libnm-*.so*
+	dolib libnm-util/libnm-*.so*
+
+	dodir "/usr/$(get_libdir)/pkgconfig"
+	insinto "/usr/$(get_libdir)/pkgconfig"
+	doins meson-private/NetworkManager*.pc
+	doins meson-private/libnm-*.pc
 }

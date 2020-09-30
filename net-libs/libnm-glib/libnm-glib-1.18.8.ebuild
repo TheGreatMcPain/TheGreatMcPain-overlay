@@ -49,12 +49,7 @@ RDEPEND="${COMMON_DEPEND}
 "
 
 DEPEND="${COMMON_DEPEND}
-	dev-util/gdbus-codegen
-	dev-util/glib-utils
-	dev-util/gtk-doc-am
 	>=dev-util/intltool-0.40
-	>=sys-devel/gettext-0.17
-	>=sys-kernel/linux-headers-3.18
 	virtual/pkgconfig
 	introspection? (
 		$(python_gen_any_dep 'dev-python/pygobject:3[${PYTHON_USEDEP}]')
@@ -149,24 +144,14 @@ multilib_src_configure() {
 }
 
 multilib_src_compile() {
-#	if multilib_is_native_abi; then
-#		meson_src_compile
-#	else
-#		local targets=(
-#			libnm/libnm.so.0.1.0
-#			libnm-util/libnm-util.so.2.7.0
-#			libnm-glib/libnm-glib.so.4.9.0
-#			libnm-glib/libnm-glib-vpn.so.1.2.0
-#		)
-#		meson_src_compile "${targets[@]}"
-#	fi
-
+	# Main library targets
 	local targets=(
 		libnm-util/libnm-util.so.2.7.0
 		libnm-glib/libnm-glib.so.4.9.0
 		libnm-glib/libnm-glib-vpn.so.1.2.0
 	)
 
+	# Extra bits
 	if multilib_is_native_abi; then
 		targets+=(
 			libnm-util/NetworkManager-1.0.gir
@@ -186,7 +171,10 @@ multilib_src_compile() {
 	meson_src_compile "${targets[@]}"
 }
 
+# Since meson_src_install will try to compile everything
+# lets just manually install the files.
 multilib_src_install() {
+	# Install extra bits.
 	if multilib_is_native_abi; then
 		dodir "/usr/$(get_libdir)/girepository-1.0"
 		insinto "/usr/$(get_libdir)/girepository-1.0"
@@ -205,6 +193,7 @@ multilib_src_install() {
 		fi
 	fi
 
+	# Install headers
 	dodir "/usr/include/libnm-glib"
 	insinto "/usr/include/libnm-glib"
 	doins libnm-glib/nm-glib-enum-types.h
@@ -215,9 +204,11 @@ multilib_src_install() {
 	doins libnm-util/nm-utils-enum-types.h
 	doins "${S}"/libnm-util/*.h
 
+	# Install libraries
 	dolib libnm-glib/libnm-*.so*
 	dolib libnm-util/libnm-*.so*
 
+	# Install pkgconfig files
 	dodir "/usr/$(get_libdir)/pkgconfig"
 	insinto "/usr/$(get_libdir)/pkgconfig"
 	doins meson-private/NetworkManager*.pc

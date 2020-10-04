@@ -54,4 +54,8 @@ src_compile() {
 
 src_install() {
 	emake PREFIX="${ED}/usr" install
+
+	# Fix nvimpager's RUNTIME variable
+	sed -i "s#${ED}##g" "${ED}/usr/bin/nvimpager" ||
+		die "sed failed"
 }

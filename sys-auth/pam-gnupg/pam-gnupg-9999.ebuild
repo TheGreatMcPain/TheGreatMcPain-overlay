@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit autotools
+inherit autotools pam
 
 DESCRIPTION="Unlock GnuPG keys on login"
 HOMEPAGE="https://github.com/cruegge/pam-gnupg"
@@ -34,7 +34,7 @@ src_prepare() {
 }
 
 src_configure() {
-	econf --prefix=/usr --with-moduledir=/lib/security
+	econf --prefix=/usr --with-moduledir=$(getpam_mod_dir)
 }
 
 pkg_postinst() {

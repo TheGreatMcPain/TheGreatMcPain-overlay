@@ -215,6 +215,9 @@ multilib_src_install() {
 		doins meson-private/libnm-*.pc
 	fi
 
+	rm -rf libnm-glib/libnm-*.p
+	rm -rf libnm-util/libnm-*.p
+
 	# Install libraries
 	dolib libnm-glib/libnm-*.so*
 	dolib libnm-util/libnm-*.so*

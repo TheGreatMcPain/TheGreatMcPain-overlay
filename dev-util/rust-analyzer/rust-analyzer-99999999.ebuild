@@ -192,7 +192,12 @@ RESTRICT="mirror"
 SLOT="0"
 IUSE=""
 
-DEPEND=">=dev-lang/rust-1.46.0[rls]"
+DEPEND="
+	|| (
+	>=dev-lang/rust-1.46.0[rls]
+	>=dev-lang/rust-bin-1.46.0[rls]
+	)
+"
 RDEPEND="${DEPEND}"
 
 CARGO_INSTALL_PATH="${S}/crates/rust-analyzer"

@@ -215,6 +215,10 @@ multilib_src_install() {
 		doins meson-private/libnm-*.pc
 	fi
 
+	# Remove this, or dolib won't be happy.
+	rm -rf libnm-glib/libnm-*.p
+	rm -rf libnm-util/libnm-*.p
+
 	# Install libraries
 	dolib libnm-glib/libnm-*.so*
 	dolib libnm-util/libnm-*.so*

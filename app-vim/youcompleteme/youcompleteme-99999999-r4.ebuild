@@ -9,8 +9,8 @@ inherit eutils cmake git-r3 multilib python-single-r1 vim-plugin vcs-clean
 
 # Store Current Eclipse JDT Langauge Server Version
 # that will be compared with ycmd during src_prepare().
-JDTLS_MILESTONE="0.54.0"
-JDTLS_BUILD_STAMP="202004152304"
+JDTLS_MILESTONE="0.59.0"
+JDTLS_BUILD_STAMP="202007221016"
 
 DESCRIPTION="vim plugin: a code-completion engine for Vim"
 HOMEPAGE="http://valloric.github.io/YouCompleteMe/"

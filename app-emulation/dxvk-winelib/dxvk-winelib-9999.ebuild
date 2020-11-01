@@ -76,6 +76,24 @@ bits() {
 	[[ ${ABI} = "x86" ]]   && echo 32
 }
 
+pkg_setup() {
+	if [[ ${PV} == "9999" ]]; then
+		if $(has_version ">=app-emulation/wine-staging-5.9"); then
+			WINE_VERSION=$(best_version app-emulation/wine-staging)
+		elif $(has_version ">=app-emulation/wine-vanilla-5.9"); then
+			WINE_VERSION=$(best_version app-emulation/wine-vanilla)
+		else
+			die "${P} requires a wine version newer than 5.9 to build."
+		fi
+
+		WINEGPP=$(equery f $WINE_VERSION | grep /usr/bin | grep wineg++)
+		WINEGCC=$(equery f $WINE_VERSION | grep /usr/bin | grep winegcc)
+
+		WINEGPP=${WINEGPP/"/usr/bin/"/}
+		WINEGCC=${WINEGCC/"/usr/bin/"/}
+	fi
+}
+
 src_prepare() {
 	if use dxvk-config; then
 		PATCHES+=(
@@ -124,6 +142,16 @@ src_prepare() {
 			-e "s!@LDFLAGS@!$(_meson_env_array "${LDFLAGS}")!" \
 			build-wine$(bits).txt \
 			|| die "sed failed"
+
+		# Newer dxvk versions need winegcc 5.9 to build,
+		# so I'll use the latest version of winegcc.
+		if [[ ${PV} == "9999" ]]; then
+			sed -i \
+				-e "s!winegcc!$WINEGCC!" \
+				-e "s!wineg++!$WINEGPP!" \
+				build-wine$(bits).txt \
+				|| die "sed failed"
+		fi
 	}
 
 	multilib_foreach_abi bootstrap_dxvk

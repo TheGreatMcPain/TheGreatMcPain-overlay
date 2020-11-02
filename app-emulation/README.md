@@ -54,6 +54,12 @@ Each dxvk ebuild will have it's own setup script `dxvk-setup`, and `dxvk-winelib
 
 DXVK's DLLs will be installed in `/usr/lib(64)/dxvk*`
 
+I have recently added the [dxvk-async](https://github.com/Sporif/dxvk-async) patch to the dxvk ebuilds which can by applied by
+the useflag `async-patch`. Keep in mind that this patch is not supported upstream, but
+may lead to a more stutter-free experience at the cost of visual glitches.
+
+To enable it you just need to set the environment variable `DXVK_ASYNC=1`.
+
 ## Setting up Mingw in Gentoo
 
 ### Automated installation

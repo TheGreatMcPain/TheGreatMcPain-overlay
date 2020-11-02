@@ -5,6 +5,7 @@
     <email>sixsupersonic@gmail.com</email>
   </maintainer>
   <use>
+    <flag name="async-patch">Applies async patch from https://github.com/Sporif/dxvk-async</flag>
     <flag name="custom-cflags">Patches meson crossfiles to accept custom CFLAGS/CXXFLAGS.</flag>
     <flag name="dxvk-config">
       Install Valve Proton's 'dxvk_config.dll' which is used to load 'dxvk.conf'

@@ -22,7 +22,7 @@ fi
 
 LICENSE="ZLIB"
 SLOT=0
-IUSE="custom-cflags dxvk-config video_cards_nvidia"
+IUSE="async-patch custom-cflags dxvk-config video_cards_nvidia"
 REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )"
 
 RESTRICT="test"
@@ -103,6 +103,9 @@ src_prepare() {
 	fi
 	if use custom-cflags; then
 		PATCHES+=("${FILESDIR}/flags-winelib.patch")
+	fi
+	if use async-patch; then
+		PATCHES+=("${FILESDIR}/dxvk-async.patch")
 	fi
 
 	# From bobwya's dxvk ebuild.
@@ -192,6 +195,16 @@ pkg_postinst() {
 	ewarn "You may report winelib build issues to my gentoo overlay at:"
 	ewarn "<https://gitlab.com/TheGreatMcPain/thegreatmcpain-overlay>"
 	ewarn ""
+	if use async-patch; then
+		elog ""
+		elog "You have enabled the 'async-patch' useflag."
+		elog "Keep in mind that this patch is unsupported, but may yeld"
+		elog "a more stutter-free experience."
+		elog ""
+		elog "To use it just set the environment variable DXVK_ASYNC=1."
+		elog ""
+		elog "More information can be found here: https://github.com/Sporif/dxvk-async"
+	fi
 	elog ""
 	elog "dxvk installed, but not activated. You have to install the DLLs to a WINEPREFIX."
 	elog "To do this you just need to set WINEPREFIX: $ export WINEPREFIX=/path/to/prefix"

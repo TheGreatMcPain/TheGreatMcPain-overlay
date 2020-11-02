@@ -34,7 +34,7 @@ The DXVK ebuilds are based on [pchome's dxvk-gentoo-overlay](https://github.com/
 The dxvk-config useflag is mainly for Proton since Proton's wine-dxgi uses it to read
 certain dxgi related dxvk.conf options that normally require dxvk's version of dxgi
 (this allows vkd3d and dxvk to co-exist), and I like to use my dxvk ebuilds in self-built
-Proton installations. If you with to use dxvk_config.dll separately from Proton, I have
+Proton installations. If you wish to use dxvk_config.dll separately from Proton, I have
 added the option `--with-config` to the dxvk-setup scripts.
 
 The `app-emulation/dxvk` ebuild will use Mingw compilers (Which is supported upstream),

@@ -9,12 +9,14 @@ and each ebuild points to a different branch from that repository.
 
 Here's the current ebuild versions, and there respective lutris wine branch.
 
-| wine-staging version | lutris wine branch |
-| --- |:--- |
-| 5.7 | [lutris-fshack-5.7](https://github.com/lutris/wine/tree/lutris-fshack-5.7) (includes Proton's fullscreen hacks) |
-| 5.7\_p1 | [lutris-5.7-9](https://github.com/lutris/wine/tree/lutris-5.7-9) |
+| wine-staging version | lutris wine branch                                                                                              |
+| -------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| 5.7                  | [lutris-fshack-5.7](https://github.com/lutris/wine/tree/lutris-fshack-5.7) (includes Proton's fullscreen hacks) |
+| 5.7_p1               | [lutris-5.7-9](https://github.com/lutris/wine/tree/lutris-5.7-9)                                                |
 
 `wine-staging-5.14` Points to [telans' wine repository](https://github.com/telans/wine) which is a pre-patched version of wine-tkg.
+
+`wine-staging-5.13` Points to [Valve's wine repository](https://github.com/ValveSoftware/wine) which is the wine fork used for Proton.
 
 These ebuilds require bobwya's overlay to be enabled. `# layman -a bobwya`
 
@@ -32,7 +34,7 @@ The DXVK ebuilds are based on [pchome's dxvk-gentoo-overlay](https://github.com/
 The dxvk-config useflag is mainly for Proton since Proton's wine-dxgi uses it to read
 certain dxgi related dxvk.conf options that normally require dxvk's version of dxgi
 (this allows vkd3d and dxvk to co-exist), and I like to use my dxvk ebuilds in self-built
-Proton installations. If you with to use dxvk\_config.dll separately from Proton, I have
+Proton installations. If you with to use dxvk_config.dll separately from Proton, I have
 added the option `--with-config` to the dxvk-setup scripts.
 
 The `app-emulation/dxvk` ebuild will use Mingw compilers (Which is supported upstream),
@@ -83,7 +85,7 @@ If you want to use unstable versions of `binutils` and `gcc` then just use.
 # crossdev -t x86_64-w64-mingw32
 ```
 
-*Warning: binutils-2.34-r1 will cause DXVK to crash! binutils 2.33.1 and 2.34-r2 will work.*\
+_Warning: binutils-2.34-r1 will cause DXVK to crash! binutils 2.33.1 and 2.34-r2 will work._\
 
 Now in order for our new toolchains to build DXVK we need to enable pthread support.\
 We'll also go ahead and enable `dwarf2` in i686-w64-mingw32 for better performance in 32-bit DXVK.

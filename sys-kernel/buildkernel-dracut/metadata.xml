@@ -16,7 +16,7 @@
 		This is a script that builds a Gentoo Linux EFI stub kernel which is
 		suitable for booting from a USB key using UEFI (no additional
 		bootloader required). It makes use of the initramfs creation tools
-		(and early userspace init) provided by sys-kernel/genkernel-next.
+		(and early userspace init) provided by sys-kernel/dracut.
 
 		LVM-over-(dual-factor)LUKS, secure boot and plymouth are supported.
 </longdescription>

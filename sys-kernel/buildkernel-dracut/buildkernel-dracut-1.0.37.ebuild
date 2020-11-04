@@ -5,7 +5,7 @@ EAPI=5
 
 inherit eutils
 
-DESCRIPTION="Build secure boot EFI kernel with LUKS, LVM and plymouth"
+DESCRIPTION="Build secure boot EFI kernel with LUKS, LVM and plymouth (Dracut version)"
 BASE_SERVER_URI="https://github.com/TheGreatMcPain"
 HOMEPAGE="${BASE_SERVER_URI}/${PN}"
 SRC_URI="${BASE_SERVER_URI}/${PN}/archive/${PV}-dracut.tar.gz -> ${P}.tar.gz"

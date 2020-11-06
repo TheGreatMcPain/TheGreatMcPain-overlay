@@ -33,6 +33,12 @@ RDEPEND=">=sys-libs/ncurses-5.9-r2
 
 MY_PN="${PN/-dracut/}"
 
+src_unpack() {
+	default
+
+	mv -v "${WORKDIR}/${P}-dracut-electric-boogaloo"  "${WORKDIR}/${P}"
+}
+
 src_prepare() {
 	# if the plymouth use flag not set, set script variable accordingly
 	if ! use plymouth; then

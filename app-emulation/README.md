@@ -13,6 +13,7 @@ Here's the current ebuild versions, and there respective lutris wine branch.
 | -------------------- | :-------------------------------------------------------------------------------------------------------------- |
 | 5.7                  | [lutris-fshack-5.7](https://github.com/lutris/wine/tree/lutris-fshack-5.7) (includes Proton's fullscreen hacks) |
 | 5.7_p1               | [lutris-5.7-11](https://github.com/lutris/wine/tree/lutris-5.7-9)                                               |
+| 5.21                 | [lutris-5.21](https://github.com/lutris/wine/tree/lutris-5.21)                                                  |
 
 `wine-staging-5.14` Points to [telans' wine repository](https://github.com/telans/wine) which is a pre-patched version of wine-tkg.
 

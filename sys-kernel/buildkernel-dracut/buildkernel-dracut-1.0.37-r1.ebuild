@@ -8,7 +8,7 @@ inherit eutils
 DESCRIPTION="Build secure boot EFI kernel with LUKS, LVM and plymouth (Dracut version)"
 BASE_SERVER_URI="https://github.com/TheGreatMcPain"
 HOMEPAGE="${BASE_SERVER_URI}/${PN}"
-SRC_URI="${BASE_SERVER_URI}/${PN}/archive/${PV}-dracut.tar.gz -> ${P}.tar.gz"
+SRC_URI="${BASE_SERVER_URI}/${PN}/archive/${PV}-dracut-electric-boogaloo.tar.gz -> ${P}-${PVR}.tar.gz"
 
 LICENSE="GPL-3+"
 SLOT="0"
@@ -32,6 +32,12 @@ RDEPEND=">=sys-libs/ncurses-5.9-r2
 # ebuild function overrides
 
 MY_PN="${PN/-dracut/}"
+
+src_unpack() {
+	default
+
+	mv -v "${WORKDIR}/${P}-dracut-electric-boogaloo"  "${WORKDIR}/${P}"
+}
 
 src_prepare() {
 	# if the plymouth use flag not set, set script variable accordingly

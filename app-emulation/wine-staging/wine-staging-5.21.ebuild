@@ -12,7 +12,7 @@ inherit autotools l10n multilib multilib-minimal pax-utils toolchain-funcs virtu
 inherit git-r3
 EGIT_REPO_URI="https://github.com/lutris/wine.git"
 if [ -z ${EGIT_BRANCH+x} ]; then
-	EGIT_BRANCH="lutris-5.7-11"
+	EGIT_BRANCH="lutris-5.21"
 fi
 if [[ ${PV} = "9999" ]]; then
 	KEYWORDS=""
@@ -117,7 +117,7 @@ RDEPEND="${COMMON_DEPEND}
 	>=app-eselect/eselect-wine-1.5.5
 	dos? ( >=games-emulation/dosbox-0.74_p20160629 )
 	gecko? ( app-emulation/wine-gecko:2.47.1[abi_x86_32?,abi_x86_64?] )
-	mono? ( app-emulation/wine-mono:5.1.0 )
+	mono? ( app-emulation/wine-mono:5.1.1 )
 	perl? (
 		dev-lang/perl
 		dev-perl/XML-Simple
@@ -189,12 +189,15 @@ src_prepare() {
 	#551124 Only build wineconsole, if either of X or ncurses is installed
 	use X || use ncurses || wine_src_prepare_disable_tools wineconsole
 
+	# apply / revert patches
 	default
-
 	wine_eapply_bin
+	wine_eapply_revert
 
 	wine_winecfg_about_enhancement
-	wine_fix_block_scope_compound_literals
+
+	# Fix build with llvm-libunwind
+	eapply "${FILESDIR}/wine-staging-5.13-fix-llvm-libunwind.patch"
 
 	eautoreconf
 
@@ -268,7 +271,7 @@ multilib_src_configure() {
 		"$(use_with unwind)"
 		"$(use_with udisks dbus)"
 		"$(use_with v4l v4l2)"
-		"$(use_with vaapi va)"
+		"$(usex vaapi '' --without-va)"
 		"$(use_with vkd3d)"
 		"$(use_with vulkan)"
 		"$(use_with X x)"
@@ -339,7 +342,6 @@ pkg_postinst() {
 	wine_pkg_postinst
 	einfo
 	einfo "This ebuild pulls it's sources from ${EGIT_REPO_URI}."
-	einfo "Which is the sources that are used for the lutris wine runtimes."
 	einfo
 	einfo "By default we are using the ${EGIT_BRANCH} branch."
 	einfo "If you want you can change branches by setting the EGIT_BRANCH variable"

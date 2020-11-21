@@ -163,12 +163,12 @@ src_prepare() {
 		fi
 	fi
 
-	# sed -i '/^#! python3.7/d' third_party/ycmd/third_party/cregex/tools/build_regex_unicode.py
+	sed -i '/^#! python3.8/d' third_party/ycmd/third_party/mrab-regex/tools/build_regex_unicode.py
 
 	# for third_party_module in pythonfutures; do
 	# 	rm -r "${S}"/third_party/${third_party_module} || die "Failed to remove third party module ${third_party_module}"
 	# done
-	rm -r "${S}"/third_party/ycmd/cpp/BoostParts || die "Failed to remove bundled boost"
+	# rm -r "${S}"/third_party/ycmd/cpp/BoostParts || die "Failed to remove bundled boost"
 	cmake_src_prepare
 }
 
@@ -176,7 +176,6 @@ src_configure() {
 	local mycmakeargs=(
 		-DUSE_CLANG_COMPLETER="$(usex clang ON OFF)"
 		-DEXTERNAL_LIBCLANG_PATH="$(usex clang $(clang --print-file-name=libclang.so) '')"
-		-DUSE_SYSTEM_BOOST=ON
 	)
 	cmake_src_configure
 }

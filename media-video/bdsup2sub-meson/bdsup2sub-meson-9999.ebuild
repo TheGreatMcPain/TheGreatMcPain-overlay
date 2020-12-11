@@ -30,12 +30,11 @@ BDEPEND=""
 
 pkg_postinst() {
 	einfo
-	einfo "This package includes the libbdsup2sub++ library."
+	einfo "This fork of bdsup2sub++ has been modified, so that it can"
+	einfo "be used as a subproject incase a C++ project wanted to use"
+	einfo "bdsup2sub++ without needing to run it as a seperate executable."
 	einfo
-	einfo "This allows you to include bdsup2sub++ in a cpp project"
-	einfo "without having to start a bdsup2sub++ process."
-	einfo
-	einfo "For an example usage just go to this project's homepage,"
-	einfo "look at src/main.cpp"
+	einfo "An example of this can be found in my 3Dsuptools project"
+	einfo "which is located here: https://gitlab.com/TheGreatMcPain/3dsuptools"
 	einfo
 }

@@ -33,6 +33,7 @@ RDEPEND="${DEPEND}"
 
 BDEPEND="
 	>=dev-lang/lazarus-2.0.6
+	dev-libs/qt5pas
 "
 
 src_prepare() {
@@ -63,9 +64,9 @@ src_compile() {
 
 src_install() {
 	dobin "${PN}"
-	domenu "${S}/data/${PN}.desktop"
+	domenu "${S}/data/io.github.benjamimgois.${PN}.desktop"
 	insinto "/usr/share/metainfo"
-	doins "${S}/data/${PN}.metainfo.xml"
+	doins "${S}/data/io.github.benjamimgois.${PN}.metainfo.xml"
 
 	for icon_size in 128 256 512; do
 		doicon --size ${icon_size} "${S}/data/icons/${icon_size}x${icon_size}/${PN}.png"

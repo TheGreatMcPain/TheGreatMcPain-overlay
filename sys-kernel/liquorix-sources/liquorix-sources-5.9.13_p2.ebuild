@@ -6,11 +6,10 @@ ETYPE="sources"
 
 inherit eapi7-ver
 
-COMPRESSTYPE=".tar.gz"
 K_USEPV="yes"
 UNIPATCH_STRICTORDER="yes"
 K_SECURITY_UNSUPPORTED="1"
-GIT_COMMIT="5.9-6"
+GIT_COMMIT="5.9-13"
 
 CKV="$(ver_cut 1-2)"
 ETYPE="sources"
@@ -22,8 +21,8 @@ K_NOSETEXTRAVERSION="don't_set_it"
 DESCRIPTION="The Liquorix Kernel Sources v5.x"
 HOMEPAGE="http://liquorix.net/"
 LIQUORIX_VERSION="${GIT_COMMIT/_p[0-9]*}"
-LIQUORIX_FILE="${LIQUORIX_VERSION}${COMPRESSTYPE}"
-LIQUORIX_URI="https://github.com/damentz/liquorix-package/archive/${LIQUORIX_FILE}"
+LIQUORIX_FILE="${P}.tar.gz"
+LIQUORIX_URI="https://github.com/damentz/liquorix-package/archive/${LIQUORIX_VERSION}.tar.gz -> ${LIQUORIX_FILE}"
 SRC_URI="${KERNEL_URI} ${LIQUORIX_URI}";
 
 KEYWORDS="-* ~amd64 ~ppc ~ppc64 ~x86"

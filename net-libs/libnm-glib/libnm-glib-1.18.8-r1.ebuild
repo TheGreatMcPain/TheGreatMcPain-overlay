@@ -5,7 +5,7 @@ EAPI=6
 GNOME_ORG_MODULE="NetworkManager"
 GNOME2_LA_PUNT="yes"
 VALA_USE_DEPEND="vapigen"
-PYTHON_COMPAT=( python{3_6,3_7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit gnome2 meson multilib python-any-r1 vala udev multilib-minimal
 

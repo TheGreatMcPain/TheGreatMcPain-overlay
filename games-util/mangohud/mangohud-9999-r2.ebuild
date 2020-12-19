@@ -54,7 +54,7 @@ multilib_src_configure() {
 		-Dappend_libdir_mangohud=false
 		-Duse_system_vulkan=enabled
 		-Dinclude_doc=false
-		-Dwith_nvml=disabled
+		-Dwith_nvml=$(usex video_cards_nvidia enabled disabled)
 		-Dwith_xnvctrl=$(usex xnvctrl enabled disabled)
 		-Dwith_X11=$(usex X enabled disabled)
 		-Dwith_wayland=$(usex wayland enabled disabled)

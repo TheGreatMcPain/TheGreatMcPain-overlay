@@ -44,23 +44,19 @@ DEPEND="${RDEPEND}
 BDEPEND="
 	>=dev-util/meson-0.46"
 
-# Convert PV to not doted integer
-PVINT=$(echo "${PV//./}")
 # Restore winelib builds that were removed after 1.6.1.
 PATCHES=()
-if [[ "${PV}" == "9999" ]]; then
-	# Recent changes to upstream required a patch rebase.
-	PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
-	# Recent patch which fixes non-ascii chars on windows breaks
-	# winelib build.
-	PATCHES+=("${FILESDIR}/dxvk-revert-handle-non-ascii.patch")
-elif [[ "${PV}" == "1.7.1" ]]; then
-	PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.7.1.patch")
-else
-	PATCHES+=("${FILESDIR}/dxvk-restore-winelib.patch")
-fi
+if ver_test -gt "1.6.1"; then
+	if ver_test -ge "1.7.1"; then
+		PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+		if ver_test -ne "1.7.1"; then
+			# The non-ascii fix breaks winelib.
+			PATCHES+=("${FILESDIR}/dxvk-revert-handle-non-ascii.patch")
+		fi
+	else
+		PATCHES+=("${FILESDIR}/dxvk-restore-winelib.patch")
+	fi
 
-if [[ "${PVINT}" -gt "161" ]]; then
 	PATCHES+=(
 		"${FILESDIR}/dxvk-restore-spec-files.patch"
 		"${FILESDIR}/dxvk-revert-remove-vulkanfn.patch"

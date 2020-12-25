@@ -5,7 +5,7 @@ EAPI=7
 
 PYTHON_COMPAT=( python3_{6,7,8} )
 
-inherit cmake-utils python-single-r1 git-r3
+inherit cmake python-single-r1 git-r3
 
 DESCRIPTION="A fast and easy-to-use status bar"
 HOMEPAGE="https://github.com/polybar/polybar"
@@ -20,6 +20,9 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 DEPEND="
 	${PYTHON_DEPS}
+	$(python_gen_cond_dep '
+		dev-python/sphinx[${PYTHON_MULTI_USEDEP}]
+	')
 	x11-base/xcb-proto
 	x11-libs/cairo
 	x11-libs/libxcb[xkb]
@@ -49,5 +52,5 @@ src_configure() {
 		-DENABLE_PULSEAUDIO="$(usex pulseaudio)"
 	)
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }

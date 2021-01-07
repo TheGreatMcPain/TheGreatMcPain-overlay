@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -70,9 +70,6 @@ src_prepare() {
 			"${FILESDIR}/add-dxvk_config-to-setup.patch"
 		)
 	fi
-	if use custom-cflags; then
-		PATCHES+=("${FILESDIR}/flags-mingw.patch")
-	fi
 	if use async-patch; then
 		PATCHES+=("${FILESDIR}/dxvk-async.patch")
 	fi
@@ -130,7 +127,26 @@ multilib_src_configure() {
 		"$(usex debug '' '--strip')"
 		-Denable_tests=false
 	)
+
+	if use custom-cflags; then
+		emesonargs+=(
+			-Dc_args="${CFLAGS}"
+			-Dcpp_args="${CFLAGS}"
+			-Dc_link_args="${LDFLAGS} -static -static-libgcc"
+			-Dcpp_link_args="${LDFLAGS} -static -static-libgcc -static-libstdc++"
+		)
+	else
+		emesonargs+=(
+			-Dc_link_args="-static -static-libgcc"
+			-Dcpp_link_args="-static -static-libgcc -static-libstdc++"
+		)
+	fi
+
 	meson_src_configure
+}
+
+multilib_src_compile() {
+	meson_src_compile
 }
 
 multilib_src_install() {

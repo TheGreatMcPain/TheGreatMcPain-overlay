@@ -158,7 +158,7 @@ multilib_src_configure() {
 	if use custom-cflags; then
 		emesonargs+=(
 			-Dc_args="${CFLAGS} -m$(bits) -fvisibility=hidden"
-			-Dcpp_args="${CFLAGS} -m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
+			-Dcpp_args="${CXXFLAGS} -m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
 			-Dc_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
 			-Dcpp_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
 		)

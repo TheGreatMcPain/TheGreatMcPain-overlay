@@ -51,7 +51,7 @@ DEPEND="${RDEPEND}
 
 PATCHES=("${FILESDIR}"/renderdoc-dont-install-docs.patch)
 
-if [[ "${PV}" == "1.11" || "${PV}" == "9999" ]]; then
+if ver_test -eq "1.11"; then
 	PATCHES+=("${FILESDIR}"/renderdoc-1.11-fix-half-library.patch)
 fi
 

@@ -103,14 +103,6 @@ src_prepare() {
 		# Set DXVK location for each ABI
 		sed -e "s#x$(bits)#$(get_libdir)/${PN}#" -i "${S}/setup_dxvk.sh" \
 			|| die "sed failed"
-
-		# Add *FLAGS to cross-file
-		sed -i \
-			-e "s!@CFLAGS@!$(_meson_env_array "${CFLAGS}")!" \
-			-e "s!@CXXFLAGS@!$(_meson_env_array "${CXXFLAGS}")!" \
-			-e "s!@LDFLAGS@!$(_meson_env_array "${LDFLAGS}")!" \
-			build-win$(bits).txt \
-			|| die "sed failed"
 	}
 
 	multilib_foreach_abi bootstrap_dxvk

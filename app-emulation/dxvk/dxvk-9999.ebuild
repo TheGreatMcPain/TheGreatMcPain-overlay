@@ -123,7 +123,7 @@ multilib_src_configure() {
 	if use custom-cflags; then
 		emesonargs+=(
 			-Dc_args="${CFLAGS}"
-			-Dcpp_args="${CFLAGS}"
+			-Dcpp_args="${CXXFLAGS}"
 			-Dc_link_args="${LDFLAGS} -static -static-libgcc"
 			-Dcpp_link_args="${LDFLAGS} -static -static-libgcc -static-libstdc++"
 		)

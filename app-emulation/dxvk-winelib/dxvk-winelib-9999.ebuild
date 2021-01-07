@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -48,7 +48,12 @@ BDEPEND="
 PATCHES=()
 if ver_test -gt "1.6.1"; then
 	if ver_test -ge "1.7.1"; then
-		PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+		# Some changes after 1.7.3 causes some issues
+		if ver_test -le "1.7.4"; then
+			PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.7.1.patch")
+		else
+			PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+		fi
 		if ver_test -ne "1.7.1"; then
 			# The non-ascii fix breaks winelib.
 			PATCHES+=("${FILESDIR}/dxvk-revert-handle-non-ascii.patch")
@@ -73,21 +78,20 @@ bits() {
 }
 
 pkg_setup() {
-	if [[ ${PV} == "9999" ]]; then
-		if $(has_version ">=app-emulation/wine-staging-5.9"); then
-			WINE_VERSION=$(best_version app-emulation/wine-staging)
-		elif $(has_version ">=app-emulation/wine-vanilla-5.9"); then
-			WINE_VERSION=$(best_version app-emulation/wine-vanilla)
-		else
-			die "${P} requires a wine version newer than 5.9 to build."
-		fi
-
-		WINEGPP=$(equery f $WINE_VERSION | grep /usr/bin | grep wineg++)
-		WINEGCC=$(equery f $WINE_VERSION | grep /usr/bin | grep winegcc)
-
-		WINEGPP=${WINEGPP/"/usr/bin/"/}
-		WINEGCC=${WINEGCC/"/usr/bin/"/}
+	# Get the latest installed version of winegcc and wineg++.
+	if $(has_version ">=app-emulation/wine-staging-5.9"); then
+		WINE_VERSION=$(best_version app-emulation/wine-staging)
+	elif $(has_version ">=app-emulation/wine-vanilla-5.9"); then
+		WINE_VERSION=$(best_version app-emulation/wine-vanilla)
+	else
+		die "${P} requires a wine version newer than 5.9 to build."
 	fi
+
+	WINEGPP=$(equery f $WINE_VERSION | grep /usr/bin | grep wineg++)
+	WINEGCC=$(equery f $WINE_VERSION | grep /usr/bin | grep winegcc)
+
+	WINEGPP=${WINEGPP/"/usr/bin/"/}
+	WINEGCC=${WINEGCC/"/usr/bin/"/}
 }
 
 src_prepare() {
@@ -96,9 +100,6 @@ src_prepare() {
 			"${FILESDIR}/add-dxvk_config-winelib-library.patch"
 			"${FILESDIR}/add-dxvk_config-to-setup.patch"
 		)
-	fi
-	if use custom-cflags; then
-		PATCHES+=("${FILESDIR}/flags-winelib.patch")
 	fi
 	if use async-patch; then
 		PATCHES+=("${FILESDIR}/dxvk-async.patch")
@@ -134,23 +135,13 @@ src_prepare() {
 		sed -e "s#x$(bits)#$(get_libdir)/${PN}#" -i "${S}/setup_dxvk.sh" \
 			|| die "sed failed"
 
-		# Add *FLAGS to cross-file
-		sed -i \
-			-e "s!@CFLAGS@!$(_meson_env_array "${CFLAGS}" -fpermissive)!" \
-			-e "s!@CXXFLAGS@!$(_meson_env_array "${CXXFLAGS}" -fpermissive)!" \
-			-e "s!@LDFLAGS@!$(_meson_env_array "${LDFLAGS}")!" \
-			build-wine$(bits).txt \
-			|| die "sed failed"
-
 		# Newer dxvk versions need winegcc 5.9 to build,
 		# so I'll use the latest version of winegcc.
-		if [[ ${PV} == "9999" ]]; then
-			sed -i \
-				-e "s!winegcc!$WINEGCC!" \
-				-e "s!wineg++!$WINEGPP!" \
-				build-wine$(bits).txt \
-				|| die "sed failed"
-		fi
+		sed -i \
+			-e "s!winegcc!$WINEGCC!" \
+			-e "s!wineg++!$WINEGPP!" \
+			build-wine$(bits).txt \
+			|| die "sed failed"
 	}
 
 	multilib_foreach_abi bootstrap_dxvk
@@ -163,7 +154,28 @@ multilib_src_configure() {
 		--bindir="$(get_libdir)/${PN}/bin"
 		-Denable_tests=false
 	)
+
+	if use custom-cflags; then
+		emesonargs+=(
+			-Dc_args="${CFLAGS} -m$(bits) -fvisibility=hidden"
+			-Dcpp_args="${CFLAGS} -m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
+			-Dc_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
+			-Dcpp_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
+		)
+	else
+		emesonargs+=(
+			-Dc_args="-m$(bits) -fvisibility=hidden"
+			-Dcpp_args="-m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
+			-Dc_link_args="-m$(bits) -mwindows -lpthread"
+			-Dcpp_link_args="-m$(bits) -mwindows -lpthread"
+		)
+	fi
+
 	meson_src_configure
+}
+
+multilib_src_compile() {
+	meson_src_compile
 }
 
 multilib_src_install() {

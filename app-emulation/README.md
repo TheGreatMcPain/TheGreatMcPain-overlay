@@ -15,8 +15,6 @@ Here's the current ebuild versions, and there respective lutris wine branch.
 | 5.7_p1               | [lutris-5.7-11](https://github.com/lutris/wine/tree/lutris-5.7-9)                                               |
 | 5.21                 | [lutris-5.21](https://github.com/lutris/wine/tree/lutris-5.21)                                                  |
 
-`wine-staging-5.14` Points to [telans' wine repository](https://github.com/telans/wine) which is a pre-patched version of wine-tkg.
-
 `wine-staging-5.13` Points to [Valve's wine repository](https://github.com/ValveSoftware/wine) which is the wine fork used for Proton.
 
 These ebuilds require bobwya's overlay to be enabled. `# layman -a bobwya`

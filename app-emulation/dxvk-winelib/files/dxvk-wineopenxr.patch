@@ -1,32 +1,25 @@
-commit d2d7ebc9a026edfc80c6f43851ec8a16265d0111
+commit dfebb1ec797ce24544a68e4e94e1a80e5b650ccf
 Author: TheGreatMcPain <sixsupersonic@gmail.com>
 Date:   Thu Jan 7 20:38:45 2021 -0600
 
     Fix build with winelib
 
 diff --git a/src/dxvk/dxvk_openxr.cpp b/src/dxvk/dxvk_openxr.cpp
-index d632b989..7ab07aa9 100644
+index d632b989..2ed87128 100644
 --- a/src/dxvk/dxvk_openxr.cpp
 +++ b/src/dxvk/dxvk_openxr.cpp
-@@ -5,6 +5,17 @@
+@@ -5,6 +5,10 @@
  #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
  #endif
  
 +#ifdef __WINE__
 +#include <dlfcn.h>
-+
-+#pragma push_macro("_WIN32")
-+#undef _WIN32
-+#endif
-+
-+#ifdef __WINE__
-+#pragma pop_macro("_WIN32")
 +#endif
 +
  using PFN___wineopenxr_GetVulkanInstanceExtensions = int (WINAPI *)(uint32_t, uint32_t *, char *);
  using PFN___wineopenxr_GetVulkanDeviceExtensions = int (WINAPI *)(uint32_t, uint32_t *, char *);
  
-@@ -148,21 +159,36 @@ namespace dxvk {
+@@ -148,21 +152,36 @@ namespace dxvk {
  
    SoHandle DxvkXrProvider::loadLibrary() {
      SoHandle handle = nullptr;

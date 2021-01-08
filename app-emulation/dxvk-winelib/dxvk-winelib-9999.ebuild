@@ -116,6 +116,9 @@ src_prepare() {
 
 	replace-flags "-O3" "-O3 -fno-stack-protector"
 
+	# winelib doesn't like lto.
+	filter-flags "-flto*"
+
 	default
 
 	# Rename final setup script in README.md

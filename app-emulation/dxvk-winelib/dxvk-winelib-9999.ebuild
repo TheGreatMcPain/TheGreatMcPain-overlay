@@ -53,6 +53,7 @@ if ver_test -gt "1.6.1"; then
 			PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.7.1.patch")
 		else
 			PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+			PATCHES+=("${FILESDIR}/dxvk-wineopenxr.patch")
 		fi
 		if ver_test -ne "1.7.1"; then
 			# The non-ascii fix breaks winelib.
@@ -102,7 +103,11 @@ src_prepare() {
 		)
 	fi
 	if use async-patch; then
-		PATCHES+=("${FILESDIR}/dxvk-async.patch")
+		if ver_test -gt "1.7.3"; then
+			PATCHES+=("${FILESDIR}/dxvk-async-1.7.4.patch")
+		else
+			PATCHES+=("${FILESDIR}/dxvk-async.patch")
+		fi
 	fi
 
 	# From bobwya's dxvk ebuild.

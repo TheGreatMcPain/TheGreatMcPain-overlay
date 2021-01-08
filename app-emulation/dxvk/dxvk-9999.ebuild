@@ -71,11 +71,7 @@ src_prepare() {
 		)
 	fi
 	if use async-patch; then
-		if ver_test -gt "1.7.3"; then
-			PATCHES+=("${FILESDIR}/dxvk-async-1.7.4.patch")
-		else
-			PATCHES+=("${FILESDIR}/dxvk-async.patch")
-		fi
+		PATCHES+=("${FILESDIR}/dxvk-async.patch")
 	fi
 
 	# From bobwya's dxvk ebuild.

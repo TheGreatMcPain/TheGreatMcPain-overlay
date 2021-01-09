@@ -1,0 +1,28 @@
+commit 9bca0e369eee50fff5b72eef95dbe123866c48b4
+Author: TheGreatMcPain <sixsupersonic@gmail.com>
+Date:   Fri Jan 8 14:35:30 2021 -0600
+
+    configure.ac: Fix error when using dash as /bin/sh
+    
+    For POSIX shells like dash sourcing a script while passing arguments to
+    it doesn't work.
+    
+    'set --' is needed to pass arguments to a script when sourcing
+    it.
+
+diff --git a/configure.ac b/configure.ac
+index a906b9d1c..904a4acd1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -116,7 +116,10 @@ PKG_PROG_PKG_CONFIG([pkgconfig_required_version])
+ # Developers only
+ #################
+ AC_MSG_CHECKING([for version])
+-. $srcdir/build/version.sh "$srcdir"
++old=$@ # Store the old arguments
++set -- "$srcdir" # Allows version.sh to see $srcdir as argument.
++. $srcdir/build/version.sh
++set -- $old # Put the old arguments back.
+ AC_MSG_RESULT([$BUILD_GIT_VERSION_STRING $VERSION_SOURCE])
+ 
+ AC_MSG_CHECKING([for build date])

@@ -61,6 +61,10 @@ BDEPEND="dev-util/intltool
 REQUIRED_USE="${LUA_REQUIRED_USE}
 	|| ( alsa openal oss portaudio pulseaudio )"
 
+PATCHES=(
+	"${FILESDIR}/dash.patch"
+)
+
 pkg_setup() {
 	lua-single_pkg_setup
 }

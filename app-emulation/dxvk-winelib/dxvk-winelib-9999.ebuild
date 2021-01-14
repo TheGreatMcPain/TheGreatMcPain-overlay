@@ -159,20 +159,31 @@ multilib_src_configure() {
 		-Denable_tests=false
 	)
 
-	if use custom-cflags; then
-		emesonargs+=(
-			-Dc_args="${CFLAGS} -m$(bits) -fvisibility=hidden"
-			-Dcpp_args="${CXXFLAGS} -m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
-			-Dc_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
-			-Dcpp_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
-		)
+	if ver_test -le "1.7.4"; then
+		if use custom-cflags; then
+			emesonargs+=(
+				-Dc_args="${CFLAGS} -m$(bits) -fvisibility=hidden"
+				-Dcpp_args="${CXXFLAGS} -m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
+				-Dc_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
+				-Dcpp_link_args="${LDFLAGS} -m$(bits) -mwindows -lpthread"
+			)
+		else
+			emesonargs+=(
+				-Dc_args="-m$(bits) -fvisibility=hidden"
+				-Dcpp_args="-m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
+				-Dc_link_args="-m$(bits) -mwindows -lpthread"
+				-Dcpp_link_args="-m$(bits) -mwindows -lpthread"
+			)
+		fi
 	else
-		emesonargs+=(
-			-Dc_args="-m$(bits) -fvisibility=hidden"
-			-Dcpp_args="-m$(bits) -fvisibility=hidden -fvisibility-inlines-hidden -D__WIDL_objidl_generated_name_0000000C="
-			-Dc_link_args="-m$(bits) -mwindows -lpthread"
-			-Dcpp_link_args="-m$(bits) -mwindows -lpthread"
-		)
+		if use custom-cflags; then
+			emesonargs+=(
+				-Dc_args="${CFLAGS}"
+				-Dcpp_args="${CXXFLAGS}"
+				-Dc_link_args="${LDFLAGS} -lpthread"
+				-Dcpp_link_args="${LDFLAGS} -lpthread"
+			)
+		fi
 	fi
 
 	meson_src_configure

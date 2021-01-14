@@ -124,14 +124,28 @@ multilib_src_configure() {
 		emesonargs+=(
 			-Dc_args="${CFLAGS}"
 			-Dcpp_args="${CXXFLAGS}"
-			-Dc_link_args="${LDFLAGS} -static -static-libgcc"
-			-Dcpp_link_args="${LDFLAGS} -static -static-libgcc -static-libstdc++"
 		)
+	fi
+
+	if ver_test -le "1.7.4"; then
+		if use custom-cflags; then
+			emesonargs+=(
+				-Dc_link_args="${LDFLAGS} -static -static-libgcc"
+				-Dcpp_link_args="${LDFLAGS} -static -static-libgcc -static-libstdc++"
+			)
+		else
+			emesonargs+=(
+				-Dc_link_args="-static -static-libgcc"
+				-Dcpp_link_args="-static -static-libgcc -static-libstdc++"
+			)
+		fi
 	else
-		emesonargs+=(
-			-Dc_link_args="-static -static-libgcc"
-			-Dcpp_link_args="-static -static-libgcc -static-libstdc++"
-		)
+		if use custom-cflags; then
+			emesonargs+=(
+				-Dc_link_args="${LDFLAGS}"
+				-Dcpp_link_args="${LDFLAGS}"
+			)
+		fi
 	fi
 
 	meson_src_configure

@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake desktop xdg
+inherit cmake desktop xdg flag-o-matic
 
 DESCRIPTION="A modder-friendly OpenGL source port based on the DOOM engine"
 HOMEPAGE="https://zdoom.org"
@@ -71,6 +71,8 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
+		-DCMAKE_CXX_FLAGS_GENTOO="-DNDEBUG"
+		-DCMAKE_C_FLAGS_GENTOO="-DNDEBUG"
 		-DINSTALL_DOCS_PATH="${EPREFIX}/usr/share/doc/${PF}"
 		-DINSTALL_PK3_PATH="${EPREFIX}/usr/share/doom"
 		-DINSTALL_SOUNDFONT_PATH="${EPREFIX}/usr/share/doom"

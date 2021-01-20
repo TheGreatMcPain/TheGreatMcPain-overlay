@@ -478,11 +478,6 @@ src_prepare() {
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
 
-	# Work around pyyaml circular import.
-	if has_version dev-python/pyyaml; then
-		rm -rv "${S}/third_party/python/PyYAML" || die
-	fi
-
 	# Make LTO respect MAKEOPTS
 	sed -i \
 		-e "s/multiprocessing.cpu_count()/$(makeopts_jobs)/" \
@@ -942,11 +937,11 @@ src_install() {
 	fi
 
 	# Install icons
-	local icon_srcdir="${S}/browser/branding/official"
-	local icon_symbolic_file="${FILESDIR}/icon/firefox-symbolic.svg"
+	local icon_srcdir="${S}/browser/branding/${PN}"
+	# local icon_symbolic_file="${FILESDIR}/icon/firefox-symbolic.svg"
 
 	insinto /usr/share/icons/hicolor/symbolic/apps
-	newins "${icon_symbolic_file}" ${PN}-symbolic.svg
+	# newins "${icon_symbolic_file}" ${PN}-symbolic.svg
 
 	local icon size
 	for icon in "${icon_srcdir}"/default*.png ; do
@@ -966,7 +961,7 @@ src_install() {
 	local desktop_file="${FILESDIR}/icon/${PN}-r2.desktop"
 	local display_protocols="auto X11"
 	local icon="${PN}"
-	local name="Mozilla ${MOZ_PN^}"
+	local name="LibreWolf"
 	local use_wayland="false"
 
 	if use wayland ; then
@@ -1036,6 +1031,8 @@ src_install() {
 			"${wrapper}" \
 			|| die
 	done
+
+	librewolf-r0_src_install
 }
 
 pkg_preinst() {

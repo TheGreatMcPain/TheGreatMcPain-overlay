@@ -4,4 +4,4 @@
 # Run Mozilla Firefox under Wayland
 #
 export MOZ_ENABLE_WAYLAND=1
-exec @PREFIX@/bin/firefox "$@"
+exec @PREFIX@/bin/librewolf "$@"

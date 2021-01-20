@@ -6,7 +6,7 @@
 # aidanharris
 # @AUTHOR:
 # aidanharris
-# @BLURB: 
+# @BLURB:
 # @DESCRIPTION: librewolf customisation/configuration
 
 if [[ ! ${_LIBREWOLF_R0} ]]; then
@@ -37,7 +37,6 @@ export MOZ_REQUIRE_SIGNING=0
 
 # Features
 ac_add_options --disable-crashreporter
-ac_add_options --disable-gconf
 ac_add_options --disable-updater
 
 # Disables crash reporting, telemetry and other data gathering tools

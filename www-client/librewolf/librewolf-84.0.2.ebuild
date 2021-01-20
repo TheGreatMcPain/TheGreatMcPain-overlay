@@ -476,6 +476,11 @@ src_prepare() {
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
 
+	# Work around pyyaml circular import.
+	if has_version dev-python/pyyaml; then
+		rm -rv "${S}/third_party/python/PyYAML" || die
+	fi
+
 	# Make LTO respect MAKEOPTS
 	sed -i \
 		-e "s/multiprocessing.cpu_count()/$(makeopts_jobs)/" \

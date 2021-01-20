@@ -23,7 +23,7 @@ fi
 LICENSE="Apache-2.0 BSD BZIP2 GPL-3 LGPL-2.1+ LGPL-3 MIT
 	non-free? ( Activision ChexQuest3 DOOM-COLLECTORS-EDITION freedist WidePix )"
 SLOT="0"
-IUSE="gtk gtk2 +non-free openmp"
+IUSE="debug gtk gtk2 +non-free openmp"
 
 DEPEND="
 	app-arch/bzip2
@@ -71,8 +71,6 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
-		-DCMAKE_CXX_FLAGS_GENTOO="-DNDEBUG"
-		-DCMAKE_C_FLAGS_GENTOO="-DNDEBUG"
 		-DINSTALL_DOCS_PATH="${EPREFIX}/usr/share/doc/${PF}"
 		-DINSTALL_PK3_PATH="${EPREFIX}/usr/share/doom"
 		-DINSTALL_SOUNDFONT_PATH="${EPREFIX}/usr/share/doom"
@@ -82,6 +80,14 @@ src_configure() {
 		-DNO_OPENMP="$(usex !openmp)"
 		-DBUILD_NONFREE="$(usex non-free)"
 	)
+
+	# Has issues with LTO
+	filter-flags "-flto=*"
+
+	# Disable asserts for slight performance improvement
+	# at the cost of not catching certain errors in the code.
+	use debug || append-cppflags -NDEBUG
+
 	cmake_src_configure
 }
 

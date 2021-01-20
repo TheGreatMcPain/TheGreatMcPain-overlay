@@ -86,7 +86,7 @@ src_configure() {
 
 	# Disable asserts for slight performance improvement
 	# at the cost of not catching certain errors in the code.
-	use debug || append-cppflags -NDEBUG
+	use debug || append-cppflags -DNDEBUG
 
 	cmake_src_configure
 }

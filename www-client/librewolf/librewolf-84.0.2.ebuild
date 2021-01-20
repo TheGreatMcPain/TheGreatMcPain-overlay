@@ -187,7 +187,7 @@ DEPEND="${CDEPEND}
 	amd64? ( virtual/opengl )
 	x86? ( virtual/opengl )"
 
-S="${WORKDIR}/${PN}-${PV%_*}"
+S="${WORKDIR}/firefox-${PV%_*}"
 
 # Allow MOZ_GMP_PLUGIN_LIST to be set in an eclass or
 # overridden in the enviromnent (advanced hackers only)
@@ -467,6 +467,8 @@ src_unpack() {
 			unpack ${_src_file}
 		fi
 	done
+
+	librewolf-r0_src_unpack
 }
 
 src_prepare() {
@@ -581,7 +583,6 @@ src_configure() {
 		--disable-install-strip \
 		--disable-strip \
 		--disable-updater \
-		--enable-official-branding \
 		--enable-release \
 		--enable-system-ffi \
 		--enable-system-pixman \
@@ -600,6 +601,8 @@ src_configure() {
 		--with-unsigned-addon-scopes=app,system \
 		--x-includes="${SYSROOT}${EPREFIX}/usr/include" \
 		--x-libraries="${SYSROOT}${EPREFIX}/usr/$(get_libdir)"
+
+	librewolf-r0_src_configure
 
 	# Set update channel
 	local update_channel=release

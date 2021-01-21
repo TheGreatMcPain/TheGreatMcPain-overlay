@@ -54,8 +54,8 @@ PATCH_URIS=(
 SRC_URI="${MOZ_SRC_BASE_URI}/source/${MOZ_P}.source.tar.xz -> ${MOZ_P_DISTFILES}.source.tar.xz
 	${PATCH_URIS[@]}"
 
-DESCRIPTION="Firefox Web Browser"
-HOMEPAGE="https://www.mozilla.com/firefox"
+DESCRIPTION="LibreWolf Web Browser"
+HOMEPAGE="https://librewolf-community.gitlab.io/"
 
 KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 

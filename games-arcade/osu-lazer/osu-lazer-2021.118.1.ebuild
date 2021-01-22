@@ -1,4 +1,4 @@
-# Copyright 2020 Gentoo Authors
+# Copyright 2020-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -13,7 +13,7 @@ if [[ ${PV} = "9999" ]]; then
 	EGIT_REPO_URI="https://github.com/ppy/osu.git"
 	KEYWORDS=""
 else
-	SRC_URI="https://github.com/ppy/osu/archive/${PV}.tar.gz"
+	SRC_URI="https://github.com/ppy/osu/archive/${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64"
 fi
 
@@ -27,11 +27,11 @@ DEPEND="
 	virtual/opengl
 	media-libs/libsdl2
 	x11-misc/shared-mime-info
-	>=dev-dotnet/dotnetcore-sdk-bin-3.1.201
+	>=dev-dotnet/dotnetcore-sdk-bin-5.0.101
 "
 RDEPEND="${DEPEND}"
 
-dotnet_ver=3.1
+dotnet_ver=5.0
 output="./osu.Desktop/bin/Release/netcoreapp$dotnet_ver/linux-x64"
 
 if ! [[ ${PV} = "9999" ]]; then
@@ -56,14 +56,12 @@ pkg_setup() {
 src_compile() {
 	if [[ ${PV} = "9999" ]]; then
 		dotnet publish osu.Desktop \
-			--framework netcoreapp$dotnet_ver \
 			--configuration Release \
 			--runtime linux-x64 \
 			--output $output \
 			--no-self-contained
 	else
 		dotnet publish osu.Desktop \
-			--framework netcoreapp$dotnet_ver \
 			--configuration Release \
 			--runtime linux-x64 \
 			--output $output \

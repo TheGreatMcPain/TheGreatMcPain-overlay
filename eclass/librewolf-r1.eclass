@@ -9,11 +9,11 @@
 # @BLURB:
 # @DESCRIPTION: librewolf customisation/configuration
 
-if [[ ! ${_LIBREWOLF_R0} ]]; then
+if [[ ! ${_LIBREWOLF_R1} ]]; then
 
 inherit git-r3
 
-librewolf-r0_src_configure() {
+librewolf-r1_src_configure() {
 local _PN="LibreWolf"
 [[ "${PN}" == "librewolf-nightly" ]] && _PN="${_PN}-Nightly"
 # stolen from the AUR PKGBUILD with irrelevant options removed (here irrelvant means the feature is controlled via a useflag so there's no need to unconditionally enable/disable it here. Only the common options we want to always apply are listed here)
@@ -64,7 +64,7 @@ END
   fi
 }
 
-librewolf-r0_src_unpack() {
+librewolf-r1_src_unpack() {
 	if [[ "$PN" == "librewolf-nightly" ]]
 	then
 		mercurial_src_unpack
@@ -84,7 +84,7 @@ librewolf-r0_src_unpack() {
 	popd
 }
 
-librewolf-r0_src_install() {
+librewolf-r1_src_install() {
   local vendorjs="$ED/usr/$(get_libdir)/${PN}/browser/defaults/preferences/vendor.js"
 
   cat >> "$vendorjs" <<END
@@ -112,5 +112,5 @@ app.partner.librewolf=${PN}
 END
 }
 
-_LIBREWOLF_R0=1
+_LIBREWOLF_R1=1
 fi

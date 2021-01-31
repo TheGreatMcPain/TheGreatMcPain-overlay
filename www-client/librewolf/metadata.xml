@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-<maintainer type="person">
-	<email>sixsupersonic@gmail.com</email>
-	<name>James McClain</name>
+<maintainer type="project">
+	<email>mozilla@gentoo.org</email>
+	<name>Gentoo Mozilla Team</name>
 </maintainer>
 <use>
 	<flag name="clang">Use Clang compiler instead of GCC</flag>
@@ -33,5 +33,7 @@
 		instead of bundled.</flag>
 	<flag name="system-webp">Use the system-wide <pkg>media-libs/libwebp</pkg>
 		instead of bundled.</flag>
+
+
 </use>
 </pkgmetadata>

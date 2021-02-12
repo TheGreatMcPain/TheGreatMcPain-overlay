@@ -2,15 +2,15 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 <maintainer type="person">
-		<email>sixsupersonic@gmail.com</email>
+		<email>jmcclain2020@protonmail.com</email>
 		<name>James McClain</name>
 </maintainer>
 <upstream>
 		<maintainer>
-				<email>sixsupersonic@gmail.com</email>
+				<email>jmcclain2020@protonmail.com</email>
 				<name>James McClain</name>
 		</maintainer>
-		<bugs-to>mailto:sixsupersonic@gmail.com</bugs-to>
+		<bugs-to>mailto:jmcclain2020@protonmail.com</bugs-to>
 </upstream>
 <longdescription>
 		This is a utility intended to simplify the process of keeping your

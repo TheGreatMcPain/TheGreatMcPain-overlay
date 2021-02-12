@@ -5,7 +5,7 @@
 		<email>vim@gentoo.org</email>
 	</maintainer>
 	<maintainer type="person">
-		<email>sixsupersonic@gmail.com</email>
+		<email>jmcclain2020@protonmail.com</email>
 	</maintainer>
 	<use>
 		<flag name="clang">Enable c-family semantic completion via libclang.</flag>

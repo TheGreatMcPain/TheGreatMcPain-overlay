@@ -6,6 +6,6 @@ EAPI=7
 inherit acct-user
 
 ACCT_USER_ID=-1
-ACCT_USER_GROUPS=( monero )
+ACCT_USER_GROUPS=( masari )
 
 acct-user_add_deps

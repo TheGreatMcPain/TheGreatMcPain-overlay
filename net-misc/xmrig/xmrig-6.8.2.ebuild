@@ -12,7 +12,8 @@ SRC_URI="https://github.com/xmrig/xmrig/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="GPL-3+"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="cuda nvml donate libressl opencl ssl"
+IUSE="cuda +daemon nvml donate libressl opencl ssl"
+REQUIRED_USE="nvml? ( cuda )"
 
 # Not sure if the cuda and nvml useflags for hwloc is needed.
 DEPEND="
@@ -51,7 +52,19 @@ src_configure() {
 }
 
 src_install() {
+	# TODO: add openrc init and config.
 	dobin "${BUILD_DIR}/xmrig"
+
+	keepdir /var/log/xmrig
+	fperms 0755 /var/log/xmrig
+
+	keepdir /etc/xmrig
+	fperms 0755 /etc/xmrig
+
+	if use daemon; then
+		newconfd "${FILESDIR}/xmrig.confd" xmrig
+		newinitd "${FILESDIR}/xmrig.initd" xmrig
+	fi
 }
 
 pkg_postinst() {
@@ -61,4 +74,20 @@ pkg_postinst() {
 	einfo "value so that XMRig can allocate with huge pages."
 	einfo
 	einfo "You can use 'https://xmrig.com/wizard' to create a configuration."
+
+	if use daemon; then
+		einfo
+		einfo "For the openrc daemon to work you will need"
+		einfo "to create a configuration and place it in: /etc/xmrig/config.json"
+	fi
+
+	if use cuda; then
+		einfo
+		einfo "You've enabled the CUDA backend."
+		einfo
+		einfo "To use it make sure your config has something like this..."
+		einfo '   "cuda": {'
+		einfo '       "enabled": true'
+		einfo '   }'
+	fi
 }

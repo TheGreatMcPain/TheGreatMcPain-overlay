@@ -14,12 +14,16 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="cuda nvml donate libressl opencl ssl"
 
+# Not sure if the cuda and nvml useflags for hwloc is needed.
 DEPEND="
 	dev-libs/libuv:=
-	sys-apps/hwloc:=
+	sys-apps/hwloc:=[cuda?,nvml?]
 	ssl? (
 		!libressl? ( dev-libs/openssl:= )
 		libressl? ( dev-libs/libressl:= )
+	)
+	cuda? (
+		net-misc/xmrig-cuda
 	)"
 
 PATCHES=("${FILESDIR}/${PN}-5.11.2-nonotls.patch")
@@ -55,4 +59,6 @@ pkg_postinst() {
 	einfo "XMRig can perform CPU specific tweaks like disabling the instruction"
 	einfo "prefetcher. Also remember to increase the vm.nr_hugepages sysctl"
 	einfo "value so that XMRig can allocate with huge pages."
+	einfo
+	einfo "You can use 'https://xmrig.com/wizard' to create a configuration."
 }

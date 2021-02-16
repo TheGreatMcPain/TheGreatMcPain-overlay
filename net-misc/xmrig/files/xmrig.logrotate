@@ -1,0 +1,8 @@
+/var/log/xmrig/xmrig.log {
+        missingok
+        rotate 4
+        compress
+        delaycompress
+        minsize 100k
+        notifempty
+}

@@ -62,6 +62,9 @@ src_install() {
 	fperms 0755 /etc/xmrig
 
 	if use daemon; then
+		insinto /etc/logrotate.d
+		newins "${FILESDIR}/${PN}.logrotate" ${PN}
+
 		newconfd "${FILESDIR}/xmrig.confd" xmrig
 		newinitd "${FILESDIR}/xmrig.initd" xmrig
 	fi

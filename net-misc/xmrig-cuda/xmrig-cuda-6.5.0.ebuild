@@ -57,8 +57,7 @@ pkg_postinst() {
 	einfo "adding this to config.json:"
 	einfo
 	einfo ' "cuda": {'
-	einfo '     "enable": true,'
-	einfo "     \"loader\": \"/usr/lib64/libxmrig-cuda.so\","
+	einfo '     "enable": true'
 	einfo ' }'
 	einfo
 }

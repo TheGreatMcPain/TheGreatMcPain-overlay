@@ -1,4 +1,4 @@
-/var/log/xmrig/xmrig.log {
+/var/log/xmrig/* {
         missingok
         rotate 4
         compress

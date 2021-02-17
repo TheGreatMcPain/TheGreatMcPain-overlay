@@ -1,0 +1,17 @@
+[Unit]
+Description=masari P2P Daemon
+After=network.target
+
+[Service]
+User=masari
+Group=masari
+StateDirectory=masari
+LogsDirectory=masari
+Type=simple
+ExecStart=/usr/bin/masarid --config-file /etc/masari/masarid.conf --non-interactive
+Restart=on-failure
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=multi-user.target

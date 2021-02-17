@@ -1,0 +1,39 @@
+diff --git a/external/boost/archive/portable_binary_archive.hpp b/external/boost/archive/portable_binary_archive.hpp
+index e940c5b..95e6015 100644
+--- a/external/boost/archive/portable_binary_archive.hpp
++++ b/external/boost/archive/portable_binary_archive.hpp
+@@ -22,7 +22,7 @@
+ #endif
+ 
+ #include <boost/archive/basic_archive.hpp>
+-#include <boost/detail/endian.hpp>
++#include <boost/endian.hpp>
+ 
+ #include <boost/archive/impl/archive_serializer_map.ipp>
+ 
+diff --git a/external/boost/archive/portable_binary_iarchive.hpp b/external/boost/archive/portable_binary_iarchive.hpp
+index 7792b53..cdd0fbf 100644
+--- a/external/boost/archive/portable_binary_iarchive.hpp
++++ b/external/boost/archive/portable_binary_iarchive.hpp
+@@ -226,7 +226,7 @@ public:
+ #include <istream>
+ #include <string>
+ 
+-#include <boost/detail/endian.hpp>
++#include <boost/endian.hpp>
+ #include <boost/serialization/throw_exception.hpp>
+ #include <boost/archive/archive_exception.hpp>
+ 
+diff --git a/external/boost/archive/portable_binary_oarchive.hpp b/external/boost/archive/portable_binary_oarchive.hpp
+index e2dcb94..0bfefe1 100644
+--- a/external/boost/archive/portable_binary_oarchive.hpp
++++ b/external/boost/archive/portable_binary_oarchive.hpp
+@@ -221,7 +221,7 @@ public:
+ //  See http://www.boost.org for updates, documentation, and revision history.
+ 
+ #include <ostream>
+-#include <boost/detail/endian.hpp>
++#include <boost/endian.hpp>
+ 
+ namespace boost { namespace archive {
+ 

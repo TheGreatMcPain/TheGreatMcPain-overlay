@@ -5,7 +5,7 @@ EAPI=7
 
 inherit cmake git-r3 systemd flag-o-matic
 
-DESCRIPTION="The secure, private, untraceable cryptocurrency"
+DESCRIPTION="Masari: simple, scalable, and private cryptocurrency"
 HOMEPAGE="https://www.getmasari.org https://github.com/masari-project/masari"
 SRC_URI=""
 EGIT_REPO_URI="https://github.com/masari-project/masari.git"
@@ -37,7 +37,7 @@ DEPEND="
 RDEPEND="${DEPEND}"
 BDEPEND="virtual/pkgconfig"
 
-# They seriously need to do a rebase.
+# They really need to update their stuff.
 PATCHES=(
 		"${FILESDIR}/${PN}-0.3.1.2-linkjobs.patch"
 		"${FILESDIR}/${PN}-0.3.1.2-cmake-fixes.patch"

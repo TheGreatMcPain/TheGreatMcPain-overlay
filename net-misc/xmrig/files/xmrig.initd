@@ -20,7 +20,7 @@ start_pre() {
 
 start() {
   ebegin "Starting XMRig Miner"
-  start-stop-daemon --exec ${command} --start --pidfile ${pidfile} \
+  start-stop-daemon --exec ${command} --start --make-pidfile --pidfile ${pidfile} \
     --background -- ${command_args}
   return 0
 }

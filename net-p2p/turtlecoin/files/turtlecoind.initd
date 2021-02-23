@@ -6,6 +6,7 @@ pidfile=/var/run/turtlecoind.pid
 command=/usr/bin/TurtleCoind
 command_args="${turtlecoind_args}"
 start_stop_daemon_args="-u ${turtlecoind_user} -b -m -p ${pidfile}"
+stopsig="SIGINT"
 
 name="turtlecoin P2P Daemon"
 description="Connects to the turtlecoin P2P network"

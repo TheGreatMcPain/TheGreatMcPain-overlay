@@ -1,6 +1,6 @@
 # Copyright 2020-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-turtlecoind_args="--config-file /etc/turtlecoin/turtlecoind.json"
+turtlecoind_args="--config-file /etc/turtlecoin/turtlecoind.json --no-console"
 turtlecoind_user=turtlecoin
 turtlecoind_group=turtlecoin

@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake
+inherit cmake flag-o-matic
 
 DESCRIPTION="Decentralized Peer-2-Peer open source electronic currency."
 HOMEPAGE="https://turtlecoin.lol/"
@@ -41,6 +41,12 @@ src_prepare() {
 	sed -i "s|set(Boost_USE_STATIC_RUNTIME ON)||" CMakeLists.txt || die
 
 	cmake_src_prepare
+}
+
+src_configure() {
+	append-cppflags -DNDEBUG
+
+	cmake_src_configure
 }
 
 src_install() {

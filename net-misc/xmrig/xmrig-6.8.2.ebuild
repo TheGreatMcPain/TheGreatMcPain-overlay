@@ -32,6 +32,12 @@ PATCHES=("${FILESDIR}/${PN}-5.11.2-nonotls.patch")
 src_prepare() {
 	use donate || eapply "${FILESDIR}/${PN}-6.3.3-nodonate.patch"
 
+	# https://github.com/xmrig/xmrig/commit/b665d2d865efc04998b21a6c54f9ad56622f4872
+	# Broke armv7 compilation. (Will get a better fix soon)
+	if [ "${ARCH}" = "arm" ]; then
+		PATCHES+=("${FILESDIR}/revert-sse2neon.patch")
+	fi
+
 	cmake_src_prepare
 }
 
@@ -47,11 +53,6 @@ src_configure() {
 
 		-DWITH_NVML=$(usex nvml)
 	)
-
-	# Force armv7 for arm profiles.
-	if [[ "${ARCH}" = "arm" ]]; then
-		mycmakeargs+=( -DARM_TARGET=7 )
-	fi
 
 	cmake_src_configure
 }

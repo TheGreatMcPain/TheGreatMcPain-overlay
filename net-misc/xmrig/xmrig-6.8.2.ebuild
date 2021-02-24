@@ -48,6 +48,11 @@ src_configure() {
 		-DWITH_NVML=$(usex nvml)
 	)
 
+	# Force armv7 for arm profiles.
+	if [[ "${ARCH}" = "arm" ]]; then
+		mycmakeargs+=( -DARM_TARGET=7 )
+	fi
+
 	cmake_src_configure
 }
 

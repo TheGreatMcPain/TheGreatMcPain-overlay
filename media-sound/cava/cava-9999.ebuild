@@ -1,4 +1,4 @@
-# Copyright 2020 Gentoo Authors
+# Copyright 2020-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -31,6 +31,9 @@ pkg_setup() {
 }
 
 src_prepare() {
+	# Remove hardcoded '/usr/local/lib' LDFLAG
+	sed -i "s|-L/usr/local/lib -Wl,-rpath /usr/local/lib||" Makefile.am || die
+
 	eapply_user
 	if [[ "${PV}" = "9999" ]]; then
 		git describe --always --tags --dirty > version

@@ -65,10 +65,13 @@ pkg_setup() {
 
 src_prepare() {
 	if use dxvk-config; then
-		PATCHES+=(
-			"${FILESDIR}/add-dxvk_config-mingw-library.patch"
-			"${FILESDIR}/add-dxvk_config-to-setup.patch"
-		)
+		if ver_test -gt "1.8.1"; then
+			PATCHES+=("${FILESDIR}/add-dxvk_config-mingw-library-1.8.2.patch")
+		else
+			PATCHES+=("${FILESDIR}/add-dxvk_config-mingw-library.patch")
+		fi
+
+		PATCHES+=("${FILESDIR}/add-dxvk_config-to-setup.patch")
 	fi
 	if use async-patch; then
 		PATCHES+=("${FILESDIR}/dxvk-async.patch")

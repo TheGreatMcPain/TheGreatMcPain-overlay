@@ -1,14 +1,14 @@
-commit 395655da570aa0ce93c62c206cdc7ec76a23cb8d
-Author: TheGreatMcPain <jmcclain2020@protonmail.com>
-Date:   Sat Mar 20 23:37:44 2021 -0500
+commit b54dad074ece8235f428d98446956e90a45b4464
+Author: TheGreatMcPain <sixsupersonic@gmail.com>
+Date:   Thu Jan 14 14:05:18 2021 -0600
 
-    dxvk-restore-winelib-9999.patch
+    Rebase winelib restore
 
 diff --git a/README.md b/README.md
-index e4b8bc46..3ab7557a 100644
+index ef3530ea..e3e4ec72 100644
 --- a/README.md
 +++ b/README.md
-@@ -56,6 +56,8 @@ cd /your/target/directory/build.64
+@@ -53,6 +53,8 @@ cd /your/target/directory/build.64
  ninja install
  ```
  
@@ -60,10 +60,10 @@ index 00000000..46abe86e
 +endian = 'little'
 +
 diff --git a/meson.build b/meson.build
-index c2c6b743..78ea3418 100644
+index 97182367..c2aa4f9a 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -47,58 +47,96 @@ else
+@@ -34,58 +34,96 @@ else
    dxvk_library_path = meson.source_root() + '/lib32'
  endif
  
@@ -72,7 +72,7 @@ index c2c6b743..78ea3418 100644
 +#error 1
 +#endif'''
  
--if dxvk_is_msvc
+-if dxvk_compiler.get_id() == 'msvc'
 -  wrc = find_program('rc')
 -else
 -  add_global_link_arguments('-static', '-static-libgcc', language: 'c')
@@ -128,7 +128,7 @@ index c2c6b743..78ea3418 100644
 +  res_ext = '.res'
 +  def_spec_ext = '.spec'
 +else
-+  if dxvk_is_msvc
++  if dxvk_compiler.get_id() == 'msvc'
 +    wrc = find_program('rc')
 +  else
 +    add_global_link_arguments('-static', '-static-libgcc', language: 'c')
@@ -167,12 +167,12 @@ index c2c6b743..78ea3418 100644
 +  lib_dxgi    = dxvk_compiler.find_library('dxgi')
 +  lib_d3dcompiler_43 = dxvk_compiler.find_library('d3dcompiler_43', dirs : dxvk_library_path)
  
--if dxvk_is_msvc
+-if dxvk_compiler.get_id() == 'msvc'
 -  lib_d3dcompiler_47 = dxvk_compiler.find_library('d3dcompiler')
 -else
 -  lib_d3dcompiler_47 = dxvk_compiler.find_library('d3dcompiler_47')
 -endif
-+  if dxvk_is_msvc
++  if dxvk_compiler.get_id() == 'msvc'
 +    lib_d3dcompiler_47 = dxvk_compiler.find_library('d3dcompiler')
 +  else
 +    lib_d3dcompiler_47 = dxvk_compiler.find_library('d3dcompiler_47')
@@ -183,12 +183,12 @@ index c2c6b743..78ea3418 100644
 +  exe_ext = ''
 +  dll_ext = ''
  
--if dxvk_is_msvc
+-if dxvk_compiler.get_id() == 'msvc'
 -  res_ext = '.res'
 -else
 -  res_ext = '.o'
 -endif
-+  if dxvk_is_msvc
++  if dxvk_compiler.get_id() == 'msvc'
 +    res_ext = '.res'
 +  else
 +    res_ext = '.o'
@@ -201,7 +201,7 @@ index c2c6b743..78ea3418 100644
  glsl_compiler = find_program('glslangValidator')
  glsl_generator = generator(glsl_compiler,
 diff --git a/package-release.sh b/package-release.sh
-index 935b2ae0..0fd92194 100755
+index 3f5d9a4c..5bb11a51 100755
 --- a/package-release.sh
 +++ b/package-release.sh
 @@ -5,7 +5,7 @@ set -e
@@ -213,17 +213,17 @@ index 935b2ae0..0fd92194 100755
    exit 1
  fi
  
-@@ -24,6 +24,7 @@ shift 2
+@@ -23,6 +23,7 @@ shift 2
+ 
  opt_nopackage=0
  opt_devbuild=0
- opt_buildid=false
 +opt_winelib=0
  
  crossfile="build-win"
  
-@@ -39,6 +40,10 @@ while [ $# -gt 0 ]; do
-   "--build-id")
-     opt_buildid=true
+@@ -35,6 +36,10 @@ while [ $# -gt 0 ]; do
+     opt_nopackage=1
+     opt_devbuild=1
      ;;
 +  "--winelib")
 +    opt_winelib=1
@@ -233,7 +233,7 @@ index 935b2ae0..0fd92194 100755
      echo "Unrecognized option: $1" >&2
      exit 1
 diff --git a/src/d3d10/meson.build b/src/d3d10/meson.build
-index 46a10c4b..9257145a 100644
+index dd6c574f..d1d8d6a6 100644
 --- a/src/d3d10/meson.build
 +++ b/src/d3d10/meson.build
 @@ -12,9 +12,11 @@ d3d10_main_src = [
@@ -248,4 +248,4 @@ index 46a10c4b..9257145a 100644
 +  dependencies        : [ d3d10_d3d11_dep ],
    include_directories : dxvk_include_path,
    install             : true,
-   objects             : not dxvk_is_msvc ? 'd3d10core'+def_spec_ext : [],
+   objects             : not dxvk_msvc ? 'd3d10core'+def_spec_ext : [],

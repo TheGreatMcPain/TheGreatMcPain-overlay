@@ -49,10 +49,14 @@ PATCHES=()
 if ver_test -gt "1.6.1"; then
 	if ver_test -ge "1.7.1"; then
 		# Some changes after 1.7.3 causes some issues
-		if ver_test -le "1.7.4"; then
+		if ver_test -le "1.7.3"; then
 			PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.7.1.patch")
 		else
-			PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+			if ver_test -le "1.8.1"; then
+				PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.8.patch")
+			else
+				PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
+			fi
 			PATCHES+=("${FILESDIR}/dxvk-wineopenxr.patch")
 		fi
 		if ver_test -ne "1.7.1"; then
@@ -97,10 +101,13 @@ pkg_setup() {
 
 src_prepare() {
 	if use dxvk-config; then
-		PATCHES+=(
-			"${FILESDIR}/add-dxvk_config-winelib-library.patch"
-			"${FILESDIR}/add-dxvk_config-to-setup.patch"
-		)
+		if ver_test -gt "1.8.1"; then
+			PATCHES+=("${FILESDIR}/add-dxvk_config-winelib-library-9999.patch")
+		else
+			PATCHES+=("${FILESDIR}/add-dxvk_config-winelib-library.patch")
+		fi
+
+		PATCHES+=("${FILESDIR}/add-dxvk_config-to-setup.patch")
 	fi
 	if use async-patch; then
 		PATCHES+=("${FILESDIR}/dxvk-async.patch")

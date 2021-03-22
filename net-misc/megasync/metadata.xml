@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>jmcclain2020@protonmail.com</email>
+		<name>TheGreatMcPain</name>
+	</maintainer>
+	<use>
+		<flag name="freeimage">Enable support for image I/O via media-libs/freeimage</flag>
+		<flag name="dolphin">Install the kde-apps/dolphin extension</flag>
+		<flag name="nautilus">Install the gnome-base/nautilus extension</flag>
+		<flag name="thunar">Install the xfce-base/thunar extension</flag>
+		<flag name="cryptopp">Enable support for dev-libs/crypto++</flag>
+	</use>
+</pkgmetadata>

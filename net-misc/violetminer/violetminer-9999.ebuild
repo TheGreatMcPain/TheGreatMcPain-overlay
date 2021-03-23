@@ -23,7 +23,7 @@ IUSE="cuda ssl"
 
 DEPEND="
 	cuda? (
-		dev-util/nvidia-cuda-toolkit
+		dev-util/nvidia-cuda-toolkit:=
 	)
 	ssl? (
 		dev-libs/openssl:=

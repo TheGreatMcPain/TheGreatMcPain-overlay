@@ -44,33 +44,24 @@ DEPEND="${RDEPEND}
 BDEPEND="
 	>=dev-util/meson-0.46"
 
-# Restore winelib builds that were removed after 1.6.1.
 PATCHES=()
 if ver_test -gt "1.6.1"; then
-	if ver_test -ge "1.7.1"; then
-		# Some changes after 1.7.3 causes some issues
-		if ver_test -le "1.7.3"; then
-			PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.7.1.patch")
-		else
-			if ver_test -le "1.8.1"; then
-				PATCHES+=("${FILESDIR}/dxvk-restore-winelib-1.8.patch")
-			else
-				PATCHES+=("${FILESDIR}/dxvk-restore-winelib-9999.patch")
-			fi
-			PATCHES+=("${FILESDIR}/dxvk-wineopenxr.patch")
-		fi
-		if ver_test -ne "1.7.1"; then
-			# The non-ascii fix breaks winelib.
-			PATCHES+=("${FILESDIR}/dxvk-revert-handle-non-ascii.patch")
-		fi
-	else
-		PATCHES+=("${FILESDIR}/dxvk-restore-winelib.patch")
-	fi
-
+	# Restore winelib builds that were removed after 1.6.1.
 	PATCHES+=(
+		"${FILESDIR}/dxvk-restore-winelib-${PV}.patch"
 		"${FILESDIR}/dxvk-restore-spec-files.patch"
 		"${FILESDIR}/dxvk-revert-remove-vulkanfn.patch"
 	)
+
+	# Adds missing functions for winelib.
+	if ver_test -gt "1.7.3"; then
+		PATCHES+=("${FILESDIR}/dxvk-wineopenxr.patch")
+	fi
+
+	# The non-ascii fix breaks winelib. (TODO: find out why it doesn't work)
+	if ver_test -ne "1.7.1"; then
+		PATCHES+=("${FILESDIR}/dxvk-revert-handle-non-ascii.patch")
+	fi
 fi
 
 if [[ ${PV} != "9999" ]] ; then
@@ -102,7 +93,7 @@ pkg_setup() {
 src_prepare() {
 	if use dxvk-config; then
 		if ver_test -gt "1.8.1"; then
-			PATCHES+=("${FILESDIR}/add-dxvk_config-winelib-library-9999.patch")
+			PATCHES+=("${FILESDIR}/add-dxvk_config-winelib-library-1.8.2.patch")
 		else
 			PATCHES+=("${FILESDIR}/add-dxvk_config-winelib-library.patch")
 		fi

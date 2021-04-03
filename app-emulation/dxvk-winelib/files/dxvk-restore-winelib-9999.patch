@@ -1,8 +1,8 @@
-commit 395655da570aa0ce93c62c206cdc7ec76a23cb8d
+commit d570dde5debc9e7421ca0fef169060c9b364e2e2
 Author: TheGreatMcPain <jmcclain2020@protonmail.com>
-Date:   Sat Mar 20 23:37:44 2021 -0500
+Date:   Sat Apr 3 11:25:24 2021 -0500
 
-    dxvk-restore-winelib-9999.patch
+    /home/james/git-repos/mine/thegreatmcpain-overlay/app-emulation/dxvk-winelib/files/dxvk-restore-winelib-9999.patch
 
 diff --git a/README.md b/README.md
 index e4b8bc46..3ab7557a 100644
@@ -60,10 +60,10 @@ index 00000000..46abe86e
 +endian = 'little'
 +
 diff --git a/meson.build b/meson.build
-index c2c6b743..78ea3418 100644
+index effc870a..84dedd91 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -47,58 +47,96 @@ else
+@@ -47,64 +47,108 @@ else
    dxvk_library_path = meson.source_root() + '/lib32'
  endif
  
@@ -94,9 +94,9 @@ index c2c6b743..78ea3418 100644
    endif
 -endif
 -
--if cpu_family == 'x86'
--  if dxvk_compiler.has_link_argument('-Wl,--add-stdcall-alias')
--    add_global_link_arguments('-Wl,--add-stdcall-alias', language: 'cpp')
+-if cpu_family == 'x86_64'
+-  if dxvk_compiler.has_argument('-msse3')
+-    add_project_arguments('-msse3', language: ['c', 'cpp'])
 +  add_project_arguments(march, '-fvisibility=hidden', language: 'c')
 +  add_project_arguments(march, '-fvisibility=hidden', '-fvisibility-inlines-hidden', '-D__WIDL_objidl_generated_name_0000000C=', language: 'cpp')
 +  add_global_link_arguments(march, '-mwindows', language: 'c')
@@ -104,17 +104,26 @@ index c2c6b743..78ea3418 100644
 +  if dxvk_compiler.has_argument('--no-gnu-unique')
 +    add_project_arguments('--no-gnu-unique', language : ['cpp'])
    endif
+-elif cpu_family == 'x86'
+-  if dxvk_compiler.has_link_argument('-Wl,--add-stdcall-alias')
+-    add_global_link_arguments('-Wl,--add-stdcall-alias', language: 'cpp')
+-  endif
 -  if dxvk_compiler.has_link_argument('-Wl,--enable-stdcall-fixup')
 -    add_global_link_arguments('-Wl,--enable-stdcall-fixup', language: 'cpp')
-+  if cpu_family == 'x86'
-+    if dxvk_compiler.has_argument('-msse') and dxvk_compiler.has_argument('-msse2')
-+      add_project_arguments('-msse', '-msse2', language: 'c')
-+      add_project_arguments('-msse', '-msse2', language: 'cpp')
++  if cpu_family == 'x86_64'
++    if dxvk_compiler.has_argument('-msse3')
++      add_project_arguments('-msse3', language: ['c', 'cpp'])
++    endif
++  elif cpu_family == 'x86'
++    if dxvk_compiler.has_argument('-msse') and dxvk_compiler.has_argument('-msse2') and dxvk_compiler.has_argument('-msse3')
++      add_project_arguments('-msse', '-msse2', '-msse3', language: ['c', 'cpp'])
++    endif
++    if dxvk_compiler.has_argument('-mfpmath=sse')
++      add_project_arguments('-mfpmath=sse', language: ['c', 'cpp'])
 +    endif
    endif
--  if dxvk_compiler.has_argument('-msse') and dxvk_compiler.has_argument('-msse2')
--    add_project_arguments('-msse', '-msse2', language: 'c')
--    add_project_arguments('-msse', '-msse2', language: 'cpp')
+-  if dxvk_compiler.has_argument('-msse') and dxvk_compiler.has_argument('-msse2') and dxvk_compiler.has_argument('-msse3')
+-    add_project_arguments('-msse', '-msse2', '-msse3', language: ['c', 'cpp'])
 +  wrc = find_program('wrc')
 +  lib_vulkan  = declare_dependency(link_args: [ '-lwinevulkan' ])
 +  lib_d3d9    = declare_dependency(link_args: [ '-ld3d9' ])
@@ -141,17 +150,25 @@ index c2c6b743..78ea3418 100644
 +    else
 +      error('Unsupported target architecture')
 +    endif
-+  endif
-+  if cpu_family == 'x86'
+   endif
+-  if dxvk_compiler.has_argument('-mfpmath=sse')
+-    add_project_arguments('-mfpmath=sse', language: ['c', 'cpp'])
++  if cpu_family == 'x86_64'
++    if dxvk_compiler.has_argument('-msse3')
++      add_project_arguments('-msse3', language: ['c', 'cpp'])
++    endif
++  elif cpu_family == 'x86'
 +    if dxvk_compiler.has_link_argument('-Wl,--add-stdcall-alias')
 +      add_global_link_arguments('-Wl,--add-stdcall-alias', language: 'cpp')
 +    endif
 +    if dxvk_compiler.has_link_argument('-Wl,--enable-stdcall-fixup')
 +      add_global_link_arguments('-Wl,--enable-stdcall-fixup', language: 'cpp')
 +    endif
-+    if dxvk_compiler.has_argument('-msse') and dxvk_compiler.has_argument('-msse2')
-+      add_project_arguments('-msse', '-msse2', language: 'c')
-+      add_project_arguments('-msse', '-msse2', language: 'cpp')
++    if dxvk_compiler.has_argument('-msse') and dxvk_compiler.has_argument('-msse2') and dxvk_compiler.has_argument('-msse3')
++      add_project_arguments('-msse', '-msse2', '-msse3', language: ['c', 'cpp'])
++    endif
++    if dxvk_compiler.has_argument('-mfpmath=sse')
++      add_project_arguments('-mfpmath=sse', language: ['c', 'cpp'])
 +    endif
    endif
 -endif

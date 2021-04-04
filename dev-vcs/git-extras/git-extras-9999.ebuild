@@ -10,7 +10,7 @@ if [ ${PV} = "9999" ]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/tj/git-extras.git"
 else
-	SRC_URI="https://github.com/tj/git-extras/archive/${PV}.tar.gz"
+	SRC_URI="https://github.com/tj/git-extras/archive/${PV}.tar.gz -> ${P}.tar.gz"
 fi
 
 LICENSE="MIT"

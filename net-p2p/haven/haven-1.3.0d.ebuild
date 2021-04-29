@@ -11,7 +11,7 @@ HOMEPAGE="https://havenprotocol.org
 
 SRC_URI=""
 EGIT_REPO_URI="https://github.com/haven-protocol-org/haven-offshore.git"
-EGIT_COMMIT="v${PV}c"
+EGIT_COMMIT="v${PV}"
 
 LICENSE="BSD MIT"
 SLOT="0"

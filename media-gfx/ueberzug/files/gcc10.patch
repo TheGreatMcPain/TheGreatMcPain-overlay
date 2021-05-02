@@ -1,0 +1,40 @@
+commit cef1abe771fcc4134b3a20802ec9f7526eafdda6
+Author: TheGreatMcPain <jmcclain2020@protonmail.com>
+Date:   Sat May 1 21:22:37 2021 -0500
+
+    Fix compilation with GCC 10
+
+diff --git a/ueberzug/X/Xshm.h b/ueberzug/X/Xshm.h
+index 9368233..ab61b4d 100644
+--- a/ueberzug/X/Xshm.h
++++ b/ueberzug/X/Xshm.h
+@@ -3,5 +3,5 @@
+ #include "python.h"
+ 
+ 
+-PyTypeObject ImageType;
++extern PyTypeObject ImageType;
+ #endif
+diff --git a/ueberzug/X/display.h b/ueberzug/X/display.h
+index d7fcdc4..8492607 100644
+--- a/ueberzug/X/display.h
++++ b/ueberzug/X/display.h
+@@ -24,6 +24,6 @@ typedef struct {
+     Atom wm_locale_name;
+     Atom wm_normal_hints;
+ } DisplayObject;
+-PyTypeObject DisplayType;
++extern PyTypeObject DisplayType;
+ 
+ #endif
+diff --git a/ueberzug/X/window.h b/ueberzug/X/window.h
+index 7380618..ac59417 100644
+--- a/ueberzug/X/window.h
++++ b/ueberzug/X/window.h
+@@ -3,5 +3,5 @@
+ #include "python.h"
+ 
+ 
+-PyTypeObject WindowType;
++extern PyTypeObject WindowType;
+ #endif

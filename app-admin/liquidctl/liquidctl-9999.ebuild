@@ -33,6 +33,7 @@ RDEPEND="
 	dev-python/pyusb[${PYTHON_USEDEP}]
 	dev-python/hidapi[${PYTHON_USEDEP}]
 	dev-python/docopt[${PYTHON_USEDEP}]
+	sys-apps/i2c-tools[python,${PYTHON_USEDEP}]
 "
 
 DEPEND="${RDEPEND}"

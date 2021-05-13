@@ -21,4 +21,4 @@ RDEPEND="
 	virtual/libusb
 	virtual/libudev"
 
-S="${WORKDIR}"/"${PN}-${MY_PV}"
+S="${WORKDIR}"/"${PN}-${PV}"

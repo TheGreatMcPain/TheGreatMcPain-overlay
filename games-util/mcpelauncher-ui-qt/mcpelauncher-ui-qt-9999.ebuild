@@ -24,3 +24,11 @@ DEPEND="
 	dev-libs/protobuf"
 RDEPEND="${DEPEND}"
 BDEPEND=""
+
+src_configure() {
+	local mycmakeargs=(
+		-DBUILD_SHARED_LIBS=OFF
+	)
+
+	cmake_src_configure
+}

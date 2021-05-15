@@ -1,0 +1,39 @@
+diff --git a/ext/json.cmake b/ext/json.cmake
+index 9824519..35fa61f 100644
+--- a/ext/json.cmake
++++ b/ext/json.cmake
+@@ -1,15 +1,20 @@
+-include(FetchContent)
++if(USE_EXTERNAL_JSON)
++  add_library(nlohmann_json INTERFACE IMPORTED)
++  Set_property(TARGET nlohmann_json PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${JSON_SOURCES}/include")
++else()
++  include(FetchContent)
++  
++  FetchContent_Declare(
++          nlohmann_json_ext
++          URL "https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip"
++  )
++  
++  FetchContent_GetProperties(nlohmann_json_ext)
++  if(NOT nlohmann_json_ext_POPULATED)
++    FetchContent_Populate(nlohmann_json_ext)
++  endif()
+ 
+-FetchContent_Declare(
+-        nlohmann_json_ext
+-        URL "https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip"
+-)
+-
+-FetchContent_GetProperties(nlohmann_json_ext)
+-if(NOT nlohmann_json_ext_POPULATED)
+-  FetchContent_Populate(nlohmann_json_ext)
++  Add_library(nlohmann_json INTERFACE IMPORTED)
++  Add_dependencies(nlohmann_json nlohmann_json_ext)
++  Set_property(TARGET nlohmann_json PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${nlohmann_json_ext_SOURCE_DIR}/include")
+ endif()
+-
+-add_library(nlohmann_json INTERFACE IMPORTED)
+-add_dependencies(nlohmann_json nlohmann_json_ext)
+-set_property(TARGET nlohmann_json PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${nlohmann_json_ext_SOURCE_DIR}/include")
+\ No newline at end of file

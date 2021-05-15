@@ -32,6 +32,7 @@ src_unpack() {
 
 src_configure() {
 	local mycmakeargs=(
+		-DBUILD_SHARED_LIBS=OFF
 		-DUSE_EXTERNAL_JSON=YES # Workaround for nlohmann_json
 		-DJSON_SOURCES="${WORKDIR}" # Workaround for nlohmann_json
 		-DENABLE_MSA_QT_UI=$(usex qt5 ON OFF)

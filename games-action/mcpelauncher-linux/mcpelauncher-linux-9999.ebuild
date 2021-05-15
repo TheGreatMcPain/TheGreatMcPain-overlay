@@ -56,9 +56,9 @@ src_configure() {
 	tc-export CC CXX LD AR NM OBJDUMP RANLIB PKG_CONFIG
 
 	local mycmakeargs=(
+		-DBUILD_SHARED_LIBS=OFF
 		-DUSE_EXTERNAL_JSON=YES               # Workaround for nlohmann_json
 		-DJSON_SOURCES="${WORKDIR}"           # Workaround for nlohmann_json
-		-DCMAKE_POSITION_INDEPENDENT_CODE=YES # Workaround for fpic errors
 		-DJNI_USE_JNIVM=ON
 	)
 

@@ -36,5 +36,3 @@ DEPEND="
 	${RDEPEND}
 	dev-python/setuptools[${PYTHON_USEDEP}]
 "
-
-PATCHES=("${FILESDIR}/gcc10.patch")

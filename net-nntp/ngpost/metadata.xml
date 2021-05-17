@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>jmcclain2020@protonmail.com</email>
+		<name>TheGreatMcPain</name>
+	</maintainer>
+	<use>
+		<flag name="rar">Install <pkg>app-arch/rar</pkg></flag>
+		<flag name="par2">Install <pkg>app-arch/par2cmdline</pkg></flag>
+		<flag name="7z">Install <pkg>app-arch/p7zip</pkg></flag>
+	</use>
+</pkgmetadata>

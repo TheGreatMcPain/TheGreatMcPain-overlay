@@ -16,7 +16,7 @@ EGIT_COMMIT="v${PV}"
 LICENSE="BSD MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="+daemon hw-wallet libressl readline tools +wallet-cli +wallet-rpc"
+IUSE="+daemon hw-wallet readline tools +wallet-cli +wallet-rpc"
 REQUIRED_USE="|| ( daemon tools wallet-cli wallet-rpc )"
 
 DEPEND="
@@ -31,8 +31,7 @@ DEPEND="
 		dev-libs/protobuf:=
 		virtual/libusb:1
 	)
-	!libressl? ( dev-libs/openssl:= )
-	libressl? ( dev-libs/libressl:= )
+	dev-libs/openssl:=
 	readline? ( sys-libs/readline:0= )"
 RDEPEND="${DEPEND}"
 BDEPEND="virtual/pkgconfig"
@@ -123,7 +122,7 @@ pkg_postinst() {
 		einfo
 		einfo "Run havend status as any user to get sync status and other stats."
 		einfo
-		einfo "The Haven blockchain can take up a lot of space (80 GiB) and is stored"
+		einfo "The Haven blockchain can take up a lot of space (>30 GiB) and is stored"
 		einfo "in /var/lib/haven by default. You may want to enable pruning by adding"
 		einfo "'prune-blockchain=1' to /etc/haven/havend.conf to prune the blockchain"
 		einfo "or move the data directory to another disk."

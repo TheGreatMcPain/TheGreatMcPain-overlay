@@ -35,15 +35,15 @@ RDEPEND="
 	dev-libs/libdazzle
 
 	$(python_gen_cond_dep '
-		dev-python/injector[${PYTHON_MULTI_USEDEP}]
-		dev-python/matplotlib[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/peewee-3.13.2[${PYTHON_MULTI_USEDEP}]
-		dev-python/py3nvml[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/injector-0.18.4[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/matplotlib-3.4.1[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/peewee-3.14.4[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/py3nvml-0.2.6[${PYTHON_MULTI_USEDEP}]
 		dev-python/pygobject:3[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/python-xlib-0.26[${PYTHON_MULTI_USEDEP}]
-		dev-python/pyxdg[${PYTHON_MULTI_USEDEP}]
-		dev-python/requests[${PYTHON_MULTI_USEDEP}]
-		dev-python/Rx[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/python-xlib-0.29[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/pyxdg-0.27[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/requests-2.25.1[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/Rx-3.1.1[${PYTHON_MULTI_USEDEP}]
 	')
 "
 

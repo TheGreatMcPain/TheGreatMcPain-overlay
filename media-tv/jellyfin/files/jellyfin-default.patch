@@ -1,0 +1,12 @@
+index 7cbfa88..e7ac16b 100644
+--- a/etc/default/jellyfin
++++ b/etc/default/jellyfin
+@@ -25,7 +25,7 @@ JELLYFIN_WEB_OPT="--webdir=/usr/share/jellyfin/web"
+ JELLYFIN_RESTART_OPT="--restartpath=/usr/lib/jellyfin/restart.sh"
+ 
+ # ffmpeg binary paths, overriding the system values
+-JELLYFIN_FFMPEG_OPT="--ffmpeg=/usr/lib/jellyfin-ffmpeg/ffmpeg"
++#JELLYFIN_FFMPEG_OPT="--ffmpeg=/usr/lib/jellyfin-ffmpeg/ffmpeg"
+ 
+ # [OPTIONAL] run Jellyfin as a headless service
+ #JELLYFIN_SERVICE_OPT="--service"

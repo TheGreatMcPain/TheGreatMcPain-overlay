@@ -20,17 +20,17 @@ IUSE="systray display-mirroring shaders discord"
 
 DEPEND="
 	media-video/mpv[libmpv]
-	dev-python/python-mpv
-	dev-python/python-mpv-jsonipc
-	dev-python/jellyfin-apiclient-python
+	dev-python/python-mpv[${PYTHON_USEDEP}]
+	dev-python/python-mpv-jsonipc[${PYTHON_USEDEP}]
+	dev-python/jellyfin-apiclient-python[${PYTHON_USEDEP}]
 	dev-lang/python:*[tk]
-	systray? ( dev-python/pystray )
+	systray? ( dev-python/pystray[${PYTHON_USEDEP}] )
 	display-mirroring? (
-		dev-python/jinja
-		dev-python/pywebview
+		dev-python/jinja[${PYTHON_USEDEP}]
+		dev-python/pywebview[${PYTHON_USEDEP}]
 	)
 	shaders? ( dev-util/mpv-shim-default-shaders )
-	discord? ( dev-python/pypresence )
+	discord? ( dev-python/pypresence[${PYTHON_USEDEP}] )
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>jmcclain2020@protonmail.com</email>
+		<name>TheGreatMcPain</name>
+	</maintainer>
+	<use>
+		<flag name="systray">Install <pkg>dev-python/pystray</pkg></flag>
+		<flag name="display-mirroring">Enable display-mirroring</flag>
+		<flag name="shaders">Install MPV shader pack</flag>
+		<flag name="discord">Enable discord rich presence</flag>
+	</use>
+</pkgmetadata>

@@ -1,29 +1,22 @@
-# Copyright 2021 Gentoo Authors
+# Copyright 2020-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_8 )
+PYTHON_COMPAT=( python3_{7..9} )
+
 inherit distutils-r1
 
-DESCRIPTION="Build GUI for Python with JS, HTML, and CSS"
+DESCRIPTION="A lightweight cross-platform wrapper around a webview component"
 HOMEPAGE="https://github.com/r0x0r/pywebview"
-SRC_URI="
-	https://github.com/r0x0r/pywebview/archive/${PV}.tar.gz -> ${P}.tar.gz
-"
+SRC_URI="mirror://pypi/${P:0:1}/${PN}/${P}.tar.gz"
 
-IUSE="qt5 gtk"
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
-DEPEND="
-	gtk? (
-		dev-python/pygobject[${PYTHON_USEDEP}]
-		dev-python/pycairo[${PYTHON_USEDEP}]
-		net-libs/webkit-gtk
-	)
-	qt5? ( dev-python/PyQtWebEngine[${PYTHON_USEDEP}] )
+RDEPEND="
+	dev-python/pygobject[${PYTHON_USEDEP}]
+	dev-python/PyQt5[${PYTHON_USEDEP}]
+	dev-python/PyQtWebEngine[${PYTHON_USEDEP}]
 "
-RDEPEND="${DEPEND}"
-BDEPEND=""

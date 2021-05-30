@@ -8,7 +8,7 @@ name=jellyfin
 
 cfgfile="/etc/conf.d/${name}"
 
-command="/usr/lib/${name}/bin/${name}"
+command="/usr/lib/${name}/${name}"
 command_user="${JELLYFIN_USER}"
 command_background="yes"
 

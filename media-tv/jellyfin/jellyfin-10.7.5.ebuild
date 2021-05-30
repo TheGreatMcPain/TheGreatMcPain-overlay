@@ -38,7 +38,7 @@ src_prepare() {
 	default
 
 	# Use system ffmpeg
-	sed -i "s|JELLYFIN_FFMPEG_OPT|#JELLYFIN_FFMPEG_OPT|" "debian/conf/${PN}" \
+	sed -i "s|JELLYFIN_FFMPEG_OPT=|#JELLYFIN_FFMPEG_OPT=|" "debian/conf/${PN}" \
 		|| die
 }
 

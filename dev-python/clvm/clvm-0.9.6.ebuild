@@ -13,7 +13,7 @@ EGIT_COMMIT="${PV}"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64"
 
 DEPEND="
 	dev-python/blspy[${PYTHON_USEDEP}]

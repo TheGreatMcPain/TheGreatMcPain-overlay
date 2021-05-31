@@ -14,7 +14,7 @@ EGIT_REPO_URI="https://github.com/Chia-Network/bls-signatures.git"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64"
 
 # for some reason the build system doesn't like the
 # shared version of libsodium

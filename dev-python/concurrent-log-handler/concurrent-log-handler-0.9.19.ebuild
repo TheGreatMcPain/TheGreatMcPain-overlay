@@ -14,7 +14,7 @@ SRC_URI="
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~x86"
 
 DEPEND="
 	dev-python/portalocker[${PYTHON_USEDEP}]

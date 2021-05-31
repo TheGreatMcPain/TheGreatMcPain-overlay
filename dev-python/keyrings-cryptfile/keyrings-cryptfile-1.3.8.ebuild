@@ -14,7 +14,7 @@ SRC_URI="
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~x86"
 
 DEPEND="
 	dev-python/argon2-cffi[${PYTHON_USEDEP}]

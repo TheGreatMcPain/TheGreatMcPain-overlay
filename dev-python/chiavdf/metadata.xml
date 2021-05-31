@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>jmcclain2020@protonmail.com</email>
+		<name>TheGreatMcPain</name>
+	</maintainer>
+	<use>
+		<flag name="client">Build vdf_client</flag>
+		<flag name="bench">Build vdf_bench</flag>
+	</use>
+</pkgmetadata>

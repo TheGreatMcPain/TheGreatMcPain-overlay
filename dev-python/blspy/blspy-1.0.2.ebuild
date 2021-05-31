@@ -22,6 +22,7 @@ DEPEND="
 	dev-libs/gmp
 	dev-libs/libsodium[static-libs]
 	dev-util/cmake
+	dev-python/wheel[${PYTHON_USEDEP}]
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""

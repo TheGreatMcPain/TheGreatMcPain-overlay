@@ -4,13 +4,12 @@
 EAPI=7
 
 PYTHON_COMPAT=( python3_{7..9} )
-inherit distutils-r1
+inherit distutils-r1 git-r3
 
 DESCRIPTION="Tools for clvm development"
 HOMEPAGE="https://github.com/Chia-Network/clvm_tools"
-SRC_URI="
-	https://github.com/Chia-Network/clvm_tools/archive/${PV}.tar.gz -> ${P}.tar.gz
-"
+EGIT_REPO_URI="https://github.com/Chia-Network/clvm_tools.git"
+EGIT_COMMIT="${PV}"
 
 LICENSE="Apache-2.0"
 SLOT="0"
@@ -21,5 +20,3 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""
-
-S="${WORKDIR}/clvm_tools-${PV}"

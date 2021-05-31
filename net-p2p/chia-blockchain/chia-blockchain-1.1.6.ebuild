@@ -19,6 +19,7 @@ KEYWORDS="~amd64"
 # colorlog and miniupnpc don't have arm64 keywords
 DEPEND="
 	dev-python/blspy[${PYTHON_USEDEP}]
+	dev-python/chiapos[${PYTHON_USEDEP}]
 	dev-python/chiavdf[${PYTHON_USEDEP}]
 	dev-python/chiabip158[${PYTHON_USEDEP}]
 	dev-python/clvm[${PYTHON_USEDEP}]

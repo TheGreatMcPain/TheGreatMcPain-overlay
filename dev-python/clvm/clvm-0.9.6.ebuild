@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_8 )
+PYTHON_COMPAT=( python3_{7..9} )
 inherit distutils-r1 git-r3
 
 DESCRIPTION="[Contract Language|Chia Lisp] Virtual Machine"
@@ -16,7 +16,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 DEPEND="
-	dev-python/blspy
+	dev-python/blspy[${PYTHON_USEDEP}]
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""

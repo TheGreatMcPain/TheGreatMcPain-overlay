@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_8 )
+PYTHON_COMPAT=( python3_{7..9} )
 inherit distutils-r1
 
 DESCRIPTION="Encrypted plain file keyring backend for the python keyring package"
@@ -17,9 +17,9 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 DEPEND="
-	dev-python/argon2-cffi
-	dev-python/keyring
-	dev-python/pycryptodome
+	dev-python/argon2-cffi[${PYTHON_USEDEP}]
+	dev-python/keyring[${PYTHON_USEDEP}]
+	dev-python/pycryptodome[${PYTHON_USEDEP}]
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""

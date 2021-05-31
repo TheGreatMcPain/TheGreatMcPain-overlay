@@ -4,12 +4,14 @@
 EAPI=7
 
 PYTHON_COMPAT=( python3_{7..9} )
-inherit distutils-r1 git-r3
+inherit distutils-r1
 
 DESCRIPTION="Chia VDF utilities"
 HOMEPAGE="https://github.com/Chia-Network/chiavdf"
-EGIT_REPO_URI="https://github.com/Chia-Network/chiavdf.git"
-EGIT_COMMIT="${PV}"
+SRC_URI="
+	https://github.com/Chia-Network/chiavdf/archive/${PV}.tar.gz -> ${P}.tar.gz
+"
+export SETUPTOOLS_SCM_PRETEND_VERSION=${PV}
 
 LICENSE="Apache-2.0"
 SLOT="0"

@@ -30,7 +30,7 @@ DEPEND="
 	dev-python/concurrent-log-handler[${PYTHON_USEDEP}]
 	dev-python/cryptography[${PYTHON_USEDEP}]
 	dev-python/keyring[${PYTHON_USEDEP}]
-	dev-python/keyrings-cryptfile[${PYTHON_USEDEP}]
+	~dev-python/keyrings-cryptfile-1.3.4[${PYTHON_USEDEP}]
 	dev-python/pyyaml[${PYTHON_USEDEP}]
 	dev-python/setproctitle[${PYTHON_USEDEP}]
 	dev-python/sortedcontainers[${PYTHON_USEDEP}]

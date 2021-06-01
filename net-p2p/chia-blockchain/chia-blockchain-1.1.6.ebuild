@@ -19,7 +19,6 @@ PATCHES=(
 	"${FILESDIR}/fix-dependencies.patch"
 )
 
-# TODO: make ebuild for clvm_rs and add IUSE
 # colorlog and miniupnpc don't have arm64 keywords
 DEPEND="
 	~dev-python/blspy-1.0.2[${PYTHON_USEDEP}]
@@ -27,6 +26,7 @@ DEPEND="
 	~dev-python/chiavdf-1.0.1[${PYTHON_USEDEP}]
 	~dev-python/chiabip158-1.0[${PYTHON_USEDEP}]
 	~dev-python/clvm-0.9.6[${PYTHON_USEDEP}]
+	~dev-python/clvm-rs-0.1.7[${PYTHON_USEDEP}]
 	~dev-python/clvm-tools-0.4.3[${PYTHON_USEDEP}]
 	~dev-python/aiohttp-3.7.4[${PYTHON_USEDEP}]
 	~dev-python/aiosqlite-0.17.0[${PYTHON_USEDEP}]

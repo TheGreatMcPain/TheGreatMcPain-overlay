@@ -1,11 +1,5 @@
-commit d570dde5debc9e7421ca0fef169060c9b364e2e2
-Author: TheGreatMcPain <jmcclain2020@protonmail.com>
-Date:   Sat Apr 3 11:25:24 2021 -0500
-
-    /home/james/git-repos/mine/thegreatmcpain-overlay/app-emulation/dxvk-winelib/files/dxvk-restore-winelib-9999.patch
-
 diff --git a/README.md b/README.md
-index e4b8bc46..3ab7557a 100644
+index 82a1fc1a..fde2a2a8 100644
 --- a/README.md
 +++ b/README.md
 @@ -56,6 +56,8 @@ cd /your/target/directory/build.64
@@ -60,7 +54,7 @@ index 00000000..46abe86e
 +endian = 'little'
 +
 diff --git a/meson.build b/meson.build
-index effc870a..84dedd91 100644
+index b9dec25f..43719115 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -47,64 +47,108 @@ else
@@ -216,9 +210,9 @@ index effc870a..84dedd91 100644
 +endif
  
  glsl_compiler = find_program('glslangValidator')
- glsl_generator = generator(glsl_compiler,
+ glsl_args = [ '-V', '--vn', '@BASENAME@', '@INPUT@', '-o', '@OUTPUT@' ]
 diff --git a/package-release.sh b/package-release.sh
-index 935b2ae0..0fd92194 100755
+index 9318226c..12ad23b2 100755
 --- a/package-release.sh
 +++ b/package-release.sh
 @@ -5,7 +5,7 @@ set -e
@@ -266,3 +260,95 @@ index 46a10c4b..9257145a 100644
    include_directories : dxvk_include_path,
    install             : true,
    objects             : not dxvk_is_msvc ? 'd3d10core'+def_spec_ext : [],
+diff --git a/src/dxgi/dxgi_swapchain.cpp b/src/dxgi/dxgi_swapchain.cpp
+index d02c62b5..5376f893 100644
+--- a/src/dxgi/dxgi_swapchain.cpp
++++ b/src/dxgi/dxgi_swapchain.cpp
+@@ -14,9 +14,15 @@ namespace dxvk {
+     m_window    (hWnd),
+     m_desc      (*pDesc),
+     m_descFs    (*pFullscreenDesc),
+-    m_presentCount(0u),
+     m_presenter (pPresenter),
+     m_monitor   (nullptr) {
++    // Initialize frame statistics
++    m_stats.PresentCount         = 0;
++    m_stats.PresentRefreshCount  = 0;
++    m_stats.SyncRefreshCount     = 0;
++    m_stats.SyncQPCTime.QuadPart = 0;
++    m_stats.SyncGPUTime.QuadPart = 0;
++    
+     if (FAILED(m_presenter->GetAdapter(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&m_adapter))))
+       throw DxvkError("DXGI: Failed to get adapter for present device");
+     
+@@ -165,22 +171,10 @@ namespace dxvk {
+   
+   
+   HRESULT STDMETHODCALLTYPE DxgiSwapChain::GetFrameStatistics(DXGI_FRAME_STATISTICS* pStats) {
+-    std::lock_guard<std::recursive_mutex> lock(m_lockWindow);
+-
+-    if (!pStats)
++    if (pStats == nullptr)
+       return E_INVALIDARG;
+-
+-    static bool s_errorShown = false;
+-
+-    if (!std::exchange(s_errorShown, true))
+-      Logger::warn("DxgiSwapChain::GetFrameStatistics: Semi-stub");
+-
+-    // TODO deal with the refresh counts at some point
+-    pStats->PresentCount = m_presentCount;
+-    pStats->PresentRefreshCount = 0;
+-    pStats->SyncRefreshCount = 0;
+-    pStats->SyncQPCTime.QuadPart = dxvk::high_resolution_clock::getCounter();
+-    pStats->SyncGPUTime.QuadPart = 0;
++    
++    *pStats = m_stats;
+     return S_OK;
+   }
+   
+@@ -234,7 +228,7 @@ namespace dxvk {
+     if (pLastPresentCount == nullptr)
+       return E_INVALIDARG;
+     
+-    *pLastPresentCount = m_presentCount;
++    *pLastPresentCount = m_stats.PresentCount;
+     return S_OK;
+   }
+   
+@@ -265,10 +259,7 @@ namespace dxvk {
+     std::lock_guard<std::mutex> lockBuf(m_lockBuffer);
+ 
+     try {
+-      HRESULT hr = m_presenter->Present(SyncInterval, PresentFlags, nullptr);
+-      if (hr == S_OK && !(PresentFlags & DXGI_PRESENT_TEST))
+-        m_presentCount++;
+-      return hr;
++      return m_presenter->Present(SyncInterval, PresentFlags, nullptr);
+     } catch (const DxvkError& err) {
+       Logger::err(err.message());
+       return DXGI_ERROR_DRIVER_INTERNAL_ERROR;
+diff --git a/src/dxgi/dxgi_swapchain.h b/src/dxgi/dxgi_swapchain.h
+index a071ae4a..b39ff6f4 100644
+--- a/src/dxgi/dxgi_swapchain.h
++++ b/src/dxgi/dxgi_swapchain.h
+@@ -11,8 +11,6 @@
+ 
+ #include "../spirv/spirv_module.h"
+ 
+-#include "../util/util_time.h"
+-
+ namespace dxvk {
+   
+   class DxgiDevice;
+@@ -186,8 +184,8 @@ namespace dxvk {
+     HWND                            m_window;
+     DXGI_SWAP_CHAIN_DESC1           m_desc;
+     DXGI_SWAP_CHAIN_FULLSCREEN_DESC m_descFs;
+-    UINT                            m_presentCount;
+-
++    DXGI_FRAME_STATISTICS           m_stats;
++    
+     Com<IDXGIVkSwapChain>           m_presenter;
+     
+     HMONITOR                        m_monitor;

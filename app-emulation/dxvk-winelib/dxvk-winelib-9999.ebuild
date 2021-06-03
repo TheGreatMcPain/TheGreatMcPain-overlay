@@ -51,6 +51,7 @@ if ver_test -gt "1.6.1"; then
 		"${FILESDIR}/dxvk-restore-winelib-${PV}.patch"
 		"${FILESDIR}/dxvk-restore-spec-files.patch"
 		"${FILESDIR}/dxvk-revert-remove-vulkanfn.patch"
+		"${FILESDIR}/double-define-r2.patch"
 	)
 
 	# Adds missing functions for winelib.
@@ -112,6 +113,9 @@ src_prepare() {
 
 	# winelib doesn't like lto.
 	filter-flags "-flto*"
+
+	# -fcommon
+	append-flags "-fcommon"
 
 	default
 

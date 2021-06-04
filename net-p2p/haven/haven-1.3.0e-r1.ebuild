@@ -50,6 +50,7 @@ src_prepare() {
 	# cmake_src_prepare will try to apply patches in PATCHES
 	eapply "${FILESDIR}/${PN}-1.3.0-linkjobs.patch"
 	eapply "${FILESDIR}/strip-haven-build.patch"
+	eapply "${FILESDIR}/${PN}-boost-1.76.patch"
 	eapply_user
 
 	# Run the stripped down build script to patch the monero sources.

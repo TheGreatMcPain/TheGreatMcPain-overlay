@@ -44,6 +44,7 @@ PATCHES=(
 		"${FILESDIR}/${PN}-0.3.1.2-boost-1.74.patch"
 		"${FILESDIR}/${PN}-0.3.1.2-boost-timer.patch"
 		"${FILESDIR}/${PN}-0.3.1.2-boost-endian.patch"
+		"${FILESDIR}/${PN}-0.3.1.2-boost-1.76.patch"
 		"${FILESDIR}/${PN}-0.3.1.2-size_t.patch"
 )
 

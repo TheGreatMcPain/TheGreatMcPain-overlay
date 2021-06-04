@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7,8} )
+PYTHON_COMPAT=( python3_{6..9} )
 
 inherit distutils-r1
 
@@ -11,7 +11,7 @@ inherit distutils-r1
 
 DESCRIPTION="Python wrapper for the HIDAPI"
 HOMEPAGE="https://github.com/trezor/cython-hidapi"
-SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${PN}-${PV}.tar.gz"
+SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -21,4 +21,4 @@ RDEPEND="
 	virtual/libusb
 	virtual/libudev"
 
-S="${WORKDIR}"/"${PN}-${PV}"
+S="${WORKDIR}"/"${P}"

@@ -1,4 +1,4 @@
-# Copyright 2021 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -71,7 +71,7 @@ winapi-x86_64-pc-windows-gnu-0.4.0
 wyz-0.2.0
 "
 
-PYTHON_COMPAT=( python3_{7..9} )
+PYTHON_COMPAT=( python3_{6..9} )
 inherit python-r1 flag-o-matic cargo
 
 DESCRIPTION="Rust implementation of clvm"

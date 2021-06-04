@@ -34,7 +34,10 @@ DEPEND="
 RDEPEND="${DEPEND}"
 BDEPEND="virtual/pkgconfig"
 
-PATCHES=("${FILESDIR}/${PN}-0.17.1.3-linkjobs.patch")
+PATCHES=(
+	"${FILESDIR}/${PN}-0.17.1.3-linkjobs.patch"
+	"${FILESDIR}/${PN}-boost-1.76.0-fix.patch"
+)
 
 src_configure() {
 	local mycmakeargs=(

@@ -45,3 +45,42 @@ category/package: the thing I did
 
 More information about the thing I did.
 ```
+
+## Crypto Currency Ebuilds
+
+If you are looking for the crypto ebuilds that gpo.zugaina.org says are here, they have been moved to my crypto overlay.
+
+You can find that [here.](https://gitlab.com/TheGreatMcPain/thegreatmcpain-crypto-overlay)
+
+Here's the list of packages that were moved.
+
+```
+acct-group/haven
+acct-group/masari
+acct-group/monero
+acct-group/turtlecoin
+acct-user/haven
+acct-user/masari
+acct-user/monero
+acct-user/turtlecoin
+dev-python/aiosqlite
+dev-python/blspy
+dev-python/chiabip158
+dev-python/chiapos
+dev-python/chiavdf
+dev-python/clvm
+dev-python/clvm-rs
+dev-python/clvm-tools
+dev-python/concurrent-log-handler
+dev-python/keyrings-cryptfile
+dev-python/maturin
+dev-python/portalocker
+net-misc/violetminer
+net-misc/xmrig
+net-misc/xmrig-cuda
+net-p2p/chia-blockchain
+net-p2p/haven
+net-p2p/masari
+net-p2p/monero
+net-p2p/turtlecoin
+```

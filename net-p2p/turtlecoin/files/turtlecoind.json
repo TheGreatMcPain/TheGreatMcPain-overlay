@@ -1,4 +1,0 @@
-{
-  "data-dir": "/var/lib/turtlecoin",
-  "log-file": "/var/log/turtlecoin/turtlecoind.log"
-}

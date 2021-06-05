@@ -1,8 +1,0 @@
-/var/log/xmrig/* {
-        missingok
-        rotate 4
-        compress
-        delaycompress
-        minsize 100k
-        notifempty
-}

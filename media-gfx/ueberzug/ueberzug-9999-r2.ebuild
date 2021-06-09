@@ -31,6 +31,7 @@ RDEPEND="
 	dev-python/docopt[${PYTHON_USEDEP}]
 	dev-python/psutil[${PYTHON_USEDEP}]
 	dev-python/attrs[${PYTHON_USEDEP}]
+	x11-libs/libXres
 "
 DEPEND="
 	${RDEPEND}

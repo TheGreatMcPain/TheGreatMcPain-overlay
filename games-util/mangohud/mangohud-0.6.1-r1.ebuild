@@ -56,7 +56,7 @@ multilib_src_configure() {
 		-Dinclude_doc=false
 		-Dwith_nvml=$(usex video_cards_nvidia enabled disabled)
 		-Dwith_xnvctrl=$(usex xnvctrl enabled disabled)
-		-Dwith_X11=$(usex X enabled disabled)
+		-Dwith_x11=$(usex X enabled disabled)
 		-Dwith_wayland=$(usex wayland enabled disabled)
 		-Dwith_dbus=$(usex dbus enabled disabled)
 	)

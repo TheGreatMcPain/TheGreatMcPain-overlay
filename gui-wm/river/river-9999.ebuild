@@ -42,6 +42,8 @@ BDEPEND="
 	app-text/scdoc
 "
 
+PATCHES=("${FILESDIR}/bypass-zig-wlroot-version.patch")
+
 src_configure() {
 	export zigoptions=(
 		--verbose

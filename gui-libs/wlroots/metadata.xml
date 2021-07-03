@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>jmcclain2020@protonmail.com</email>
+		<name>James McClain</name>
+	</maintainer>
+	<longdescription lang="en">
+		Pluggable, composable, unopinionated modules for building a Wayland
+		compositor. (EGLStreams fork)
+
+		wlroots implements a huge variety of Wayland compositor features and
+		implements them right. By using wlroots, you get high performance,
+		excellent hardware compatibility, broad support for many wayland
+		interfaces, and comfortable development tools.
+
+		wlroots is developed under the direction of the <pkg>gui-wm/sway</pkg> project.
+	</longdescription>
+	<use>
+		<flag name="x11-backend">Enable support for handling input/output devices through <pkg>x11-libs/libxcb</pkg></flag>
+		<flag name="X">Enable support for X11 applications (XWayland)</flag>
+	</use>
+</pkgmetadata>

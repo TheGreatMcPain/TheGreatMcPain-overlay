@@ -1,0 +1,28 @@
+Title: Ending DXVK Winelib support
+Author: James McClain <jmcclain2020@protonmail.com>
+Content-Type: text/plain
+Posted: 2021-07-23
+Revision: 1
+News-Item-Format: 1.0
+
+Since wine 6.6 has removed the ability to compile dxvk-winelib via the below commit,
+
+> commit 1cc6b4921a21de5a3ccb8a4443a8ceac8a23187f
+> Author: Jacek Caban <jacek@codeweavers.com>
+> Date:   Wed Apr 14 17:58:21 2021 +0200
+>
+>     winevulkan: Remove native_vkGetInstanceProcAddrWINE.
+>
+>     It was needed for use cases like DXVK winelib builds. It was never
+>     really adopted and it's problematic for PE builds.
+>
+>     Signed-off-by: Jacek Caban <jacek@codeweavers.com>
+>     Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+
+and I don't think there's a need to use it anymore, I'm gonna stop maintaining the
+app-emulation/dxvk-winelib ebuilds.
+
+I will keep them in the overlay, and will even accept pull-requests for them.
+
+If anybody needs help getting a mingw64 toolchain going for app-emulation/dxvk
+please consult: https://wiki.gentoo.org/wiki/DXVK

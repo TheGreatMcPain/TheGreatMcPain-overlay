@@ -74,18 +74,22 @@ bits() {
 	[[ ${ABI} = "x86" ]]   && echo 32
 }
 
+# Return latest winegcc that's below 6.6.
+setup_winegcc() {
+	equery f $1 | grep /usr/bin | grep $2 | tail -n1
+}
+
 pkg_setup() {
 	# Get the latest installed version of winegcc and wineg++.
 	if $(has_version ">=app-emulation/wine-staging-5.9"); then
-		WINE_VERSION=$(best_version app-emulation/wine-staging)
+		WINEGPP=$(setup_winegcc "<app-emulation/wine-staging-6.6" "wineg++")
+		WINEGCC=$(setup_winegcc "<app-emulation/wine-staging-6.6" "winegcc")
 	elif $(has_version ">=app-emulation/wine-vanilla-5.9"); then
-		WINE_VERSION=$(best_version app-emulation/wine-vanilla)
+		WINEGPP=$(setup_winegcc "<app-emulation/wine-vanilla-6.6" "wineg++")
+		WINEGCC=$(setup_winegcc "<app-emulation/wine-vanilla-6.6" "winegcc")
 	else
 		die "${P} requires a wine version newer than 5.9 to build."
 	fi
-
-	WINEGPP=$(equery f $WINE_VERSION | grep /usr/bin | grep wineg++)
-	WINEGCC=$(equery f $WINE_VERSION | grep /usr/bin | grep winegcc)
 
 	WINEGPP=${WINEGPP/"/usr/bin/"/}
 	WINEGCC=${WINEGCC/"/usr/bin/"/}

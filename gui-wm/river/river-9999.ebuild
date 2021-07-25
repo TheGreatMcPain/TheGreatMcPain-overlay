@@ -66,5 +66,17 @@ src_test() {
 
 src_install() {
 	zig build install "${zigoptions[@]}" --prefix "${ED}/usr" || die
-	mv "${ED}"/usr/etc "${ED}" || die
+
+	dodoc "${S}/example/init"
+}
+
+pkg_postinst() {
+	einfo
+	einfo "See /usr/share/doc/${P}/init.bz2 for example config."
+	einfo
+	einfo "You can run the commands below to install the example config."
+	einfo
+	einfo "$ bzcat /usr/share/doc/${P}/init.bz2 >> ~/.config/river/init"
+	einfo "$ chmod +x ~/.config/river/init"
+	einfo
 }

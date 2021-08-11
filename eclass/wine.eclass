@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: wine.eclass
@@ -17,7 +17,7 @@
 if [[ -z "${_WINE_ECLASS}" ]]; then
 _WINE_ECLASS=1
 
-inherit flag-o-matic l10n mingw64 multilib virtualx xdg-utils
+inherit flag-o-matic mingw64 multilib plocale virtualx xdg-utils
 
 case ${EAPI} in
 	6)  inherit eapi7-ver ;;
@@ -1733,7 +1733,7 @@ wine_fix_gentoo_winegcc_support() {
 	sed -i -e '/^    signal[(] SIGINT, exit_on_signal [)];$/a\
 \
 #ifdef FORCE_POINTER_SIZE\
-    force_pointer_size = sizeof(size_t);\
+	force_pointer_size = sizeof(size_t);\
 #endif' \
 		"${source_files[0]}" || die "sed failed"
 
@@ -1741,7 +1741,7 @@ wine_fix_gentoo_winegcc_support() {
 	sed -i -e '/^    signal[(] SIGINT, exit_on_signal [)];$/a\
 \
 #ifdef FORCE_POINTER_SIZE\
-    opts.force_pointer_size = sizeof(size_t);\
+	opts.force_pointer_size = sizeof(size_t);\
 #endif' \
 		"${source_files[1]}" || die "sed failed"
 }
@@ -1860,7 +1860,7 @@ wine_src_disable_unused_locale_man_files() {
 	local _makefile_in
 	find "${S}" -type f -name "Makefile.in" -exec egrep -q "^MANPAGES" "{}" \; -printf '%p\0' 2>/dev/null \
 	| while IFS= read -r -d '' _makefile_in; do
-		l10n_for_each_disabled_locale_do _wine_src_disable_man_file "${_makefile_in}" ""
+		plocale_for_each_disabled_locale _wine_src_disable_man_file "${_makefile_in}" ""
 	done
 }
 

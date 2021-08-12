@@ -219,7 +219,7 @@ readonly _WINE_IS_STAGING
 # @ECLASS-VARIABLE: WINE_EBUILD_COMMON_P
 # @DESCRIPTION:
 # Full name and version for current: gentoo-wine-ebuild-common; tarball.
-WINE_EBUILD_COMMON_P="gentoo-wine-ebuild-common-20200629"
+WINE_EBUILD_COMMON_P="gentoo-wine-ebuild-common-20210725"
 readonly WINE_EBUILD_COMMON_P
 
 # @ECLASS-VARIABLE: WINE_EBUILD_COMMON_PN
@@ -237,7 +237,6 @@ readonly WINE_EBUILD_COMMON_PV
 # @ECLASS-VARIABLE: WINE_PV
 # @DESCRIPTION:
 # Wine release version. This will be stripped of components (see below).
-# WINE_PV="${PV}"
 WINE_PV="9999"
 
 # @ECLASS-VARIABLE: _WINE_VERSION_ARRAY_COMPONENTS
@@ -324,7 +323,12 @@ WINE_STAGING_PN=""
 # @ECLASS-VARIABLE: WINE_STAGING_PV
 # @DESCRIPTION:
 # Separate versioning for Wine Staging, to allow for re-release version updates.
-WINE_STAGING_PV="${WINE_PV}"
+case "${WINE_PV}" in
+	6.0-rc1)
+		WINE_STAGING_PV="${WINE_PV/-rc/rc}";;
+	*)
+		WINE_STAGING_PV="${WINE_PV}";;
+esac
 
 # @ECLASS-VARIABLE: _WINE_STAGING_SUFFIX
 # @INTERNAL
@@ -345,7 +349,7 @@ _WINE_STAGING_SUFFIX=""
 	1.8.[1-6])
 		_WINE_STAGING_SUFFIX="-unofficial"
 		;;
-	3.13.1|5.12.1)
+	3.13.1|5.12.1|5.15.2)
 		_WINE_STAGING_REVISION=".${WINE_PV##*.}"
 		WINE_PV="${WINE_PV%${_WINE_STAGING_REVISION}}"
 		;;
@@ -1107,6 +1111,7 @@ wine_staging_git_src_unpack() {
 # @DESCRIPTION:
 # This function tests for invalid EGIT_GIT env variable overrides, for the packages:
 #  app-emulation/wine-staging:9999 app-emulation/wine-vanilla:9999
+# shellcheck disable=SC2120
 _wine_env_vcs_variable_prechecks() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1137,6 +1142,7 @@ _wine_env_vcs_variable_prechecks() {
 # @DESCRIPTION:
 # This function tests for invalid gcc or clang versions, for the packages:
 #  app-emulation/wine-staging app-emulation/wine-vanilla
+# shellcheck disable=SC2120
 _wine_build_environment_prechecks() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1179,6 +1185,7 @@ _wine_build_environment_prechecks() {
 # @DESCRIPTION:
 # This function tests for an invalid gcc version, for the packages:
 #  app-emulation/wine-staging app-emulation/wine-vanilla
+# shellcheck disable=SC2120
 _wine_gcc_specific_pretests() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1230,6 +1237,7 @@ _wine_gcc_specific_pretests() {
 # @DESCRIPTION:
 # This function tests generic compiler support for critical functionality, for the packages:
 #  app-emulation/wine-staging app-emulation/wine-vanilla
+# shellcheck disable=SC2120
 _wine_generic_compiler_pretests() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1293,6 +1301,7 @@ _wine_src_disable_man_file() {
 # @DESCRIPTION:
 # This functions deregisters the current: app-emulation/wine-staging, app-emulation/wine-vanilla
 # variant, with the eselect-wine module.
+# shellcheck disable=SC2120
 _wine_deregister_current_variant() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1309,6 +1318,7 @@ _wine_deregister_current_variant() {
 # @DESCRIPTION:
 # This functions registers a new: app-emulation/wine-staging, app-emulation/wine-vanilla
 # variant, with the eselect-wine module.
+# shellcheck disable=SC2120
 _wine_register_new_variant() {
 	(($# == 0)) || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
@@ -1464,6 +1474,9 @@ wine_eapply_staging_patchset() {
 		) \
 		_ntdll_forcebottomupalloc_fix_range=(
 			"8648971fa855c92e9bd73a7d5163a4d2c1d0f9a3" "044cb930662d61f401a5d1bdd7b8e75d59cea5ea"
+		) \
+		_ws2_32_connect_already_connected_patchset_fix_range=(
+			"ce643e9d2ad99daf8898707d4e4c12ba9ffa3525" "163f74fe61851ff57264437073805dd5e7afe2bd"
 		)
 
 	ewarn "Applying the Wine Staging patchset. Any bug reports to Wine Bugzilla"
@@ -1520,12 +1533,17 @@ wine_eapply_staging_patchset() {
 		5.10)
 			eapply "${DISTDIR}/${PN}-5.10_044cb930662d61f401a5d1bdd7b8e75d59cea5ea_ntdll_forcebottomupalloc_fix.patch"
 			;;
+		6.12)
+			eapply "${DISTDIR}/${PN}-6.12_163f74fe61851ff57264437073805dd5e7afe2bd_ws2_32_connect_already_connected_patchset_fix.patch"
+			;;
 		9999)
 			# shellcheck disable=SC2068
 			if _wine_git_is_commit_in_range "${_WINE_STAGING_DIR}" ${_eventfd_synchronization_dir_change_fix_range[@]}; then
 				eapply "${DISTDIR}/${PN}-4.7_c48811407e3c9cb2d6a448d6664f89bacd9cc36f_eventfd_synchronization_fix.patch"
 			elif _wine_git_is_commit_in_range "${_WINE_STAGING_DIR}" ${_ntdll_forcebottomupalloc_fix_range[@]}; then
 				eapply "${DISTDIR}/${PN}-5.10_044cb930662d61f401a5d1bdd7b8e75d59cea5ea_ntdll_forcebottomupalloc_fix.patch"
+			elif _wine_git_is_commit_in_range "${_WINE_STAGING_DIR}" ${_ws2_32_connect_already_connected_patchset_fix_range[@]}; then
+				eapply "${DISTDIR}/${PN}-6.12_163f74fe61851ff57264437073805dd5e7afe2bd_ws2_32_connect_already_connected_patchset_fix.patch"
 			fi
 			;;
 		*)
@@ -1643,6 +1661,15 @@ wine_add_stock_gentoo_patches() {
 			;;
 	esac
 
+	# shellcheck disable=SC2086
+	has mingw ${IUSE} && use mingw && mingw64_gcc_version_geq "11" && case "${WINE_PV}" in
+		4.[6-9]|4.1[0-9]|4.12.1|4.2[0-1]|5.*|6.0|6.0-rc[1-9]|6.0.[1-9]|6.0.[1-9]-rc[1-9]|6.[1-8]|9999)
+			PATCHES+=( "${_patch_directory}/wine-4.6-msvcrt_add_sincos_to_importlib.patch" )
+			;;
+		*)
+			;;
+	esac
+
 	case "${WINE_PV}" in
 		1.8|1.8.[1-7]|1.9.[0-9]|9999)
 			PATCHES+=( "${_patch_directory}/wine-1.8-disable_gnu_dirent.patch" )
@@ -1656,6 +1683,23 @@ wine_add_stock_gentoo_patches() {
 			;;
 		*)
 			PATCHES_REVERT+=( "${_patch_directory}/revert/wine-5.9-makedep_install_also_generated_typelib_for_installed_idl.patch" )
+			;;
+	esac
+	case "${WINE_PV}" in
+		9999)
+			local -a _revert_add_equality_sign_delimiter_commit=( "de4c91e0a1ac65017190bead4c053ae65db8f80e" )
+			_wine_prune_patches_from_array "${S}" "1" "_revert_add_equality_sign_delimiter_commit"
+			# shellcheck disable=SC2068
+			if ((${#_revert_add_equality_sign_delimiter_commit[@]})); then
+				# See: https://bugs.gentoo.org/800809
+				PATCHES_REVERT+=( "${_patch_directory}/revert/wine-6.12-winegcc_add_equality_sign_delimiter.patch" )
+			fi
+			;;
+		6.1[2-3])
+			# See: https://bugs.gentoo.org/800809
+			PATCHES_REVERT+=( "${_patch_directory}/revert/wine-6.12-winegcc_add_equality_sign_delimiter.patch" )
+			;;
+		*)
 			;;
 	esac
 }
@@ -1702,7 +1746,8 @@ wine_fix_gentoo_O3_compilation_support() {
 	sed -i '/^ dnl Check for some compiler flags/a \
 		 WINE_TRY_CFLAGS([-fno-tree-loop-distribute-patterns])' \
 		configure.ac || die "sed failed"
-	if use mingw; then
+	# shellcheck disable=SC2086
+	if has mingw ${IUSE} && use mingw; then
 		# shellcheck disable=SC1004
 		sed -i '/^  dnl clang needs to be told to fail on unknown options/i \
 			  WINE_TRY_CROSSCFLAGS([-fno-tree-loop-distribute-patterns])' \
@@ -1858,10 +1903,9 @@ wine_src_disable_unused_locale_man_files() {
 	(($# == 0))  || die "${FUNCNAME[0]}(): invalid number of arguments: ${#} (0)"
 
 	local _makefile_in
-	find "${S}" -type f -name "Makefile.in" -exec egrep -q "^MANPAGES" "{}" \; -printf '%p\0' 2>/dev/null \
-	| while IFS= read -r -d '' _makefile_in; do
+	while IFS= read -r -d '' _makefile_in; do
 		plocale_for_each_disabled_locale _wine_src_disable_man_file "${_makefile_in}" ""
-	done
+	done < <(find "${S}" -type f -name "Makefile.in" -exec egrep -q "^MANPAGES" "{}" \; -printf '%p\0' 2>/dev/null)
 }
 
 # @FUNCTION: wine_symlink_64bit_manpages
@@ -1905,16 +1949,20 @@ wine_pkg_pretend() {
 		die "USE=+oss currently unsupported on this system."
 	fi
 
-	use mingw && mingw64_check_requirements "5.0.0" "7.0.0"
+	# shellcheck disable=SC2086
+	has mingw ${IUSE} && use mingw && mingw64_check_requirements "5.0.0" "7.0.0"
 }
 
 # @FUNCTION: wine_pkg_setup
 # @DESCRIPTION:
 # This ebuild phase function performs various compiler version and env variable checks.
 wine_pkg_setup() {
+	# shellcheck disable=SC2119
 	# _wine_env_vcs_variable_prechecks || die "_wine_env_vcs_variable_prechecks() failed"
+	# shellcheck disable=SC2119
 	_wine_build_environment_prechecks || die "_wine_build_environment_prechecks() failed"
-	use mingw && mingw64_check_requirements "5.0.0" "7.0.0"
+	# shellcheck disable=SC2086
+	has mingw ${IUSE} && use mingw && mingw64_check_requirements "5.0.0" "7.0.0"
 }
 
 # @FUNCTION: wine_src_configure
@@ -1926,12 +1974,15 @@ wine_pkg_setup() {
 # 'CROSSLDFLAGS': cross-compiler cflags (fallback to 'LDFLAGS' - if 'CROSSLDFLAGS' is unspecified)
 # This function then calls the multilib-minimal_src_configure phase.
 wine_src_configure() {
+	# shellcheck disable=SC2119
 	_wine_gcc_specific_pretests || die "_wine_gcc_specific_pretests() failed"
+	# shellcheck disable=SC2119
 	_wine_generic_compiler_pretests || die "_wine_generic_compiler_pretests() failed"
 
 	local -r _gcc_10_fcommon_fix_commit="c13d58780f78393571dfdeb5b4952e3dcd7ded90"
 	export LDCONFIG="/bin/true"
-	if use mingw; then
+	# shellcheck disable=SC2086
+	if has mingw ${IUSE} && use mingw; then
 		# FIXME: hack to allow flag-o-matic to filter Wine's CROSS{C,LD}FLAGS
 		local cross_flag flag
 		local -A saved_flags
@@ -2006,6 +2057,7 @@ wine_multilib_src_test() {
 # This function also updates the XDG Mime database.
 # This function prints various USE flag and Wine version specific warning messages.
 wine_pkg_postinst() {
+	# shellcheck disable=SC2119
 	_wine_register_new_variant
 
 	xdg_mimeinfo_database_update
@@ -2046,6 +2098,7 @@ wine_pkg_postinst() {
 # @DESCRIPTION:
 # This ebuild phase function deregisters the currently Wine variant.
 wine_pkg_prerm() {
+	# shellcheck disable=SC2119
 	_wine_deregister_current_variant
 }
 

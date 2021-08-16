@@ -2001,6 +2001,7 @@ wine_src_configure() {
 		for flag in $(all-flag-vars); do
 			cross_flag="CROSS${flag}"
 			declare -n cross_flag_ref="${cross_flag}" flag_ref="${flag}"
+			export ${cross_flag}
 			# shellcheck disable=SC2034
 			cross_flag_ref="${!flag}"
 			[[ "${flag}" =~ ^(C|LD)FLAGS$ ]] && einfo "${cross_flag}='${!cross_flag}'"

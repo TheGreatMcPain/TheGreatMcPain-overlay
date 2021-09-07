@@ -7,7 +7,7 @@ inherit qmake-utils
 
 LAZ_COMMIT="1159b4327b97e0283fed38d091b057172123a291"
 LAZ_DIRECTORY="lcl/interfaces/qt5/cbindings"
-LAZ_UNPACKED_DIR="lazarus-${LAZ_COMMIT:0:8}-${LAZ_COMMIT}-${LAZ_DIRECTORY//\//-}"
+LAZ_UNPACKED_DIR="lazarus-${LAZ_COMMIT}-${LAZ_DIRECTORY//\//-}"
 
 DESCRIPTION="Free Pascal Qt5 bindings library updated by lazarus IDE."
 HOMEPAGE="https://svn.freepascal.org/svn/lazarus/trunk/lcl/interfaces/qt5/cbindings"

@@ -2,7 +2,7 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
   <maintainer type="person">
-    <email>jmcclain2020@protonmail.com</email>
+    <email>james@thegreatmcpain.xyz</email>
   </maintainer>
   <upstream>
     <remote-id type="pypi">Rx</remote-id>

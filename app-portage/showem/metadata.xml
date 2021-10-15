@@ -2,15 +2,15 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 <maintainer type="person">
-		<email>jmcclain2020@protonmail.com</email>
+		<email>james@thegreatmcpain.xyz</email>
 		<name>James McClain</name>
 </maintainer>
 <upstream>
 		<maintainer status="active">
-				<email>jmcclain2020@protonmail.com</email>
+				<email>james@thegreatmcpain.xyz</email>
 				<name>James McClain</name>
 		</maintainer>
-		<bugs-to>mailto:jmcclain2020@protonmail.com</bugs-to>
+		<bugs-to>mailto:james@thegreatmcpain.xyz</bugs-to>
 </upstream>
 <longdescription>
 		This is a very simple utility script, which allows you to monitor the

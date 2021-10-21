@@ -1,20 +1,4 @@
-# About the DXVK and Wine-Staging ebuilds
-
-## Wine-Staging ebuilds
-
-The `wine-staging` ebuilds are based on the wine-vanilla ebuild from [bobwya's overlay](https://github.com/bobwya/bobwya), but have the dependences from wine-staging added.
-
-They've also been modified to pull from [lutris's wine repository,](https://github.com/lutris/wine)\
-and each ebuild points to a different branch from that repository.
-
-Here's the current ebuild versions, and there respective lutris/proton wine branch.
-
-| wine-staging version | lutris wine branch                                                                                              |
-| -------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| 6.14                  | [lutris-fshack-6.14-3 branch of https://github.com/lutris/wine](https://github.com/lutris/wine/tree/lutris-fshack-5.7) (includes Proton's fullscreen hacks) |
-| 6.3 | [proton_6.3 branch of https://github.com/ValveSoftware/Proton](https://github.com/ValveSoftware/Proton/tree/proton_6.3) |
-
-These ebuilds require bobwya's overlay to be enabled. `# layman -a bobwya`
+# DXVK ebuilds info
 
 ## DXVK ebuilds
 

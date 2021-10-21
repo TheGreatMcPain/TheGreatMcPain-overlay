@@ -2,8 +2,6 @@
 
 Just a bunch of stuff I wanted to install which were not available in other overlays, or are just unmaintained, etc. I mainly just didn't want to install a lot of overlays.
 
-You may want to read about the stuff in [app-emulation](app-emulation/README.md) though.
-
 ### Installation
 
 Bobwya's overlay is required since my wine-staging is based on their wine-vanilla ebuild.\
@@ -45,6 +43,12 @@ category/package: the thing I did
 
 More information about the thing I did.
 ```
+
+## Wine-staging ebuilds have been moved.
+
+I've moved my wine-staging ebuilds to a seperate overlay in-order to remove the need to install the `bobwya` overlay which was only required for the `app-emulation/wine-staging` ebuilds.
+
+[The overlay can be found here.](https://gitlab.com/TheGreatMcPain/thegreatmcpain-wine-overlay/)
 
 ## Crypto Currency Ebuilds
 

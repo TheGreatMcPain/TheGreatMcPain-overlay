@@ -1,4 +1,4 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -73,8 +73,13 @@ src_prepare() {
 
 		PATCHES+=("${FILESDIR}/add-dxvk_config-to-setup.patch")
 	fi
+
 	if use async-patch; then
-		PATCHES+=("${FILESDIR}/dxvk-async.patch")
+		if ver_test -eq "9999"; then
+			PATCHES+=("${FILESDIR}/dxvk-async.patch")
+		else
+			PATCHES+=("${FILESDIR}/dxvk-async-f1aad6c.patch")
+		fi
 	fi
 
 	# From bobwya's dxvk ebuild.

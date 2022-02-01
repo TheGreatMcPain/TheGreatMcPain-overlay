@@ -1,4 +1,4 @@
-# Copyright 2021 Gentoo Authors
+# Copyright 2021-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -21,27 +21,28 @@ RDEPEND="${DEPEND}"
 
 DOCS="README.md"
 
+PATCHES="${FILESDIR}/cava-9999-iniparser4.patch"
+
 pkg_setup() {
-		if linux_config_exists ; then
-			einfo "Checking kernel configuration at $(linux_config_path)..."
-			if ! linux_chkconfig_present SND_ALOOP ; then
-				ewarn 'Kernel option CONFIG_SND_ALOOP=[ym] needed but missing'
-			fi
+	if linux_config_exists ; then
+		einfo "Checking kernel configuration at $(linux_config_path)..."
+		if ! linux_chkconfig_present SND_ALOOP ; then
+			ewarn 'Kernel option CONFIG_SND_ALOOP=[ym] needed but missing'
 		fi
+	fi
 }
 
 src_prepare() {
-	# Remove hardcoded '/usr/local/lib' LDFLAG
-	sed -i "s|-L/usr/local/lib -Wl,-rpath /usr/local/lib||" Makefile.am || die
-
-	eapply_user
+	default
 	if [[ "${PV}" = "9999" ]]; then
 		git describe --always --tags --dirty > version
 	else
 		echo ${PV} > version
 	fi
-	# Make sure we use iniparser:4
-	append-cppflags -I/usr/include/iniparser4
+
+	# Remove hardcoded '/usr/local/lib' LDFLAG
+	sed -i "s|-L/usr/local/lib -Wl,-rpath /usr/local/lib||" Makefile.am || die
+
 	eautoreconf
 }
 
@@ -52,10 +53,10 @@ src_configure() {
 }
 
 src_compile() {
-	emake SYSTEM_LIBINIPARSER=1
+	emake
 }
 
 src_install() {
 	einstalldocs
-	emake DESTDIR="${D}" PREFIX=/usr SYSTEM_LIBINIPARSER=1 install
+	emake DESTDIR="${D}" PREFIX=/usr install
 }

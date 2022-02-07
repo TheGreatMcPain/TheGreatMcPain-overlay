@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>james@thegreatmcpain.xyz</email>
+  </maintainer>
+  <upstream>
+    <bugs-to>https://github.com/jp7677/dxvk-nvapi/issues</bugs-to>
+  </upstream>
+  <use>
+    <flag name="custom-cflags">Patches meson crossfiles to accept custom CFLAGS/CXXFLAGS.</flag>
+  </use>
+</pkgmetadata>

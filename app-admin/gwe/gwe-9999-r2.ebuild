@@ -1,4 +1,4 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python3_{6..9} )
 
 inherit meson python-single-r1 xdg-utils gnome2-utils
 
-DESCRIPTION="System utility designed to provide information, control the fans and overclock your NVIDIA card"
+DESCRIPTION="Utility which provides info, control the fans, and overclock your NVIDIA card"
 HOMEPAGE="https://gitlab.com/leinardi/gwe"
 
 if [[ ${PV} == "9999" ]]; then
@@ -35,15 +35,15 @@ RDEPEND="
 	dev-libs/libdazzle
 
 	$(python_gen_cond_dep '
-		>=dev-python/injector-0.18.4[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/matplotlib-3.4.1[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/peewee-3.14.4[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/py3nvml-0.2.6[${PYTHON_MULTI_USEDEP}]
-		dev-python/pygobject:3[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/python-xlib-0.29[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/pyxdg-0.27[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/requests-2.25.1[${PYTHON_MULTI_USEDEP}]
-		>=dev-python/Rx-3.1.1[${PYTHON_MULTI_USEDEP}]
+		>=dev-python/injector-0.18.4[${PYTHON_USEDEP}]
+		>=dev-python/matplotlib-3.4.1[${PYTHON_USEDEP}]
+		>=dev-python/peewee-3.14.4[${PYTHON_USEDEP}]
+		>=dev-python/py3nvml-0.2.6[${PYTHON_USEDEP}]
+		dev-python/pygobject:3[${PYTHON_USEDEP}]
+		>=dev-python/python-xlib-0.29[${PYTHON_USEDEP}]
+		>=dev-python/pyxdg-0.27[${PYTHON_USEDEP}]
+		>=dev-python/requests-2.25.1[${PYTHON_USEDEP}]
+		>=dev-python/Rx-3.1.1[${PYTHON_USEDEP}]
 	')
 "
 

@@ -75,8 +75,10 @@ src_prepare() {
 	fi
 
 	if use async-patch; then
-		if ver_test -gt "1.9.2"; then
+		if ver_test -eq "9999"; then
 			PATCHES+=("${FILESDIR}/dxvk-async.patch")
+		elif ver_test -gt "1.9.2"; then
+			PATCHES+=("${FILESDIR}/dxvk-async-67e2ee1.patch")
 		else
 			PATCHES+=("${FILESDIR}/dxvk-async-f1aad6c.patch")
 		fi

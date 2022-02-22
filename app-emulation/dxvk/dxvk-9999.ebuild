@@ -100,11 +100,11 @@ src_prepare() {
 
 	# From bobwya's dxvk ebuild.
 	# Delete installation instructions for unused ABIs.
-	if use abi_x86_32; then
+	if ! use abi_x86_32; then
 		sed -i '\|installFile "$win32_sys_path"|d' "${S}/setup_dxvk.sh" \
 			|| die "sed failed"
 	fi
-	if use abi_x86_64; then
+	if ! use abi_x86_64; then
 		sed -i '\|installFile "$win64_sys_path"|d' "${S}/setup_dxvk.sh" \
 			|| die "sed failed"
 	fi

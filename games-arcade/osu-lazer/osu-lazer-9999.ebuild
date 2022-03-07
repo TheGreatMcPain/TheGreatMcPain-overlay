@@ -1,4 +1,4 @@
-# Copyright 2021 Gentoo Authors
+# Copyright 2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -27,11 +27,11 @@ DEPEND="
 	virtual/opengl
 	media-libs/libsdl2
 	x11-misc/shared-mime-info
-	>=dev-dotnet/dotnetcore-sdk-bin-5.0.101
+	>=dev-dotnet/dotnetcore-sdk-bin-6.0.102
 "
 RDEPEND="${DEPEND}"
 
-dotnet_ver=5.0
+dotnet_ver=6.0
 output="./osu.Desktop/bin/Release/netcoreapp$dotnet_ver/linux-x64"
 
 if ! [[ ${PV} = "9999" ]]; then

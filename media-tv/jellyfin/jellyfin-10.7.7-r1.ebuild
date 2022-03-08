@@ -1,4 +1,4 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -16,7 +16,7 @@ KEYWORDS="~amd64"
 # dotnet restore needs internet
 RESTRICT="network-sandbox"
 
-DEPEND=">=dev-dotnet/dotnetcore-sdk-bin-5.0.202"
+DEPEND="dev-dotnet/dotnetcore-sdk-bin:5.0"
 RDEPEND="
 	${DEPEND}
 	>=media-video/ffmpeg-4.2.2

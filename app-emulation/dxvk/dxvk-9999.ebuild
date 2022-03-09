@@ -42,7 +42,7 @@ DEPEND="${RDEPEND}
 	dev-util/vulkan-headers"
 
 BDEPEND="
-	>=dev-util/meson-0.46"
+	>=dev-util/meson-0.55"
 
 if [[ ${PV} != "9999" ]] ; then
 	S="${WORKDIR}/dxvk-${PV}"
@@ -65,23 +65,12 @@ pkg_setup() {
 
 src_prepare() {
 	if use dxvk-config; then
-		if ver_test -gt "1.8.1"; then
-			PATCHES+=("${FILESDIR}/add-dxvk_config-mingw-library-1.8.2.patch")
-		else
-			PATCHES+=("${FILESDIR}/add-dxvk_config-mingw-library.patch")
-		fi
-
+		PATCHES+=("${FILESDIR}/add-dxvk_config-mingw-library.patch")
 		PATCHES+=("${FILESDIR}/add-dxvk_config-to-setup.patch")
 	fi
 
 	if use async-patch; then
-		if ver_test -gt "1.9.4"; then
-			PATCHES+=("${FILESDIR}/dxvk-async.patch")
-		elif ver_test -gt "1.9.2"; then
-			PATCHES+=("${FILESDIR}/dxvk-async-67e2ee1.patch")
-		else
-			PATCHES+=("${FILESDIR}/dxvk-async-f1aad6c.patch")
-		fi
+		PATCHES+=("${FILESDIR}/dxvk-async-${PV}.patch")
 	fi
 
 	# From bobwya's dxvk ebuild.
@@ -134,28 +123,9 @@ multilib_src_configure() {
 		emesonargs+=(
 			-Dc_args="${CFLAGS}"
 			-Dcpp_args="${CXXFLAGS}"
+			-Dc_link_args="${LDFLAGS}"
+			-Dcpp_link_args="${LDFLAGS}"
 		)
-	fi
-
-	if ver_test -le "1.7.4"; then
-		if use custom-cflags; then
-			emesonargs+=(
-				-Dc_link_args="${LDFLAGS} -static -static-libgcc"
-				-Dcpp_link_args="${LDFLAGS} -static -static-libgcc -static-libstdc++"
-			)
-		else
-			emesonargs+=(
-				-Dc_link_args="-static -static-libgcc"
-				-Dcpp_link_args="-static -static-libgcc -static-libstdc++"
-			)
-		fi
-	else
-		if use custom-cflags; then
-			emesonargs+=(
-				-Dc_link_args="${LDFLAGS}"
-				-Dcpp_link_args="${LDFLAGS}"
-			)
-		fi
 	fi
 
 	meson_src_configure

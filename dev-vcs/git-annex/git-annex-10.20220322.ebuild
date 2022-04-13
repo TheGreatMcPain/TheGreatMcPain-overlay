@@ -85,7 +85,7 @@ RDEPEND="dev-haskell/aeson:=
 	benchmark? ( dev-haskell/criterion:= )
 	dbus? ( >=dev-haskell/dbus-0.10.7:=
 		>=dev-haskell/fdo-notify-0.3:= )
-	gitlfs? ( >=dev-haskell/git-lfs-1.1.0:= )
+	gitlfs? ( >=dev-haskell/git-lfs-1.2.0:= )
 	httpclientrestricted? ( >=dev-haskell/http-client-restricted-0.0.2:= )
 	magicmime? ( dev-haskell/magic:= )
 	networkbsd? ( >=dev-haskell/network-3.0.0.0:=

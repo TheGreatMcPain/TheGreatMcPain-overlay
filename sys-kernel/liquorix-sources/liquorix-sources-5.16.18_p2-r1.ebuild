@@ -1,15 +1,13 @@
 # Copyright 2020-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 ETYPE="sources"
-
-inherit eapi7-ver
 
 K_USEPV="yes"
 UNIPATCH_STRICTORDER="yes"
 K_SECURITY_UNSUPPORTED="1"
-GIT_COMMIT="5.16-23"
+GIT_COMMIT="5.16-27"
 
 CKV="$(ver_cut 1-2)"
 ETYPE="sources"

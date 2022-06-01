@@ -9,7 +9,7 @@ K_SECURITY_UNSUPPORTED="1"
 inherit kernel-2 unpacker
 
 BOARD="rockchip64"
-BRANCH="edge"
+BRANCH="current"
 ARMBIAN_VER="22.05.1"
 EXTRAVERSION="-armbian-${BOARD}"
 
@@ -22,7 +22,7 @@ SRC_URI="
 "
 
 SLOT="0"
-KEYWORDS="-*"
+KEYWORDS="~arm64"
 
 DEPEND=""
 RDEPEND="${DEPEND}"

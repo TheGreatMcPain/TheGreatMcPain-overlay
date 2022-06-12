@@ -23,7 +23,7 @@ fi
 
 LICENSE="ZLIB"
 SLOT=0
-IUSE="async-patch custom-cflags debug dxvk-config video_cards_nvidia"
+IUSE="async-patch custom-cflags debug video_cards_nvidia"
 REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )"
 
 RESTRICT="test"
@@ -77,11 +77,6 @@ src_unpack() {
 }
 
 src_prepare() {
-	if use dxvk-config; then
-		PATCHES+=("${FILESDIR}/add-dxvk_config-mingw-library.patch")
-		PATCHES+=("${FILESDIR}/add-dxvk_config-to-setup.patch")
-	fi
-
 	if use async-patch; then
 		PATCHES+=("${WORKDIR}/dxvk-async-${PV}/dxvk-async.patch")
 	fi

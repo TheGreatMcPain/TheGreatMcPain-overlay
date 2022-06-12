@@ -16,7 +16,8 @@ if [[ ${PV} == "9999" ]] ; then
 	inherit git-r3
 	SRC_URI=""
 else
-	SRC_URI="https://github.com/doitsujin/dxvk/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/doitsujin/dxvk/archive/v${PV}.tar.gz -> ${P}.tar.gz
+			async-patch? ( https://github.com/Sporif/dxvk-async/archive/${PV}.tar.gz -> dxvk-async-${PV}.tar.gz )"
 	KEYWORDS="-* ~amd64"
 fi
 
@@ -63,6 +64,18 @@ pkg_setup() {
 	mingw64_check_requirements "6.0.0" "8.0.0"
 }
 
+src_unpack() {
+	if [[ ${PV} == "9999" ]]; then
+		if use async-patch; then
+			git-r3_fetch "https://github.com/Sporif/dxvk-async.git"
+			git-r3_checkout "https://github.com/Sporif/dxvk-async.git" \
+				"${WORKDIR}/dxvk-async-${PV}"
+		fi
+		git-r3_src_unpack
+	fi
+	default
+}
+
 src_prepare() {
 	if use dxvk-config; then
 		PATCHES+=("${FILESDIR}/add-dxvk_config-mingw-library.patch")
@@ -70,7 +83,7 @@ src_prepare() {
 	fi
 
 	if use async-patch; then
-		PATCHES+=("${FILESDIR}/dxvk-async-${PV}.patch")
+		PATCHES+=("${WORKDIR}/dxvk-async-${PV}/dxvk-async.patch")
 	fi
 
 	# From bobwya's dxvk ebuild.

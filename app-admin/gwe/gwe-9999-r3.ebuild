@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6..9} )
+PYTHON_COMPAT=( python3_{6..10} )
 
 inherit meson python-single-r1 xdg-utils gnome2-utils
 
@@ -35,15 +35,15 @@ RDEPEND="
 	dev-libs/libdazzle
 
 	$(python_gen_cond_dep '
-		>=dev-python/injector-0.18.4[${PYTHON_USEDEP}]
-		>=dev-python/matplotlib-3.4.1[${PYTHON_USEDEP}]
-		>=dev-python/peewee-3.14.4[${PYTHON_USEDEP}]
-		>=dev-python/py3nvml-0.2.6[${PYTHON_USEDEP}]
+		>=dev-python/injector-0.19.0[${PYTHON_USEDEP}]
+		>=dev-python/matplotlib-3.5.1[${PYTHON_USEDEP}]
+		>=dev-python/peewee-3.14.10[${PYTHON_USEDEP}]
+		>=dev-python/py3nvml-0.2.7[${PYTHON_USEDEP}]
 		dev-python/pygobject:3[${PYTHON_USEDEP}]
-		>=dev-python/python-xlib-0.29[${PYTHON_USEDEP}]
+		>=dev-python/python-xlib-0.31[${PYTHON_USEDEP}]
 		>=dev-python/pyxdg-0.27[${PYTHON_USEDEP}]
-		>=dev-python/requests-2.25.1[${PYTHON_USEDEP}]
-		>=dev-python/Rx-3.1.1[${PYTHON_USEDEP}]
+		>=dev-python/requests-2.27.1[${PYTHON_USEDEP}]
+		>=dev-python/Rx-3.2.0[${PYTHON_USEDEP}]
 	')
 "
 

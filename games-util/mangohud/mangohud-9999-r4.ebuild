@@ -1,4 +1,4 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -23,7 +23,7 @@ if [[ ${PV} == "9999" ]]; then
 	SRC_URI="${IMGUI_SRC_URI}"
 else
 	SRC_URI="
-		https://github.com/flightlessmango/MangoHud/archive/v${PV}.tar.gz -> ${P}.tar.gz
+		https://github.com/flightlessmango/MangoHud/archive/v${PV}-1.tar.gz -> ${P}.tar.gz
 		${IMGUI_SRC_URI}
 	"
 	KEYWORDS="-* ~amd64 ~x86"
@@ -43,6 +43,7 @@ DEPEND="
 	dev-util/glslang
 	>=dev-util/vulkan-headers-1.2
 	media-libs/vulkan-loader[${MULTILIB_USEDEP}]
+	dev-libs/spdlog[${MULTILIB_USEDEP}]
 	media-libs/libglvnd[$MULTILIB_USEDEP]
 	dbus? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
 	X? ( x11-libs/libX11[${MULTILIB_USEDEP}] )
@@ -55,7 +56,7 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 if ! [[ ${PV} == "9999" ]]; then
-	S="${WORKDIR}"/MangoHud-${PV}
+	S="${WORKDIR}"/MangoHud-${PV}-1
 fi
 
 src_unpack() {
@@ -75,6 +76,7 @@ multilib_src_configure() {
 	local emesonargs=(
 		-Dappend_libdir_mangohud=false
 		-Duse_system_vulkan=enabled
+		-Duse_system_spdlog=enabled
 		-Dinclude_doc=false
 		-Dwith_nvml=$(usex video_cards_nvidia enabled disabled)
 		-Dwith_xnvctrl=$(usex xnvctrl enabled disabled)

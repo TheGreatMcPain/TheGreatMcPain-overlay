@@ -1,4 +1,4 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -10,13 +10,22 @@ inherit meson distutils-r1 multilib-minimal flag-o-matic
 DESCRIPTION="A Vulkan and OpenGL overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 HOMEPAGE="https://github.com/flightlessmango/MangoHud"
 
-IMGUI_COMMIT="96a2c4619b0c8009f684556683b2e1b6408bb0dc"
+IMGUI_VER="1.81"
+
+IMGUI_SRC_URI="
+	https://github.com/ocornut/imgui/archive/v${IMGUI_VER}.tar.gz -> ${PN}-imgui-${IMGUI_VER}.tar.gz
+	https://wrapdb.mesonbuild.com/v1/projects/imgui/${IMGUI_VER}/1/get_zip -> ${PN}-imgui-wrap-${IMGUI_VER}.zip
+"
+
 if [[ ${PV} == "9999" ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/flightlessmango/MangoHud.git"
-	SRC_URI=""
+	SRC_URI="${IMGUI_SRC_URI}"
 else
-	SRC_URI="https://github.com/flightlessmango/MangoHud/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="
+		https://github.com/flightlessmango/MangoHud/archive/v${PV}-1.tar.gz -> ${P}.tar.gz
+		${IMGUI_SRC_URI}
+	"
 	KEYWORDS="-* ~amd64 ~x86"
 fi
 
@@ -34,6 +43,7 @@ DEPEND="
 	dev-util/glslang
 	>=dev-util/vulkan-headers-1.2
 	media-libs/vulkan-loader[${MULTILIB_USEDEP}]
+	dev-libs/spdlog[${MULTILIB_USEDEP}]
 	media-libs/libglvnd[$MULTILIB_USEDEP]
 	dbus? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
 	X? ( x11-libs/libX11[${MULTILIB_USEDEP}] )
@@ -46,13 +56,27 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 if ! [[ ${PV} == "9999" ]]; then
-	S="${WORKDIR}"/MangoHud-${PV}
+	S="${WORKDIR}"/MangoHud-${PV}-1
 fi
+
+src_unpack() {
+	git-r3_src_unpack
+	default
+}
+
+src_prepare() {
+	# Both imgui archives use the same folder name, so we don't need
+	# to rename anything. Just move the folders to the appropriate location.
+	mv "${WORKDIR}/imgui-${IMGUI_VER}" "${S}/subprojects" || die
+
+	eapply_user
+}
 
 multilib_src_configure() {
 	local emesonargs=(
 		-Dappend_libdir_mangohud=false
 		-Duse_system_vulkan=enabled
+		-Duse_system_spdlog=enabled
 		-Dinclude_doc=false
 		-Dwith_nvml=$(usex video_cards_nvidia enabled disabled)
 		-Dwith_xnvctrl=$(usex xnvctrl enabled disabled)

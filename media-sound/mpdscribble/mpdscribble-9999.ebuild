@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -18,7 +18,7 @@ RDEPEND="dev-libs/glib:2
 	media-libs/libmpdclient
 	curl? ( net-misc/curl )
 	!curl? ( net-libs/libsoup:2.4 )
-	dev-libs/boost[threads]
+	dev-libs/boost
 	dev-libs/libgcrypt"
 
 DEPEND="${RDEPEND}

@@ -1,73 +1,51 @@
-diff --git a/README.md b/README.md
-index 04d8a61..7d50775 100644
---- a/README.md
-+++ b/README.md
-@@ -13,6 +13,8 @@ A Python script that displays your [Plex](https://www.plex.tv) status on [Discor
+commit 5672780745ed8d4bc34badf40176043f674155bc
+Author: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date:   Sun Jun 12 03:01:36 2022 -0500
+
+    Allow for external config directory
+
+diff --git a/store/constants.py b/store/constants.py
+index 21b30fa..57e33df 100644
+--- a/store/constants.py
++++ b/store/constants.py
+@@ -1,14 +1,37 @@
+ import os
+ import sys
  
- Add your configuration(s) into the `plexConfigs` list on line 30.
- 
-+You can place your plexConfig options into a discordRichPresencePlex.conf inside of ~/.config.
 +
- #### Example
- 
- ```python
-diff --git a/discordRichPresencePlex.conf b/discordRichPresencePlex.conf
-new file mode 100644
-index 0000000..4cdf72c
---- /dev/null
-+++ b/discordRichPresencePlex.conf
-@@ -0,0 +1 @@
-+# plexConfig(serverName = "", username = "", password = "", token = "")
-diff --git a/discordRichPresencePlex.py b/discordRichPresencePlex.py
-old mode 100644
-new mode 100755
-index 2953014..ce88e5b
---- a/discordRichPresencePlex.py
-+++ b/discordRichPresencePlex.py
-@@ -1,3 +1,4 @@
-+#!/usr/bin/env python3
- import asyncio
- import datetime
- import hashlib
-@@ -11,6 +12,33 @@ import tempfile
- import threading
- import time
- 
-+def readConf():
-+    confighome = ""
-+    if 'APPDATA' in os.environ:
-+        confighome = os.environ['APPDATA']
-+    elif 'XDG_CONFIG_HOME' in os.environ:
-+        confighome = os.environ['XDG_CONFIG_HOME']
-+    elif os.path.isdir(os.path.expanduser('~/.config')):
-+        confighome = os.path.expanduser('~/.config')
++def get_config_dir():
++    configRoot = ""
++    if "APPDATA" in os.environ:
++        configRoot = os.environ["APPDATA"]
++    elif "XDG_CONFIG_HOME" in os.environ:
++        configRoot = os.environ["XDG_CONFIG_HOME"]
++    elif os.path.isdir(os.path.expanduser("~/.config")):
++        configRoot = os.path.expanduser("~/.config")
 +
-+    if confighome == "":
-+        print("Config location couldn't be found. Ignoring external config.")
-+        return []
++    if configRoot == "":
++        print("Default config locations don't exist. Ignoring external config.")
++        return ""
 +
-+    conf = os.path.join(confighome, 'discordRichPresencePlex.conf')
-+    if not os.path.isfile(conf):
-+        print("Config file couldn't be found. Ignoring external config.")
-+        return []
++    configHome = os.path.join(configRoot, "discord-rich-presence-plex")
 +
-+    with open(conf) as f:
-+        content = f.readlines()
-+    content = [x.strip() for x in content]
-+    confList = []
-+    for x in content:
-+        if not x.startswith("#"):
-+            confList.append( eval(x) )
-+    return confList
++    if not os.path.isdir(configHome):
++        print("{} doesn't exist. Creating it.".format(configHome))
++        os.mkdir(configHome)
 +
- class plexConfig:
++    return configHome
++
++
+ name = "Discord Rich Presence for Plex"
+ version = "2.2.4"
  
- 	extraLogging = True
-@@ -29,6 +57,7 @@ class plexConfig:
- plexConfigs = [
- 	# plexConfig(serverName = "", username = "", password = "", token = "")
- ]
-+plexConfigs += readConf()
+ plexClientID = "discord-rich-presence-plex"
+ discordClientID = "413407336082833418"
+-configFilePath = "config.json"
+-cacheFilePath = "cache.json"
+-logFilePath = "console.log"
++configFilePath = os.path.join(get_config_dir(), "config.json")
++cacheFilePath = os.path.join(get_config_dir(), "cache.json")
++logFilePath = os.path.join(get_config_dir(), "console.log")
  
- class discordRichPresence:
- 
+ isUnix = sys.platform in ["linux", "darwin"]
+ processID = os.getpid()

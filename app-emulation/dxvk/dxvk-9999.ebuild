@@ -28,22 +28,8 @@ REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )"
 
 RESTRICT="test"
 
-RDEPEND="
-	|| (
-		video_cards_nvidia? ( >=x11-drivers/nvidia-drivers-440.31 )
-		>=media-libs/mesa-19.2
-	)
-	|| (
-		>=app-emulation/wine-vanilla-4.5:*[${MULTILIB_USEDEP},vulkan]
-		>=app-emulation/wine-staging-4.5:*[${MULTILIB_USEDEP},vulkan]
-	)"
-
-DEPEND="${RDEPEND}
-	dev-util/glslang
-	dev-util/vulkan-headers"
-
 BDEPEND="
-	>=dev-util/meson-0.55"
+	dev-util/glslang"
 
 if [[ ${PV} != "9999" ]] ; then
 	S="${WORKDIR}/dxvk-${PV}"

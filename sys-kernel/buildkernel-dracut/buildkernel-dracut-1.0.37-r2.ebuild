@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -24,7 +24,7 @@ DEPEND="!sys-kernel/buildkernel
 	>=virtual/linux-sources-3"
 RDEPEND=">=sys-libs/ncurses-5.9-r2
 	>=app-crypt/sbsigntools-0.6-r1
-	plymouth? ( >=sys-boot/plymouth-0.8.8-r4[gdm(+),libkms,pango] )
+	plymouth? ( >=sys-boot/plymouth-22.02.122-r1[gdm(+),pango] )
 	>=sys-kernel/dracut-050-r2
 	>=sys-boot/efibootmgr-0.5.4-r1
 	>=sys-apps/debianutils-4.9.1[installkernel(+)]"

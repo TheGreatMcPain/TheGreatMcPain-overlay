@@ -8,7 +8,7 @@ PYTHON_COMPAT=( python3_{6..10} )
 inherit distutils-r1
 
 DESCRIPTION="Cross-platform CLI and Python drivers for AIO liquid coolers and other devices"
-HOMEPAGE="https://gitlab.com/leinardi/gwe"
+HOMEPAGE="https://github.com/jonasmalacofilho/liquidctl"
 
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="https://github.com/jonasmalacofilho/liquidctl.git"

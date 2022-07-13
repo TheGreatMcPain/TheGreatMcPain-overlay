@@ -23,7 +23,6 @@ HOMEPAGE="https://github.com/pkkid/python-plexapi"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64"
 IUSE=""
 
 RDEPEND="

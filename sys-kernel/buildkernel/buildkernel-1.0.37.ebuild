@@ -38,7 +38,7 @@ src_prepare() {
 		sed -i -e 's@USE_PLYMOUTH=true@USE_PLYMOUTH=false@g' "${S}/${PN}" || \
 			die "Failed to patch script to reflect omitted plymouth USE flag."
 	fi
-	epatch_user
+	eapply_user
 }
 src_install() {
 	dosbin "${PN}"

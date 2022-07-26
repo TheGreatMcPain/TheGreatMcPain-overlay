@@ -1,0 +1,18 @@
+diff --git a/third_party/blink/renderer/platform/text/text_break_iterator_icu.cc b/third_party/blink/renderer/platform/text/text_break_iterator_icu.cc
+index 0e8c60a..4fc5bdd 100644
+--- a/third_party/blink/renderer/platform/text/text_break_iterator_icu.cc
++++ b/third_party/blink/renderer/platform/text/text_break_iterator_icu.cc
+@@ -120,11 +120,11 @@ enum TextContext { kNoContext, kPriorContext, kPrimaryContext };
+ 
+ const int kTextBufferCapacity = 16;
+ 
+-typedef struct {
++struct UTextWithBuffer {
+   DISALLOW_NEW();
+   UText text;
+   UChar buffer[kTextBufferCapacity];
+-} UTextWithBuffer;
++};
+ 
+ static inline int64_t TextPinIndex(int64_t& index, int64_t limit) {
+   if (index < 0)

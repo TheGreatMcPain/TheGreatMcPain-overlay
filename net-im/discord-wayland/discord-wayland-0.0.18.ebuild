@@ -990,7 +990,7 @@ RDEPEND="
 	dev-libs/glib:2
 	dev-libs/nspr
 	dev-libs/nss
-	>=dev-util/electron-13.6.9
+	~dev-util/electron-13.6.9
 	media-libs/alsa-lib
 	media-libs/mesa[gbm(+)]
 	net-print/cups

@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit multilib-minimal
+inherit multilib-minimal flag-o-matic
 
 DESCRIPTION="Vulkan GPU-offloading layer"
 HOMEPAGE="https://github.com/felixdoerre/primus_vk"
@@ -25,8 +25,7 @@ src_prepare() {
 }
 
 multilib_src_compile() {
-	emake libnv_vulkan_wrapper.so
-	emake libprimus_vk.so
+	emake CXXFLAGS="${CXXFLAGS} -DNV_DRIVER_PATH=\"/usr/$(get_libdir)/libGLX_nvidia.so.0\""
 }
 
 multilib_src_install() {
@@ -42,6 +41,10 @@ multilib_src_install_all() {
 	doins nv_vulkan_wrapper.json
 
 	newbin pvkrun.in.sh pvkrun
+
+	# Some people may want to modify the pvkrun script based on their system.
+	dodir /etc/env.d
+	echo "CONFIG_PROTECT=/usr/bin/pvkrun" >> "${ED}"/etc/env.d/99primus_vk || die
 
 	dodoc README.md
 }

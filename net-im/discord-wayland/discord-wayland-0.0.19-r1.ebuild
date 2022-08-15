@@ -990,7 +990,7 @@ RDEPEND="
 	dev-libs/glib:2
 	dev-libs/nspr
 	dev-libs/nss
-	~dev-util/electron-13.6.9
+	dev-util/electron
 	media-libs/alsa-lib
 	media-libs/mesa[gbm(+)]
 	net-print/cups
@@ -1085,6 +1085,10 @@ src_prepare() {
 	sed -i "s|exeDir,|'/usr/share/pixmaps',|" "${S}/resources/app/app_bootstrap/autoStart/linux.js" || die
 	${ASAR_S}/bin/asar.js p "${S}/resources/app" "${S}/resources/app.asar" --unpack-dir '**' || die
 	rm -rf "${S}/resources/app" || die
+
+	# Fix for crash on launch when using >=electron-18
+	sed -i "s|module.paths = \[\]|module.paths = \[\"/home/\" + process.env.USER + \"/.config/discord/${PV}/modules\"\]|" "${S}/resources/app.asar.unpacked/app_bootstrap/requireNative.js" \
+		|| die
 }
 
 src_install() {

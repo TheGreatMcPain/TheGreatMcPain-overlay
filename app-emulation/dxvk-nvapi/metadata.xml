@@ -8,6 +8,9 @@
     <bugs-to>https://github.com/jp7677/dxvk-nvapi/issues</bugs-to>
   </upstream>
   <use>
-    <flag name="custom-cflags">Patches meson crossfiles to accept custom CFLAGS/CXXFLAGS.</flag>
+	<flag name="crossdev-mingw">
+		Use <pkg>sys-devel/crossdev</pkg> for the toolchain rather than
+		<pkg>dev-util/mingw64-toolchain</pkg> (requires manual setting up)
+	</flag>
   </use>
 </pkgmetadata>

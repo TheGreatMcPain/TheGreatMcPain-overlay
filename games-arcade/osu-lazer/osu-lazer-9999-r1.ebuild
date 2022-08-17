@@ -27,7 +27,7 @@ DEPEND="
 	virtual/opengl
 	media-libs/libsdl2
 	x11-misc/shared-mime-info
-	>=dev-dotnet/dotnetcore-sdk-bin-6.0.102
+	virtual/dotnet-sdk:6.0
 "
 RDEPEND="${DEPEND}"
 

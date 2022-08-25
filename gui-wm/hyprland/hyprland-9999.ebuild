@@ -13,7 +13,7 @@ EGIT_REPO_URI="https://github.com/hyprwm/Hyprland.git"
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS=""
-IUSE="eglstreams vulkan x11-backend X"
+IUSE="vulkan x11-backend X"
 
 # Copied from gui-libs/wlroots-9999
 DEPEND="
@@ -82,19 +82,6 @@ compile_wlroots() {
 	meson_src_compile
 }
 
-src_unpack() {
-	if use eglstreams; then
-		export EGIT_SUBMODULES=()
-	fi
-
-	git-r3_src_unpack
-
-	if use eglstreams; then
-		git-r3_fetch "https://github.com/danvd/wlroots-eglstreams.git"
-		git-r3_checkout "https://github.com/danvd/wlroots-eglstreams.git" "${S}/subprojects/wlroots"
-	fi
-}
-
 # For some reason hyprland uses a combination of Makefiles and CMake
 # and the provided wlroots library is compiled via Mesonbuild.
 src_configure() {
@@ -148,14 +135,4 @@ src_install() {
 pkg_postinst() {
 	elog "You must be in the input group to allow Hyprland"
 	elog "to access input devices via libinput."
-
-	if use eglstreams; then
-		elog "You have enabled 'eglstreams'."
-		elog "This uses the latest git master of the fork of wlroots from"
-		elog
-		elog "https://github.com/danvd/wlroots-eglstreams"
-		elog
-		elog "This is more or less an experiment to see if using this fork would"
-		elog "improve things for Nvidia users."
-	fi
 }

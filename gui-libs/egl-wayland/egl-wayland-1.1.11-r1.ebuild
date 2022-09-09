@@ -7,7 +7,7 @@ inherit meson
 
 DESCRIPTION="EGLStream-based Wayland external platform"
 HOMEPAGE="https://github.com/NVIDIA/egl-wayland"
-SRC_URI="https://github.com/NVIDIA/egl-wayland/archive/${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/NVIDIA/egl-wayland/archive/refs/tags/${PV}.tar.gz -> ${P}-new.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
@@ -18,8 +18,10 @@ RDEPEND="
 	!<x11-drivers/nvidia-drivers-470.57.02[wayland(-)]"
 DEPEND="
 	${RDEPEND}
+	dev-libs/wayland-protocols
 	gui-libs/eglexternalplatform
-	>=media-libs/libglvnd-1.3.4"
+	>=media-libs/libglvnd-1.3.4
+	x11-libs/libdrm"
 BDEPEND="dev-util/wayland-scanner"
 
 PATCHES=(

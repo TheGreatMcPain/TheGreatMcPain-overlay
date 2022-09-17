@@ -17,7 +17,7 @@ inherit kernel-2
 K_NOSETEXTRAVERSION="don't_set_it"
 
 DESCRIPTION="The Liquorix Kernel Sources v5.x"
-HOMEPAGE="http://liquorix.net/"
+HOMEPAGE="https://liquorix.net/"
 LIQUORIX_VERSION="${GIT_COMMIT/_p[0-9]*}"
 LIQUORIX_FILE="${P}.tar.gz"
 LIQUORIX_URI="https://github.com/damentz/liquorix-package/archive/${LIQUORIX_VERSION}.tar.gz -> ${LIQUORIX_FILE}"

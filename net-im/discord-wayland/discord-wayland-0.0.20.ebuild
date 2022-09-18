@@ -975,7 +975,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="
-	!net-im/discord
+	!net-im/discord-bin
 "
 BDEPEND="
 	sys-apps/yarn

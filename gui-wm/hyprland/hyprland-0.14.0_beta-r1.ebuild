@@ -101,6 +101,8 @@ src_prepare() {
 		sed -i "s|glFlush();|glFinish();|" \
 			"${S}/subprojects/wlroots/render/gles2/renderer.c" || die "Nvidia patch failed"
 	fi
+
+	cmake_src_prepare
 }
 
 # For some reason hyprland uses a combination of Makefiles and CMake

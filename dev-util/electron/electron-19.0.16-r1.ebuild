@@ -1228,6 +1228,7 @@ COMMON_DEPEND="
 		)
 		>=media-libs/opus-1.3.1:=
 	)
+	net-libs/http-parser
 	net-misc/curl[ssl]
 	sys-apps/dbus:=
 	media-libs/flac:=

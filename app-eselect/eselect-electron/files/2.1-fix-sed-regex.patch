@@ -1,0 +1,43 @@
+commit dca42ba627f7e3dd6c6141671a462e8bd26465ae
+Author: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date:   Mon Oct 3 02:25:30 2022 -0500
+
+    Fix 'active_slot()' and 'get_slots()'
+    
+    The previous regex used for the 'sed' commands in active_slot() and
+    get_slots() would produce "9.0" when the slot number should be "19.0"
+    
+    I guess the previous regex worked when the slot numbers looked like
+    "19" instead of "19.0".
+
+diff --git a/electron.eselect b/electron.eselect
+index 878aa1e..ab77789 100644
+--- a/electron.eselect
++++ b/electron.eselect
+@@ -8,7 +8,7 @@ inherit config multilib
+ 
+ DESCRIPTION="Manage active Electron version."
+ MAINTAINER="elvis@magic.io"
+-VERSION="2.1"
++VERSION="2.2"
+ 
+ # Global Data
+ USR_PATH="${EROOT%/}/usr"
+@@ -22,7 +22,7 @@ active_slot() {
+     # slot.  See if it's there, then find out where it links to.
+ 	if [[ -h "${USR_PATH}/include/electron" ]] ; then
+ 		canonicalise "${USR_PATH}/include/electron" | \
+-			sed -re 's#.*([1-9][0-9.]+)$#\1#'
++			sed -re 's#.*-([1-9][0-9.]+)$#\1#'
+ 	else
+ 		echo "(none)"
+ 	fi
+@@ -52,7 +52,7 @@ get_slots() {
+ 
+ 	for slot in $(find "${USR_PATH}/$(lib_dir)/" \
+ 					   -mindepth 1 -maxdepth 1 -type d -name 'electron-*' | \
+-						 sed -re 's#.*([1-9][0-9.]+)$#\1#' | sort -n)
++						 sed -re 's#.*-([1-9][0-9.]+)$#\1#' | sort -n)
+ 	do
+ 		# Check that electron binary exists for this slot, otherwise we have
+ 		# a false positive.

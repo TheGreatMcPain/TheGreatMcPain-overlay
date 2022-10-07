@@ -1,0 +1,160 @@
+From 60270cac4de227c32b205f63b4719ca9c01c70a9 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Fri, 7 Oct 2022 02:34:37 -0500
+Subject: [PATCH] Revert "dlsym: Make RTLD_NEXT prefer default version
+ definition [BZ #14932]"
+
+This reverts commit efa7936e4c91b1c260d03614bb26858fbb8a0204.
+---
+ elf/Makefile       |  7 -------
+ elf/dl-sym.c       |  2 +-
+ elf/nextmod3.c     | 20 --------------------
+ elf/nextmod3.map   |  3 ---
+ elf/tst-next-ver.c | 46 ----------------------------------------------
+ 5 files changed, 1 insertion(+), 77 deletions(-)
+ delete mode 100644 elf/nextmod3.c
+ delete mode 100644 elf/nextmod3.map
+ delete mode 100644 elf/tst-next-ver.c
+
+diff --git a/elf/Makefile b/elf/Makefile
+index fd77d0c7c8..85c7185424 100644
+--- a/elf/Makefile
++++ b/elf/Makefile
+@@ -426,7 +426,6 @@ tests += \
+   tst-initorder2 \
+   tst-latepthread \
+   tst-main1 \
+-  tst-next-ver \
+   tst-nodelete2 \
+   tst-nodelete-dlclose \
+   tst-nodelete-opened \
+@@ -713,7 +712,6 @@ modules-names += \
+   neededobj6 \
+   nextmod1 \
+   nextmod2 \
+-  nextmod3 \
+   nodel2mod1 \
+   nodel2mod2 \
+   nodel2mod3 \
+@@ -1692,9 +1690,6 @@ $(objpfx)reldep4.out: $(objpfx)reldep4mod1.so $(objpfx)reldep4mod2.so
+ $(objpfx)next: $(objpfx)nextmod1.so $(objpfx)nextmod2.so
+ LDFLAGS-next = -Wl,--no-as-needed
+ 
+-$(objpfx)tst-next-ver: $(objpfx)nextmod3.so
+-LDFLAGS-tst-next-ver = -Wl,--no-as-needed
+-
+ $(objpfx)unload2.out: $(objpfx)unload2mod.so $(objpfx)unload2dep.so
+ 
+ $(objpfx)lateglobal.out: $(objpfx)ltglobmod1.so $(objpfx)ltglobmod2.so
+@@ -2442,8 +2437,6 @@ $(objpfx)tst-linkall-static: \
+ endif
+ endif
+ 
+-LDFLAGS-nextmod3.so = -Wl,--version-script=nextmod3.map
+-
+ # The application depends on the DSO, and the DSO loads the plugin.
+ # The plugin also depends on the DSO. This creates the circular
+ # dependency via dlopen that we're testing to make sure works.
+diff --git a/elf/dl-sym.c b/elf/dl-sym.c
+index b1cf42f36d..aa993942df 100644
+--- a/elf/dl-sym.c
++++ b/elf/dl-sym.c
+@@ -144,7 +144,7 @@ RTLD_NEXT used in code not dynamically loaded"));
+ 	l = l->l_loader;
+ 
+       result = GLRO(dl_lookup_symbol_x) (name, match, &ref, l->l_local_scope,
+-					 vers, 0, flags, match);
++					 vers, 0, 0, match);
+     }
+   else
+     {
+diff --git a/elf/nextmod3.c b/elf/nextmod3.c
+deleted file mode 100644
+index cd7bdb36af..0000000000
+--- a/elf/nextmod3.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-int
+-foo_v1 (int a)
+-{
+-  return 1;
+-}
+-asm (".symver foo_v1, foo@v1");
+-
+-int
+-foo_v2 (int a)
+-{
+-  return 2;
+-}
+-asm (".symver foo_v2, foo@v2");
+-
+-int
+-foo (int a)
+-{
+-  return 3;
+-}
+-asm (".symver foo, foo@@@v3");
+diff --git a/elf/nextmod3.map b/elf/nextmod3.map
+deleted file mode 100644
+index eb0e7d7800..0000000000
+--- a/elf/nextmod3.map
++++ /dev/null
+@@ -1,3 +0,0 @@
+-v1 { };
+-v2 { } v1;
+-v3 { foo; } v2;
+diff --git a/elf/tst-next-ver.c b/elf/tst-next-ver.c
+deleted file mode 100644
+index 7241f9038b..0000000000
+--- a/elf/tst-next-ver.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/* Test RTLD_DEFAULT/RTLD_NEXT when the definition has multiple versions.
+-   Copyright (C) 2018-2022 Free Software Foundation, Inc.
+-   This file is part of the GNU C Library.
+-
+-   The GNU C Library is free software; you can redistribute it and/or
+-   modify it under the terms of the GNU Lesser General Public
+-   License as published by the Free Software Foundation; either
+-   version 2.1 of the License, or (at your option) any later version.
+-
+-   The GNU C Library is distributed in the hope that it will be useful,
+-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-   Lesser General Public License for more details.
+-
+-   You should have received a copy of the GNU Lesser General Public
+-   License along with the GNU C Library; if not, see
+-   <https://www.gnu.org/licenses/>.  */
+-
+-#include <dlfcn.h>
+-#include <stdio.h>
+-
+-#include "testobj.h"
+-
+-static int
+-do_test (void)
+-{
+-  /* Resolve to foo@@v3 in nextmod3.so, instead of
+-     foo@v1 or foo@v2.  */
+-  int (*fp) (int) = dlsym (RTLD_DEFAULT, "foo");
+-  int res = fp (0);
+-  printf ("preload (0) = %d, %s\n", res, res == 3 ? "ok" : "wrong");
+-  if (res != 3)
+-    return 1;
+-
+-  /* Resolve to foo@@v3 in nextmod3.so, instead of
+-     foo@v1 or foo@v2.  */
+-  fp = dlsym (RTLD_NEXT, "foo");
+-  res = fp (0);
+-  printf ("preload (0) = %d, %s\n", res, res == 3 ? "ok" : "wrong");
+-  if (res != 3)
+-    return 1;
+-
+-  return 0;
+-}
+-
+-#include <support/test-driver.c>
+-- 
+2.35.1
+

@@ -21,7 +21,7 @@ SRC_URI="
 	${BASE_URL}/linux-source-${PV}-${BRANCH}-${BOARD}/linux-source-${BRANCH}-${BOARD}_${ARMBIAN_VER}_all.deb -> ${P}.deb
 "
 
-SLOT="0"
+SLOT="${PV}"
 KEYWORDS="~arm64"
 
 DEPEND=""

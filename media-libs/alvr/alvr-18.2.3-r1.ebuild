@@ -509,8 +509,6 @@ BDEPEND="${RDEPEND}
 	client? ( media-gfx/imagemagick )
 "
 
-#PATCHES=( "${FILESDIR}/${P}-build.patch" )
-
 src_configure() {
 	local ECARGO_EXTRA_ARGS="
 		-p vrcompositor-wrapper
@@ -537,10 +535,10 @@ src_install() {
 	if use server; then
 		#dolib.so target/release/libalvr_server.so
 
-		insinto /usr/lib/steamvr/alvr/bin/linux64/
+		insinto /usr/lib64/alvr/bin/linux64/
 		newins target/release/libalvr_server.so driver_alvr_server.so
 
-		insinto /usr/lib/steamvr/alvr/
+		insinto /usr/lib64/alvr/
 		doins alvr/xtask/resources/driver.vrdrivermanifest
 
 	fi
@@ -551,7 +549,7 @@ src_install() {
 		doins alvr/vulkan-layer/layer/alvr_x86_64.json
 	fi
 
-	insinto /usr/lib/alvr
+	insinto /usr/libexec/alvr
 	doins target/release/vrcompositor-wrapper
 	doins packaging/firewall/alvr_fw_config.sh
 

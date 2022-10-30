@@ -497,7 +497,10 @@ RDEPEND="
 	>=media-video/ffmpeg-4.3[encode,vulkan?,x264?,x265?]
 	vaapi? ( media-video/ffmpeg[libdrm,vaapi] )
 	sys-libs/libunwind
-	www-client/chromium
+	|| (
+		www-client/chromium
+		www-client/chromium-bin
+	)
 "
 
 DEPEND="${RDEPEND}
@@ -535,8 +538,8 @@ src_install() {
 	if use server; then
 		#dolib.so target/release/libalvr_server.so
 
-		insinto /usr/lib64/alvr/bin/linux64/
-		newins target/release/libalvr_server.so driver_alvr_server.so
+		exeinto /usr/lib64/alvr/bin/linux64/
+		newexe target/release/libalvr_server.so driver_alvr_server.so
 
 		insinto /usr/lib64/alvr/
 		doins alvr/xtask/resources/driver.vrdrivermanifest
@@ -549,9 +552,9 @@ src_install() {
 		doins alvr/vulkan-layer/layer/alvr_x86_64.json
 	fi
 
-	insinto /usr/libexec/alvr
-	doins target/release/vrcompositor-wrapper
-	doins packaging/firewall/alvr_fw_config.sh
+	exeinto /usr/libexec/alvr
+	doexe target/release/vrcompositor-wrapper
+	doexe packaging/firewall/alvr_fw_config.sh
 
 	insinto /usr/share/${PN}/selinux/
 	doins packaging/selinux/*

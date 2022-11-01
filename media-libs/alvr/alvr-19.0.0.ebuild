@@ -490,7 +490,7 @@ SRC_URI+=" $(cargo_crate_uris) "
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS=""
+KEYWORDS="~amd64"
 RESTRICT="network-sandbox" # Required for 'cargo fetch'
 
 S="${WORKDIR}/${P^^}"

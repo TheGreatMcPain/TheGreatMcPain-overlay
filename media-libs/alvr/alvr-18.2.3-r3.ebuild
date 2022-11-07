@@ -512,6 +512,13 @@ BDEPEND="${RDEPEND}
 	client? ( media-gfx/imagemagick )
 "
 
+PATCHES=(
+	"${FILESDIR}/18.2.3-fix-client-audio-crash.patch"
+	"${FILESDIR}/18.2.3-unbreak-linux-audio.patch"
+)
+
+# "${FILESDIR}/18.2.3-linux-microphone-tweaks.patch"
+
 src_configure() {
 	local ECARGO_EXTRA_ARGS="
 		-p vrcompositor-wrapper

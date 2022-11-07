@@ -1,0 +1,89 @@
+From 0328621c894c840fbee1f04a3c1071db1b7e63d0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C5=81ukasz=20Maria=C5=84ski?= <lmarianski@protonmail.com>
+Date: Fri, 20 May 2022 07:50:25 +0200
+Subject: [PATCH 1/2] remove the microphone output setting and check if game
+ audio device == microphone input on linux
+
+---
+ alvr/server/src/connection.rs      | 1 +
+ alvr/session/src/settings.rs       | 2 ++
+ dashboard/js/app/customSettings.js | 5 ++++-
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/alvr/server/src/connection.rs b/alvr/server/src/connection.rs
+index c502f5380..c8ea4df2d 100644
+--- a/alvr/server/src/connection.rs
++++ b/alvr/server/src/connection.rs
+@@ -185,6 +185,7 @@ async fn client_handshake(
+                 microphone_desc.input_device_id,
+                 AudioDeviceType::VirtualMicrophoneInput,
+             )?;
++            #[cfg(not(target_os = "linux"))]
+             if alvr_audio::is_same_device(&game_audio_device, &microphone_device) {
+                 return fmt_e!("Game audio and microphone cannot point to the same device!");
+             }
+diff --git a/alvr/session/src/settings.rs b/alvr/session/src/settings.rs
+index 6db14d0c5..4bb45d39a 100644
+--- a/alvr/session/src/settings.rs
++++ b/alvr/session/src/settings.rs
+@@ -227,6 +227,7 @@ pub struct MicrophoneDesc {
+ 
+     #[schema(placeholder = "output_device_dropdown")]
+     //
++    #[cfg(not(target_os = "linux"))]
+     #[schema(advanced)]
+     pub output_device_id: AudioDeviceId,
+ 
+@@ -639,6 +640,7 @@ pub fn session_settings_default() -> SettingsDefault {
+                         Name: "".into(),
+                         Index: 1,
+                     },
++                    #[cfg(not(target_os = "linux"))]
+                     output_device_id: AudioDeviceIdDefault {
+                         variant: AudioDeviceIdDefaultVariant::Default,
+                         Name: "".into(),
+diff --git a/dashboard/js/app/customSettings.js b/dashboard/js/app/customSettings.js
+index ec3b4a530..dd8ef7810 100644
+--- a/dashboard/js/app/customSettings.js
++++ b/dashboard/js/app/customSettings.js
+@@ -435,7 +435,10 @@ define([
+         function setAudioDeviceList() {
+             setupAudioDropdown("gameAudio", "deviceDropdown", "deviceId", "output");
+             setupAudioDropdown("microphone", "inputDeviceDropdown", "inputDeviceId", "output");
+-            setupAudioDropdown("microphone", "outputDeviceDropdown", "outputDeviceId", "input");
++            
++            if (alvrSettings.getSession().sessionSettings.audio["microphone"].content["outputDeviceId"]) {
++                setupAudioDropdown("microphone", "outputDeviceDropdown", "outputDeviceId", "input");
++            }
+         }
+ 
+         function setTrackingSpeed() {
+
+From 6b633bd1a231834c8b5259bc7a8d160cb930b10b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C5=81ukasz=20Maria=C5=84ski?= <lmarianski@protonmail.com>
+Date: Fri, 20 May 2022 08:00:04 +0200
+Subject: [PATCH 2/2] fmt fix
+
+---
+ dashboard/js/app/customSettings.js | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/dashboard/js/app/customSettings.js b/dashboard/js/app/customSettings.js
+index dd8ef7810..cc4ca092d 100644
+--- a/dashboard/js/app/customSettings.js
++++ b/dashboard/js/app/customSettings.js
+@@ -435,8 +435,12 @@ define([
+         function setAudioDeviceList() {
+             setupAudioDropdown("gameAudio", "deviceDropdown", "deviceId", "output");
+             setupAudioDropdown("microphone", "inputDeviceDropdown", "inputDeviceId", "output");
+-            
+-            if (alvrSettings.getSession().sessionSettings.audio["microphone"].content["outputDeviceId"]) {
++
++            if (
++                alvrSettings.getSession().sessionSettings.audio["microphone"].content[
++                    "outputDeviceId"
++                ]
++            ) {
+                 setupAudioDropdown("microphone", "outputDeviceDropdown", "outputDeviceId", "input");
+             }
+         }

@@ -13,7 +13,7 @@ EGIT_REPO_URI="https://github.com/hyprwm/Hyprland.git"
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS=""
-IUSE="vulkan x11-backend X video_cards_nvidia"
+IUSE="greetd-fix vulkan x11-backend X video_cards_nvidia"
 
 # Copied from gui-libs/wlroots-9999
 DEPEND="
@@ -86,6 +86,10 @@ compile_wlroots() {
 src_prepare() {
 	default
 
+	if use greetd-fix; then
+		eapply "${FILESDIR}/0001-Make-tmp-hypr-readable-writable-by-everyone.patch"
+	fi
+
 	# Nvidia patch
 	if use video_cards_nvidia; then
 		sed -i "s|glFlush();|glFinish();|" \
@@ -144,6 +148,13 @@ src_install() {
 }
 
 pkg_postinst() {
+	if use greetd-fix; then
+		ewarn "You've enabled the 'greetd-fix' USE."
+		ewarn "This makes '/tmp/hypr' modifiable by everyone (mode 777),"
+		ewarn "which allows 'hyprctl' to work if '/tmp/hypr' was created by"
+		ewarn "the 'greetd' user."
+		ewarn
+	fi
 	elog "You must be in the input group to allow Hyprland"
 	elog "to access input devices via libinput."
 }

@@ -15,7 +15,7 @@ SRC_URI="https://github.com/hyprwm/Hyprland/releases/download/v${MY_PV}/source-v
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="greetd-fix vulkan x11-backend X video_cards_nvidia"
+IUSE="greetd-fix vulkan +x11-backend X video_cards_nvidia"
 
 # Copied from gui-libs/wlroots-9999
 DEPEND="
@@ -149,7 +149,7 @@ src_install() {
 	dobin "${BUILD_DIR}"/Hyprland
 	dobin ./hyprctl/hyprctl
 
-	dolib.so subprojects/wlroots/build/libwlroots.so.11032
+	dolib.so subprojects/wlroots/build/libwlroots.so.12032
 
 	insinto /usr/share/wayland-sessions
 	doins example/hyprland.desktop

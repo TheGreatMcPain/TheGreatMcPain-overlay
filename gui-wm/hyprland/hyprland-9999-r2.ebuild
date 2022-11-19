@@ -13,7 +13,7 @@ EGIT_REPO_URI="https://github.com/hyprwm/Hyprland.git"
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS=""
-IUSE="greetd-fix vulkan x11-backend X video_cards_nvidia"
+IUSE="greetd-fix vulkan +x11-backend X video_cards_nvidia"
 
 # Copied from gui-libs/wlroots-9999
 DEPEND="
@@ -95,6 +95,8 @@ src_prepare() {
 		sed -i "s|glFlush();|glFinish();|" \
 			"${S}/subprojects/wlroots/render/gles2/renderer.c" || die "Nvidia patch failed"
 	fi
+
+	cmake_src_prepare
 }
 
 # For some reason hyprland uses a combination of Makefiles and CMake
@@ -136,7 +138,7 @@ src_install() {
 	dobin "${BUILD_DIR}"/Hyprland
 	dobin ./hyprctl/hyprctl
 
-	dolib.so subprojects/wlroots/build/libwlroots.so.11032
+	dolib.so subprojects/wlroots/build/libwlroots.so.12032
 
 	insinto /usr/share/wayland-sessions
 	doins example/hyprland.desktop

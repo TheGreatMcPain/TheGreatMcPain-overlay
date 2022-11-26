@@ -1,0 +1,63 @@
+From 3807ae471099318e446340ea8b34b1928019636e Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Mon, 21 Nov 2022 01:41:33 -0600
+Subject: [PATCH] Use same ndk and egui, Use egui fork with updated glutin
+
+---
+ Cargo.toml                  | 9 +++++++++
+ alvr/client_core/Cargo.toml | 7 ++-----
+ alvr/launcher/Cargo.toml    | 2 +-
+ 3 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index af07a6eb..23014af7 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -22,3 +22,12 @@ alvr_sockets = { path = "alvr/sockets" }
+ [profile.distribution]
+ inherits = "release"
+ lto = true
++
++[patch.crates-io]
++eframe = { git = "https://github.com/coderedart/egui_glutin_upgrade", rev = "1cac8e2", default-features = false, features = ["wgpu", "default_fonts"]}
++egui = { git = "https://github.com/coderedart/egui_glutin_upgrade", rev = "1cac8e2", default-features = false, features = ["wgpu", "default_fonts"]}
++ndk = { git = "https://github.com/zarik5/android-ndk-rs", rev = "f1d38a0", features = [
++    "api-level-26",
++    "media",
++] }
++ndk-sys = { git = "https://github.com/zarik5/android-ndk-rs", rev = "f1d38a0" }
+diff --git a/alvr/client_core/Cargo.toml b/alvr/client_core/Cargo.toml
+index aed55223..3218b629 100644
+--- a/alvr/client_core/Cargo.toml
++++ b/alvr/client_core/Cargo.toml
+@@ -30,12 +30,9 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
+ [target.'cfg(target_os = "android")'.dependencies]
+ android_logger = "0.11"
+ jni = "0.20"
+-ndk = { git = "https://github.com/zarik5/android-ndk-rs", rev = "f1d38a0", features = [
+-    "api-level-26",
+-    "media",
+-] }
++ndk = "0.7.0"
+ ndk-context = "0.1"
+-ndk-sys = { git = "https://github.com/zarik5/android-ndk-rs", rev = "f1d38a0" }
++ndk-sys = "0.4.0"
+ oboe = "0.4" # todo: remove once AudioThread shutdown crash is fixed
+ 
+ [build-dependencies]
+diff --git a/alvr/launcher/Cargo.toml b/alvr/launcher/Cargo.toml
+index 1f194c3a..34e6bcf8 100644
+--- a/alvr/launcher/Cargo.toml
++++ b/alvr/launcher/Cargo.toml
+@@ -13,7 +13,7 @@ alvr_filesystem.workspace = true
+ 
+ env_logger = "0.9"
+ # eframe = "0.19" # Change back after next release (0.19.1)
+-eframe = { git = "https://github.com/emilk/egui", rev = "311eb66", default-features = false, features = ["wgpu", "default_fonts"]}
++eframe = "0.19.0"
+ serde_json = "1"
+ single-instance = "0.3"
+ sysinfo = { version = "0.26", default-features = false }
+-- 
+2.37.4
+

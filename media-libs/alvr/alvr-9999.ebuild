@@ -521,7 +521,7 @@ src_unpack() {
 	# Patch one of ALVR's Cargo.toml files to fix an error produced
 	# by 'cargo vendor'.
 	pushd "${S}"
-	eapply "${FILESDIR}/0001-Use-same-version-of-ndk.patch"
+	eapply "${FILESDIR}/0001-Use-same-ndk-and-egui-Use-egui-fork-with-updated-glu.patch"
 	popd
 
 	cargo_live_src_unpack
@@ -531,7 +531,7 @@ src_configure() {
 	local ECARGO_EXTRA_ARGS="
 		-p alvr_vrcompositor_wrapper
 		$(usex server "-p alvr_server" "" )
-		$(usex client "-p alvr_client_core -p alvr_launcher" "" )
+		$(usex client "-p alvr_client_core -p alvr_launcher -p alvr_dashboard" "" )
 		$(usex vulkan "-p alvr_vulkan_layer" "" )
 		"
 	cargo_gen_config
@@ -541,6 +541,7 @@ src_configure() {
 src_install() {
 	if use client; then
 		dobin target/release/alvr_launcher
+		dobin target/release/alvr_dashboard
 		dolib.so target/release/libalvr_client_core.so
 		domenu packaging/freedesktop/alvr.desktop
 		for size in {16,32,48,64,128,256}; do

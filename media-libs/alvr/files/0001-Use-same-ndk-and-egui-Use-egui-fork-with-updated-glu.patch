@@ -1,16 +1,11 @@
-From 3807ae471099318e446340ea8b34b1928019636e Mon Sep 17 00:00:00 2001
-From: TheGreatMcPain <james@thegreatmcpain.xyz>
-Date: Mon, 21 Nov 2022 01:41:33 -0600
-Subject: [PATCH] Use same ndk and egui, Use egui fork with updated glutin
+commit a706fda0ba49e8c189b30e757c8d25cb02861673
+Author: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date:   Mon Nov 21 01:41:33 2022 -0600
 
----
- Cargo.toml                  | 9 +++++++++
- alvr/client_core/Cargo.toml | 7 ++-----
- alvr/launcher/Cargo.toml    | 2 +-
- 3 files changed, 12 insertions(+), 6 deletions(-)
+    Use same ndk and egui, Use egui fork with updated glutin
 
 diff --git a/Cargo.toml b/Cargo.toml
-index af07a6eb..23014af7 100644
+index 8acab364..df1812c7 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -22,3 +22,12 @@ alvr_sockets = { path = "alvr/sockets" }
@@ -27,7 +22,7 @@ index af07a6eb..23014af7 100644
 +] }
 +ndk-sys = { git = "https://github.com/zarik5/android-ndk-rs", rev = "f1d38a0" }
 diff --git a/alvr/client_core/Cargo.toml b/alvr/client_core/Cargo.toml
-index aed55223..3218b629 100644
+index 8b1d2111..6c047f7a 100644
 --- a/alvr/client_core/Cargo.toml
 +++ b/alvr/client_core/Cargo.toml
 @@ -30,12 +30,9 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
@@ -41,10 +36,10 @@ index aed55223..3218b629 100644
 +ndk = "0.7.0"
  ndk-context = "0.1"
 -ndk-sys = { git = "https://github.com/zarik5/android-ndk-rs", rev = "f1d38a0" }
-+ndk-sys = "0.4.0"
++ndk-sys = "0.4.1+23.1.7779620"
  oboe = "0.4" # todo: remove once AudioThread shutdown crash is fixed
  
- [build-dependencies]
+ [target.'cfg(not(target_os = "android"))'.dependencies]
 diff --git a/alvr/launcher/Cargo.toml b/alvr/launcher/Cargo.toml
 index 1f194c3a..34e6bcf8 100644
 --- a/alvr/launcher/Cargo.toml
@@ -58,6 +53,3 @@ index 1f194c3a..34e6bcf8 100644
  serde_json = "1"
  single-instance = "0.3"
  sysinfo = { version = "0.26", default-features = false }
--- 
-2.37.4
-

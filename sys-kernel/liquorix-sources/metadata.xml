@@ -4,4 +4,7 @@
 	<maintainer type="person">
 		<email>james@thegreatmcpain.xyz</email>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">damentz/liquorix-package</remote-id>
+	</upstream>
 </pkgmetadata>

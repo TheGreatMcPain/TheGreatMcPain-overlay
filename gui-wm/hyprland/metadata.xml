@@ -14,4 +14,9 @@
 		<flag name="x11-backend">Enable support for handling input/output devices through <pkg>x11-libs/libxcb</pkg></flag>
 		<flag name="X">Enable support for X11 applications (XWayland)</flag>
 	</use>
+	<upstream>
+		<remote-id type="github">
+			hyprwm/Hyprland
+		</remote-id>
+	</upstream>
 </pkgmetadata>

@@ -5,6 +5,7 @@
 		<email>james@thegreatmcpain.xyz</email>
 	</maintainer>
 	<use>
+		<flag name="tools">"Installs the 'mangoapp' and 'mangohudctl' binaries."</flag>
 		<flag name="xnvctrl">"Use XNVctrl as fall back for older Nvidia devices."</flag>
 	</use>
 </pkgmetadata>

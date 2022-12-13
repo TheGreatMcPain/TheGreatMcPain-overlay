@@ -3,35 +3,27 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6..9} )
+PYTHON_COMPAT=( python3_{8..10} )
 
 inherit meson distutils-r1 multilib-minimal flag-o-matic
 
-DESCRIPTION="A Vulkan and OpenGL overlay for monitoring FPS, temperatures, CPU/GPU load and more."
+DESCRIPTION="A Vulkan/OpenGL overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 HOMEPAGE="https://github.com/flightlessmango/MangoHud"
-
-IMGUI_VER="1.81"
-
-IMGUI_SRC_URI="
-	https://github.com/ocornut/imgui/archive/v${IMGUI_VER}.tar.gz -> ${PN}-imgui-${IMGUI_VER}.tar.gz
-	https://wrapdb.mesonbuild.com/v1/projects/imgui/${IMGUI_VER}/1/get_zip -> ${PN}-imgui-wrap-${IMGUI_VER}.zip
-"
 
 if [[ ${PV} == "9999" ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/flightlessmango/MangoHud.git"
-	SRC_URI="${IMGUI_SRC_URI}"
+	RESTRICT="network-sandbox" # for imgui subproject
 else
 	SRC_URI="
-		https://github.com/flightlessmango/MangoHud/archive/v${PV}-1.tar.gz -> ${P}.tar.gz
-		${IMGUI_SRC_URI}
+		https://github.com/flightlessmango/MangoHud/releases/download/v${PV}/MangoHud-v${PV}-Source.tar.xz -> ${P}.tar.xz
 	"
 	KEYWORDS="-* ~amd64 ~x86"
 fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="+dbus debug +X xnvctrl wayland video_cards_nvidia"
+IUSE="+dbus debug tools +X xnvctrl wayland video_cards_nvidia"
 
 REQUIRED_USE="
 	^^ ( X wayland )
@@ -44,8 +36,11 @@ DEPEND="
 	>=dev-util/vulkan-headers-1.2
 	media-libs/vulkan-loader[${MULTILIB_USEDEP}]
 	dev-libs/spdlog[${MULTILIB_USEDEP}]
-	media-libs/libglvnd[$MULTILIB_USEDEP]
+	media-libs/libglvnd[${MULTILIB_USEDEP}]
 	dbus? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
+	tools? (
+		media-libs/glfw
+	)
 	X? ( x11-libs/libX11[${MULTILIB_USEDEP}] )
 	video_cards_nvidia? (
 		x11-drivers/nvidia-drivers[${MULTILIB_USEDEP}]
@@ -56,20 +51,14 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 if ! [[ ${PV} == "9999" ]]; then
-	S="${WORKDIR}"/MangoHud-${PV}-1
+	S="${WORKDIR}"/MangoHud-v${PV}
 fi
 
 src_unpack() {
-	git-r3_src_unpack
+	if [[ ${PV} == "9999" ]]; then
+		git-r3_src_unpack
+	fi
 	default
-}
-
-src_prepare() {
-	# Both imgui archives use the same folder name, so we don't need
-	# to rename anything. Just move the folders to the appropriate location.
-	mv "${WORKDIR}/imgui-${IMGUI_VER}" "${S}/subprojects" || die
-
-	eapply_user
 }
 
 multilib_src_configure() {
@@ -84,6 +73,18 @@ multilib_src_configure() {
 		-Dwith_wayland=$(usex wayland enabled disabled)
 		-Dwith_dbus=$(usex dbus enabled disabled)
 	)
+	if [[ ${PV} == "9999" ]]; then
+		emesonargs+=(
+			--wrap-mode default
+		)
+	fi
+	if multilib_is_native_abi; then
+		emesonargs+=(
+			-Dmangoapp=$(usex tools true false)
+			-Dmangohudctl=$(usex tools true false)
+			-Dmangoapp_layer=$(usex tools true false)
+		)
+	fi
 	meson_src_configure
 }
 
@@ -96,7 +97,11 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	dodoc "${S}/bin/MangoHud.conf"
+	dodoc "${S}/data/MangoHud.conf"
+	doman "${S}/data/mangohud.1"
+	if use tools; then
+		doman "${S}/data/mangoapp.1"
+	fi
 
 	einstalldocs
 }

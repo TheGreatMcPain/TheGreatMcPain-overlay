@@ -26,7 +26,6 @@ SLOT="0"
 IUSE="+dbus debug tools +X xnvctrl wayland video_cards_nvidia"
 
 REQUIRED_USE="
-	^^ ( X wayland )
 	xnvctrl? ( video_cards_nvidia )"
 
 BDEPEND="dev-python/mako[${PYTHON_USEDEP}]"

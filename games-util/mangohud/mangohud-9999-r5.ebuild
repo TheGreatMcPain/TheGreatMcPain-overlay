@@ -14,6 +14,7 @@ if [[ ${PV} == "9999" ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/flightlessmango/MangoHud.git"
 	RESTRICT="network-sandbox" # for imgui subproject
+	KEYWORDS=""
 else
 	SRC_URI="
 		https://github.com/flightlessmango/MangoHud/releases/download/v${PV}/MangoHud-v${PV}-Source.tar.xz -> ${P}.tar.xz

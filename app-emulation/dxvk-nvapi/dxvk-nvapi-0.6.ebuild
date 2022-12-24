@@ -10,10 +10,12 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/jp7677/dxvk-nvapi.git"
 else
-	#SRC_URI="https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/jp7677/dxvk-nvapi.git"
-	EGIT_COMMIT="v${PV}"
+	VULKAN_HEADERS_HASH="37164a5726f7e6113810f9557903a117498421cf"
+	SRC_URI="
+		https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz
+			-> ${P}.tar.gz
+		https://github.com/KhronosGroup/Vulkan-Headers/archive/${VULKAN_HEADERS_HASH}.tar.gz
+			-> ${P}-vulkan-headers.tar.gz"
 	KEYWORDS="-* ~amd64 ~x86"
 fi
 
@@ -47,6 +49,15 @@ pkg_pretend() {
 			fi
 		done
 	fi
+}
+
+src_prepare() {
+	if [[ ${PV} != "9999" ]]; then
+		rm -r "${S}/external/Vulkan-Headers"
+		mv "${WORKDIR}/Vulkan-Headers-${VULKAN_HEADERS_HASH}" "${S}/external/Vulkan-Headers"
+	fi
+
+	default
 }
 
 src_configure() {

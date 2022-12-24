@@ -6,7 +6,6 @@
 		<name>James McClain</name>
 	</maintainer>
 	<use>
-		<flag name="custom-cflags">Patches meson crossfiles to accept custom CFLAGS/CXXFLAGS.</flag>
 		<flag name="async-patch">Applies async patch from https://github.com/Sporif/dxvk-async</flag>
 		<flag name="crossdev-mingw">
 			Use <pkg>sys-devel/crossdev</pkg> for the toolchain rather than

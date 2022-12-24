@@ -9,23 +9,35 @@ inherit flag-o-matic meson-multilib
 if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"
+	EGIT_SUBMODULES=(
+		# picky about headers and is cross-compiled making -I/usr/include troublesome
+		include/{spirv,vulkan}
+	)
 else
-	SRC_URI="https://github.com/doitsujin/dxvk/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	async-patch? (
-		https://github.com/Sporif/dxvk-async/archive/${PV}.tar.gz -> dxvk-async-${PV}.tar.gz
-	)"
-	KEYWORDS="-* ~amd64 ~x86"
+	HASH_SPIRV=0bcc624926a25a2a273d07877fd25a6ff5ba1cfb
+	HASH_VULKAN=98f440ce6868c94f5ec6e198cc1adda4760e8849
+	SRC_URI="
+		https://github.com/doitsujin/dxvk/archive/refs/tags/v${PV}.tar.gz
+			-> ${P}.tar.gz
+		https://github.com/KhronosGroup/SPIRV-Headers/archive/${HASH_SPIRV}.tar.gz
+			-> ${PN}-spirv-headers-${HASH_SPIRV::10}.tar.gz
+		https://github.com/KhronosGroup/Vulkan-Headers/archive/${HASH_VULKAN}.tar.gz
+			-> ${PN}-vulkan-headers-${HASH_VULKAN::10}.tar.gz
+	"
+	ASYNC_PATCH_HASH="ab1d629"
+	KEYWORDS="-* amd64 x86"
 fi
 
 DESCRIPTION="Vulkan-based implementation of D3D9, D3D10 and D3D11 for Linux / Wine"
 HOMEPAGE="https://github.com/doitsujin/dxvk/"
 
-LICENSE="ZLIB"
+LICENSE="ZLIB Apache-2.0 MIT"
 SLOT="0"
-IUSE="+abi_x86_32 async-patch crossdev-mingw +d3d9 +d3d10 +d3d11 debug +dxgi"
+IUSE="+abi_x86_32 crossdev-mingw +d3d9 +d3d10 +d3d11 debug +dxgi"
 REQUIRED_USE="
 	|| ( d3d9 d3d10 d3d11 dxgi )
 	d3d10? ( d3d11 )
+	d3d11? ( dxgi )
 	dxgi? ( d3d11 )"
 
 BDEPEND="
@@ -53,21 +65,11 @@ pkg_pretend() {
 	fi
 }
 
-src_unpack() {
-	if [[ ${PV} == "9999" ]]; then
-		if use async-patch; then
-			git-r3_fetch "https://github.com/Sporif/dxvk-async.git"
-			git-r3_checkout "https://github.com/Sporif/dxvk-async.git" \
-				"${WORKDIR}/dxvk-async-${PV}"
-		fi
-		git-r3_src_unpack
-	fi
-	default
-}
-
 src_prepare() {
-	if use async-patch; then
-		PATCHES+=("${WORKDIR}/dxvk-async-${PV}/dxvk-async.patch")
+	if [[ ${PV} != 9999 ]]; then
+		rmdir include/{spirv,vulkan} || die
+		mv ../SPIRV-Headers-${HASH_SPIRV} include/spirv || die
+		mv ../Vulkan-Headers-${HASH_VULKAN} include/vulkan || die
 	fi
 
 	default
@@ -83,7 +85,13 @@ src_configure() {
 	append-flags -mno-avx
 
 	if [[ ${CHOST} != *-mingw* ]]; then
-		[[ ! -v MINGW_BYPASS ]] && unset AR CC CXX RC STRIP
+		if [[ ! -v MINGW_BYPASS ]]; then
+			unset AR CC CXX RC STRIP
+			filter-flags '-fstack-clash-protection' #758914
+			filter-flags '-fstack-protector*' #870136
+			filter-flags '-fuse-ld=*'
+			filter-flags '-mfunction-return=thunk*' #878849
+		fi
 
 		CHOST_amd64=x86_64-w64-mingw32
 		CHOST_x86=i686-w64-mingw32
@@ -108,7 +116,6 @@ multilib_src_configure() {
 		$(meson_use {,enable_}d3d11)
 		$(meson_use {,enable_}dxgi)
 		$(usev !debug --strip) # portage won't strip .dll, so allow it here
-		-Denable_tests=false # needs wine/vulkan and is intended for manual use
 	)
 
 	meson_src_configure
@@ -122,21 +129,10 @@ multilib_src_install_all() {
 }
 
 pkg_preinst() {
-	[[ -e /usr/$(get_libdir)/dxvk/d3d11.dll ]] && DXVK_HAD_OVERLAY=
+	[[ -e ${EROOT}/usr/$(get_libdir)/dxvk/d3d11.dll ]] && DXVK_HAD_OVERLAY=
 }
 
 pkg_postinst() {
-	if use async-patch; then
-		elog ""
-		elog "You have enabled the 'async-patch' useflag."
-		elog "Keep in mind that this patch is unsupported, but may yeld"
-		elog "a more stutter-free experience."
-		elog ""
-		elog "To use it just set the environment variable DXVK_ASYNC=1."
-		elog ""
-		elog "More information can be found here: https://github.com/Sporif/dxvk-async"
-		elog ""
-	fi
 	if [[ ! ${REPLACING_VERSIONS} ]]; then
 		elog "To enable ${PN} on a wine prefix, you can run the following command:"
 		elog
@@ -155,10 +151,12 @@ pkg_postinst() {
 		elog "it. See ${EROOT}/usr/share/doc/${PF}/README.md* for handling configs."
 	fi
 
-	# don't try to keep wine-*[vulkan] in RDEPEND, but still give a warning
-	local wine
-	for wine in app-emulation/wine-{vanilla,staging}; do
-		has_version ${wine} && ! has_version ${wine}[vulkan] &&
-			ewarn "${wine} was not built with USE=vulkan, ${PN} will not be usable with it"
-	done
+	if [[ ! ${REPLACING_VERSIONS##* } ]] ||
+		ver_test ${REPLACING_VERSIONS##* } -lt 2.0
+	then
+		elog
+		elog ">=${PN}-2.0 requires drivers and Wine to support vulkan-1.3, meaning:"
+		elog ">=wine-*-7.1 (or >=wine-proton-7.0), and >=mesa-22.0 (or >=nvidia-drivers-510)"
+		elog "For details, see: https://github.com/doitsujin/dxvk/wiki/Driver-support"
+	fi
 }

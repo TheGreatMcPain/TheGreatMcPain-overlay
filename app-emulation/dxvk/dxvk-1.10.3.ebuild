@@ -3,6 +3,9 @@
 
 EAPI=8
 
+# note: version <2.0 should be kept for longer given it's the
+# last version to support <wine-7.1 and <nvidia-drivers-510
+
 MULTILIB_COMPAT=( abi_x86_{32,64} )
 inherit flag-o-matic meson-multilib
 
@@ -10,11 +13,12 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"
 else
-	SRC_URI="https://github.com/doitsujin/dxvk/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	async-patch? (
-		https://github.com/Sporif/dxvk-async/archive/${PV}.tar.gz -> dxvk-async-${PV}.tar.gz
-	)"
-	KEYWORDS="-* ~amd64 ~x86"
+	SRC_URI="
+		https://github.com/doitsujin/dxvk/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
+		async-patch? ( https://github.com/Sporif/dxvk-async/archive/${PV}.tar.gz -> dxvk-async-patch-${PV}.tar.gz )
+	"
+	ASYNC_PATCH_HASH="af418dc"
+	KEYWORDS="-* amd64 x86"
 fi
 
 DESCRIPTION="Vulkan-based implementation of D3D9, D3D10 and D3D11 for Linux / Wine"
@@ -53,26 +57,18 @@ pkg_pretend() {
 	fi
 }
 
-src_unpack() {
-	if [[ ${PV} == "9999" ]]; then
-		if use async-patch; then
-			git-r3_fetch "https://github.com/Sporif/dxvk-async.git"
-			git-r3_checkout "https://github.com/Sporif/dxvk-async.git" \
-				"${WORKDIR}/dxvk-async-${PV}"
-		fi
-		git-r3_src_unpack
-	fi
-	default
-}
-
 src_prepare() {
-	if use async-patch; then
-		PATCHES+=("${WORKDIR}/dxvk-async-${PV}/dxvk-async.patch")
-	fi
-
 	default
 
 	sed -i "/^basedir=/s|=.*|=${EPREFIX}/usr/lib/${PN}|" setup_dxvk.sh || die
+
+	if use async-patch; then
+		if [[ ${PV} == "9999" ]]; then
+			eapply ${WORKDIR}/dxvk-async-${PV}/dxvk-async.patch
+		else
+			eapply ${WORKDIR}/dxvk-async-${PV}/dxvk-async-${ASYNC_PATCH_HASH}.patch
+		fi
+	fi
 }
 
 src_configure() {
@@ -83,7 +79,13 @@ src_configure() {
 	append-flags -mno-avx
 
 	if [[ ${CHOST} != *-mingw* ]]; then
-		[[ ! -v MINGW_BYPASS ]] && unset AR CC CXX RC STRIP
+		if [[ ! -v MINGW_BYPASS ]]; then
+			unset AR CC CXX RC STRIP
+			filter-flags '-fstack-clash-protection' #758914
+			filter-flags '-fstack-protector*' #870136
+			filter-flags '-fuse-ld=*'
+			filter-flags '-mfunction-return=thunk*' #878849
+		fi
 
 		CHOST_amd64=x86_64-w64-mingw32
 		CHOST_x86=i686-w64-mingw32
@@ -122,7 +124,7 @@ multilib_src_install_all() {
 }
 
 pkg_preinst() {
-	[[ -e /usr/$(get_libdir)/dxvk/d3d11.dll ]] && DXVK_HAD_OVERLAY=
+	[[ -e ${EROOT}/usr/$(get_libdir)/dxvk/d3d11.dll ]] && DXVK_HAD_OVERLAY=
 }
 
 pkg_postinst() {
@@ -154,11 +156,4 @@ pkg_postinst() {
 		elog "Also, if you were using /etc/${PN}.conf, ${PN} is no longer patched to load"
 		elog "it. See ${EROOT}/usr/share/doc/${PF}/README.md* for handling configs."
 	fi
-
-	# don't try to keep wine-*[vulkan] in RDEPEND, but still give a warning
-	local wine
-	for wine in app-emulation/wine-{vanilla,staging}; do
-		has_version ${wine} && ! has_version ${wine}[vulkan] &&
-			ewarn "${wine} was not built with USE=vulkan, ${PN} will not be usable with it"
-	done
 }

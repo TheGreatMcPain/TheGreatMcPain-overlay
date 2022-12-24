@@ -1,162 +1,165 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-LTO_ENABLE_FLAGOMATIC="yes"
+MULTILIB_COMPAT=( abi_x86_{32,64} )
+inherit flag-o-matic meson-multilib
 
-inherit flag-o-matic meson mingw64 multilib-minimal ninja-utils
-
-DESCRIPTION="A Vulkan-based translation layer for Direct3D 9/10/11"
-HOMEPAGE="https://github.com/doitsujin/dxvk"
-
-if [[ ${PV} == "9999" ]] ; then
-	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"
-	EGIT_BRANCH="master"
+if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
-	SRC_URI=""
+	EGIT_REPO_URI="https://github.com/doitsujin/dxvk.git"
+	EGIT_SUBMODULES=(
+		# picky about headers and is cross-compiled making -I/usr/include troublesome
+		include/{spirv,vulkan}
+		subprojects/libdisplay-info
+	)
 else
-	SRC_URI="https://github.com/doitsujin/dxvk/archive/v${PV}.tar.gz -> ${P}.tar.gz
-			async-patch? ( https://github.com/Sporif/dxvk-async/archive/${PV}.tar.gz -> dxvk-async-${PV}.tar.gz )"
-	KEYWORDS="-* ~amd64"
+	HASH_SPIRV=0bcc624926a25a2a273d07877fd25a6ff5ba1cfb
+	HASH_VULKAN=98f440ce6868c94f5ec6e198cc1adda4760e8849
+	SRC_URI="
+		https://github.com/doitsujin/dxvk/archive/refs/tags/v${PV}.tar.gz
+			-> ${P}.tar.gz
+		https://github.com/KhronosGroup/SPIRV-Headers/archive/${HASH_SPIRV}.tar.gz
+			-> ${PN}-spirv-headers-${HASH_SPIRV::10}.tar.gz
+		https://github.com/KhronosGroup/Vulkan-Headers/archive/${HASH_VULKAN}.tar.gz
+			-> ${PN}-vulkan-headers-${HASH_VULKAN::10}.tar.gz"
+	KEYWORDS="-* ~amd64 ~x86"
 fi
+# setup_dxvk.sh is no longer provided, fetch old until a better solution
+SRC_URI+=" https://raw.githubusercontent.com/doitsujin/dxvk/cd21cd7fa3b0df3e0819e21ca700b7627a838d69/setup_dxvk.sh"
 
-LICENSE="ZLIB"
-SLOT=0
-IUSE="async-patch custom-cflags debug video_cards_nvidia"
-REQUIRED_USE="|| ( abi_x86_32 abi_x86_64 )"
+DESCRIPTION="Vulkan-based implementation of D3D9, D3D10 and D3D11 for Linux / Wine"
+HOMEPAGE="https://github.com/doitsujin/dxvk/"
 
-RESTRICT="test"
+LICENSE="ZLIB Apache-2.0 MIT"
+SLOT="0"
+IUSE="+abi_x86_32 crossdev-mingw +d3d9 +d3d10 +d3d11 debug +dxgi"
+REQUIRED_USE="
+	|| ( d3d9 d3d10 d3d11 dxgi )
+	d3d10? ( d3d11 )
+	d3d11? ( dxgi )"
 
 BDEPEND="
-	dev-util/glslang"
-
-if [[ ${PV} != "9999" ]] ; then
-	S="${WORKDIR}/dxvk-${PV}"
-fi
-
-PATCHES=()
-
-bits() {
-	[[ ${ABI} = "amd64" ]] && echo 64
-	[[ ${ABI} = "x86" ]]   && echo 32
-}
+	dev-util/glslang
+	!crossdev-mingw? ( dev-util/mingw64-toolchain[${MULTILIB_USEDEP}] )"
 
 pkg_pretend() {
-	mingw64_check_requirements "6.0.0" "8.0.0"
-}
+	[[ ${MERGE_TYPE} == binary ]] && return
 
-pkg_setup() {
-	mingw64_check_requirements "6.0.0" "8.0.0"
-}
-
-src_unpack() {
-	if [[ ${PV} == "9999" ]]; then
-		if use async-patch; then
-			git-r3_fetch "https://github.com/Sporif/dxvk-async.git"
-			git-r3_checkout "https://github.com/Sporif/dxvk-async.git" \
-				"${WORKDIR}/dxvk-async-${PV}"
-		fi
-		git-r3_src_unpack
+	if use crossdev-mingw && [[ ! -v MINGW_BYPASS ]]; then
+		local tool=-w64-mingw32-g++
+		for tool in $(usev abi_x86_64 x86_64${tool}) $(usev abi_x86_32 i686${tool}); do
+			if ! type -P ${tool} >/dev/null; then
+				eerror "With USE=crossdev-mingw, it is necessary to setup the mingw toolchain."
+				eerror "For instructions, please see: https://wiki.gentoo.org/wiki/Mingw"
+				use abi_x86_32 && use abi_x86_64 &&
+					eerror "Also, with USE=abi_x86_32, will need both i686 and x86_64 toolchains."
+				die "USE=crossdev-mingw is set but ${tool} was not found"
+			elif [[ ! $(LC_ALL=C ${tool} -v 2>&1) =~ "Thread model: posix" ]]; then
+				eerror "${PN} requires GCC to be built with --enable-threads=posix"
+				eerror "Please see: https://wiki.gentoo.org/wiki/Mingw#POSIX_threads_for_Windows"
+				die "USE=crossdev-mingw is set but ${tool} does not use POSIX threads"
+			fi
+		done
 	fi
-	default
 }
 
 src_prepare() {
-	if use async-patch; then
-		PATCHES+=("${WORKDIR}/dxvk-async-${PV}/dxvk-async.patch")
+	if [[ ${PV} != 9999 ]]; then
+		rmdir include/{spirv,vulkan} || die
+		mv ../SPIRV-Headers-${HASH_SPIRV} include/spirv || die
+		mv ../Vulkan-Headers-${HASH_VULKAN} include/vulkan || die
 	fi
-
-	# From bobwya's dxvk ebuild.
-	filter-flags "-Wl,--hash-style*"
-	[[ "$(is-flag "-march=*")" == "true" ]] && append-flags "-mno-avx"
-
-	replace-flags "-O3" "-O3 -fno-stack-protector"
 
 	default
 
-	# Rename final setup script in README.md
-	sed -i -e "s|./setup_dxvk.sh|${PV}-setup|g" "${S}/README.md" \
-		|| die "sed failed"
-	sed -i -e "s#basedir=.*#basedir=\"${EPREFIX}/usr\"#" "${S}/setup_dxvk.sh" \
-		|| die "sed failed"
+	sed "/^basedir=/s|=.*|=${EPREFIX}/usr/lib/${PN}|" \
+		"${DISTDIR}"/setup_dxvk.sh > setup_dxvk.sh || die
+}
 
-	# From bobwya's dxvk ebuild.
-	# Delete installation instructions for unused ABIs.
-	if ! use abi_x86_32; then
-		sed -i '\|installFile "$win32_sys_path"|d' "${S}/setup_dxvk.sh" \
-			|| die "sed failed"
+src_configure() {
+	use crossdev-mingw || PATH=${BROOT}/usr/lib/mingw64-toolchain/bin:${PATH}
+
+	# AVX has a history of causing issues with this package, disable for safety
+	# https://github.com/Tk-Glitch/PKGBUILDS/issues/515
+	append-flags -mno-avx
+
+	if [[ ${CHOST} != *-mingw* ]]; then
+		if [[ ! -v MINGW_BYPASS ]]; then
+			unset AR CC CXX RC STRIP
+			filter-flags '-fstack-clash-protection' #758914
+			filter-flags '-fstack-protector*' #870136
+			filter-flags '-fuse-ld=*'
+			filter-flags '-mfunction-return=thunk*' #878849
+		fi
+
+		CHOST_amd64=x86_64-w64-mingw32
+		CHOST_x86=i686-w64-mingw32
+		CHOST=$(usex x86 ${CHOST_x86} ${CHOST_amd64})
+
+		strip-unsupported-flags
 	fi
-	if ! use abi_x86_64; then
-		sed -i '\|installFile "$win64_sys_path"|d' "${S}/setup_dxvk.sh" \
-			|| die "sed failed"
-	fi
 
-	bootstrap_dxvk() {
-		# Set DXVK location for each ABI
-		sed -e "s#x$(bits)#$(get_libdir)/${PN}#" -i "${S}/setup_dxvk.sh" \
-			|| die "sed failed"
-	}
-
-	multilib_foreach_abi bootstrap_dxvk
+	multilib-minimal_src_configure
 }
 
 multilib_src_configure() {
-	# If we use portage's strip FEATURE it will
-	# try to use the native strip program, so let meson
-	# do the stripping.
-	local emesonargs=(
-		--cross-file="${S}/build-win$(bits).txt"
-		--libdir="$(get_libdir)/${PN}"
-		--bindir="$(get_libdir)/${PN}"
-		"$(usex debug '' '--strip')"
-		-Denable_tests=false
-	)
+	# multilib's ${CHOST_amd64}-gcc -m32 is unusable with crossdev,
+	# unset again so meson eclass will set ${CHOST}-gcc + others
+	use crossdev-mingw && [[ ! -v MINGW_BYPASS ]] && unset AR CC CXX RC STRIP
 
-	if use custom-cflags; then
-		emesonargs+=(
-			-Dc_args="${CFLAGS}"
-			-Dcpp_args="${CXXFLAGS}"
-			-Dc_link_args="${LDFLAGS}"
-			-Dcpp_link_args="${LDFLAGS}"
-		)
-	fi
+	local emesonargs=(
+		--prefix="${EPREFIX}"/usr/lib/${PN}
+		--{bin,lib}dir=x${MULTILIB_ABI_FLAG: -2}
+		$(meson_use {,enable_}d3d9)
+		$(meson_use {,enable_}d3d10)
+		$(meson_use {,enable_}d3d11)
+		$(meson_use {,enable_}dxgi)
+		$(usev !debug --strip) # portage won't strip .dll, so allow it here
+	)
 
 	meson_src_configure
 }
 
-multilib_src_compile() {
-	meson_src_compile
-}
-
-multilib_src_install() {
-	meson_src_install
-}
-
 multilib_src_install_all() {
-	find "${D}" -name '*.a' -delete -print
+	dobin setup_dxvk.sh
+	dodoc README.md dxvk.conf
 
-	newbin "setup_dxvk.sh" "${PN}-setup"
+	find "${ED}" -type f -name '*.a' -delete || die
+}
 
-	dodoc "${S}/dxvk.conf"
-
-	einstalldocs
+pkg_preinst() {
+	[[ -e ${EROOT}/usr/$(get_libdir)/dxvk/d3d11.dll ]] && DXVK_HAD_OVERLAY=
 }
 
 pkg_postinst() {
-	if use async-patch; then
-		elog ""
-		elog "You have enabled the 'async-patch' useflag."
-		elog "Keep in mind that this patch is unsupported, but may yeld"
-		elog "a more stutter-free experience."
-		elog ""
-		elog "To use it just set the environment variable DXVK_ASYNC=1."
-		elog ""
-		elog "More information can be found here: https://github.com/Sporif/dxvk-async"
+	if [[ ! ${REPLACING_VERSIONS} ]]; then
+		elog "To enable ${PN} on a wine prefix, you can run the following command:"
+		elog
+		elog "	WINEPREFIX=/path/to/prefix setup_dxvk.sh install --symlink"
+		elog
+		elog "See ${EROOT}/usr/share/doc/${PF}/README.md* for details."
+		elog "Note: setup_dxvk.sh is unofficially temporarily provided as it was"
+		elog "removed upstream, handling may change in the future."
+	elif [[ -v DXVK_HAD_OVERLAY ]]; then
+		# temporary warning until this version is more widely used
+		elog "Gentoo's main repo ebuild for ${PN} uses different paths than most overlays."
+		elog "If you were using symbolic links in wine prefixes it may be necessary to"
+		elog "refresh them by re-running the command:"
+		elog
+		elog "	WINEPREFIX=/path/to/prefix setup_dxvk.sh install --symlink"
+		elog
+		elog "Also, if you were using /etc/${PN}.conf, ${PN} is no longer patched to load"
+		elog "it. See ${EROOT}/usr/share/doc/${PF}/README.md* for handling configs."
 	fi
-	elog ""
-	elog "dxvk installed, but not activated. You have to install the DLLs to a WINEPREFIX."
-	elog "To do this you just need to set WINEPREFIX: $ export WINEPREFIX=/path/to/prefix"
-	elog "then run: $ ${PN}-setup install --symlink"
-	elog ""
+
+	if [[ ! ${REPLACING_VERSIONS##* } ]] ||
+		ver_test ${REPLACING_VERSIONS##* } -lt 2.0
+	then
+		elog
+		elog ">=${PN}-2.0 requires drivers and Wine to support vulkan-1.3, meaning:"
+		elog ">=wine-*-7.1 (or >=wine-proton-7.0), and >=mesa-22.0 (or >=nvidia-drivers-510)"
+		elog "For details, see: https://github.com/doitsujin/dxvk/wiki/Driver-support"
+	fi
 }

@@ -31,12 +31,10 @@ DESCRIPTION="Cross platform application development framework based on web techn
 HOMEPAGE="https://electronjs.org/"
 PATCHSET="2"
 PATCHSET_NAME="chromium-104-patchset-${PATCHSET}"
-PATCHSET_NAME_PPC64="chromium_104.0.5112.101-1raptor0~deb11u1.debian"
 SRC_URI="mirror+https://commondatastorage.googleapis.com/chromium-browser-official/${CHROMIUM_P}.tar.xz
 	mirror+https://github.com/stha09/chromium-patches/releases/download/${PATCHSET_NAME}/${PATCHSET_NAME}.tar.xz
 	mirror+https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.xz
 	https://github.com/electron/electron/archive/v${PV}.tar.gz -> ${P}.tar.gz
-	ppc64? ( https://quickbuild.io/~raptor-engineering-public/+archive/ubuntu/chromium/+files/${PATCHSET_NAME_PPC64}.tar.xz )
 	ungoogled? (
 		https://github.com/ungoogled-software/ungoogled-chromium/archive/${UGC_PVR}.tar.gz -> ${UGC_PF}.tar.gz
 	)
@@ -1376,7 +1374,6 @@ src_unpack() {
 	unpack "node-v${NODE_VERSION}.tar.xz"
 	unpack "${PATCHSET_NAME}.tar.xz"
 	use ungoogled && unpack "${UGC_PF}.tar.gz"
-	use ppc64 && unpack "${PATCHSET_NAME_PPC64}.tar.xz"
 }
 
 src_prepare() {
@@ -1440,19 +1437,6 @@ src_prepare() {
 		"${FILESDIR}/gtk-fix-prefers-color-scheme-query.diff"
 		"${FILESDIR}/restore-x86.patch"
 	)
-
-	if use ppc64 ; then
-		local p
-		for p in $(grep -v "^#" "${WORKDIR}"/debian/patches/series | grep "^ppc64le" || die); do
-			if [[ $p =~ "fix-breakpad-compile.patch" ]]; then
-				eapply "${FILESDIR}/ppc64le/fix-breakpad-compile.patch"
-			else
-				eapply "${WORKDIR}/debian/patches/${p}"
-			fi
-		done
-		eapply "${FILESDIR}/ppc64le/libpng-pdfium-compile-98.patch"
-		eapply "${FILESDIR}/ppc64le/fix-swiftshader-compile.patch"
-	fi
 
 	default
 

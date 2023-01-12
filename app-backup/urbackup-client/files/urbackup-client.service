@@ -1,0 +1,11 @@
+[Unit]
+Description=UrBackup backup client backend
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/sbin/urbackupclientbackend -c /etc/conf.d/urbackupclient -w /var/run/urbackupclient.pid
+
+[Install]
+WantedBy=multi-user.target

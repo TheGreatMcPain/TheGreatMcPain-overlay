@@ -1,0 +1,13 @@
+[Unit]
+Description=UrBackup backup service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=urbackup
+ExecStart=/usr/bin/urbackupsrv run -c /etc/conf.d/urbackupsrv -w /var/run/urbackup.pid
+Restart=Always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>james@thegreatmcpain.xyz</email>
+		<name>James McClain</name>
+	</maintainer>
+	<longdescription>UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image (currently on Windows only) and file backups accomplishes both data safety and a fast restoration time.
+	
+	Backups are made while the system is running without interrupting current processes.
+	
+	UrBackup also continuously watches folders you want backed up in order to quickly find differences to previous backups. Because of that, incremental file backups are really fast.
+	
+	Your files can be restored through the web interface, via app-backup/urbackup-client or the file manager, while the backups of drive volumes can be restored with a bootable CD or USB-Stick (bare metal restore).</longdescription>
+	<use>
+		<flag name="crypt">Enables encrypted transfers and thus internet backups</flag>
+		<flag name="fuse">Enables mounting VHD containers via FUSE</flag>
+		<flag name="hardened">Enables GCC runtime fortification</flag>
+		<flag name="mail">Enables email notifications</flag>
+		<flag name="zlib">Enables compression</flag>
+	</use>
+</pkgmetadata>

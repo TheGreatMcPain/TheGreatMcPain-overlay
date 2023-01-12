@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+# $Id$
+
+URBACKUP_CONFIG="/etc/conf.d/urbackupsrv"
+URBACKUP_PIDFILE="/var/run/urbackup.pid"
+
+command="/usr/sbin/urbackupsrv"
+command_args="run -c ${URBACKUP_CONFIG} -w ${URBACKUP_PIDFILE} -d"
+pidfile="${URBACKUP_PIDFILE}"
+
+depend() {
+	use logger net
+}

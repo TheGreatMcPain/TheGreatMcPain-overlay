@@ -15,7 +15,11 @@ DEPEND=""
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
+src_unpack() {
+	mkdir "${S}"
+}
+
 src_install() {
-	dodir /usr/share/urbackup
+	insinto /usr/share/urbackup
 	doins "${FILESDIR}/urbackup_ecdsa409k1.pub"
 }

@@ -18,6 +18,7 @@ IUSE="crypt hardened fuse mail zlib"
 RDEPEND="
 	acct-user/urbackup
 	acct-group/urbackup
+	app-backup/urbackup-certificate
 	crypt? ( >=dev-libs/crypto++-5.1 )
 	dev-db/sqlite
 	app-arch/zstd
@@ -54,4 +55,7 @@ src_install() {
 	systemd_dounit "${FILESDIR}"/urbackup-server.service
 	fowners -R urbackup:urbackup "/var/lib/urbackup"
 	fowners -R urbackup:urbackup "/usr/share/urbackup/www"
+
+	# Installed by urbackup-certificate
+	rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"
 }

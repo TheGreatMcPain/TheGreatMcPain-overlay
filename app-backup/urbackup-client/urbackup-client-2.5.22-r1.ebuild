@@ -22,6 +22,7 @@ IUSE="hardened X zlib"
 RDEPEND="
 	acct-user/urbackup
 	acct-group/urbackup
+	app-backup/urbackup-certificate
 	dev-db/sqlite
 	dev-libs/crypto++
 	X? ( x11-libs/wxGTK:* )
@@ -64,6 +65,9 @@ src_install() {
 	doins "${FILESDIR}"/dattobd_remove_filesystem_snapshot
 	doins "${FILESDIR}"/lvm_create_filesystem_snapshot
 	doins "${FILESDIR}"/lvm_remove_filesystem_snapshot
+
+	# Already installed by urbackup-certificate
+	rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"
 
 	keepdir /var/lib/urbackup/data
 }

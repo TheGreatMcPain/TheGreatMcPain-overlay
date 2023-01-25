@@ -125,7 +125,7 @@ src_install() {
 	dosym "../sources/translations" "/usr/lib/webcord/app/translations"
 
 	echo "#!/bin/sh" > "webcord"
-	echo "electron-20 '/usr/lib/webcord' \"$@\"" >> "webcord"
+	echo "electron-20 '/usr/lib/webcord' \"\$@\"" >> "webcord"
 	dobin "webcord"
 }
 

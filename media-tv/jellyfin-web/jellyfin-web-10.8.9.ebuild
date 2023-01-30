@@ -21,6 +21,13 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
+src_prepare() {
+	default
+
+	# Fix 'npm ERR! code EINTEGRITY'
+	npm update
+}
+
 src_compile() {
 	npm install
 }

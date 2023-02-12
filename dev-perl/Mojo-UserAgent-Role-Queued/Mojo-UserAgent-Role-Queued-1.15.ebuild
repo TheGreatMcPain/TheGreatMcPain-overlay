@@ -16,6 +16,7 @@ RDEPEND="
 	dev-perl/Class-Method-Modifiers
 	dev-perl/Role-Tiny
 	dev-perl/Mojolicious
+"
+BDEPEND="
 	dev-perl/Module-Build-Tiny
 "
-DEPEND="${RDEPEND}"

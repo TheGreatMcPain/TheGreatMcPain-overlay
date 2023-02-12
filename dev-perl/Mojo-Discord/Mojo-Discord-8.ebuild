@@ -21,6 +21,7 @@ RDEPEND="
 	dev-perl/JSON-MaybeXS
 	virtual/perl-IO-Compress
 	virtual/perl-Encode
+	dev-perl/Moo
 	virtual/perl-Data-Dumper
 	dev-perl/IO-Socket-SSL
 	dev-perl/Role-EventEmitter

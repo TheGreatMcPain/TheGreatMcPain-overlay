@@ -19,6 +19,7 @@ RDEPEND="
 	dev-perl/strictures
 	dev-perl/Mojolicious
 	dev-perl/Mojo-Discord
+	dev-perl/Mojo-UserAgent-Role-Queued
 	dev-perl/IO-Socket-SSL
 	dev-perl/Config-Tiny
 	virtual/perl-Getopt-Long

@@ -155,13 +155,6 @@ src_install() {
 }
 
 pkg_postinst() {
-	if use greetd-fix; then
-		ewarn "You've enabled the 'greetd-fix' USE."
-		ewarn "This makes '/tmp/hypr' modifiable by everyone (mode 777),"
-		ewarn "which allows 'hyprctl' to work if '/tmp/hypr' was created by"
-		ewarn "the 'greetd' user."
-		ewarn
-	fi
 	elog "You must be in the input group to allow Hyprland"
 	elog "to access input devices via libinput."
 }

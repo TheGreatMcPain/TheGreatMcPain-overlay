@@ -3,8 +3,6 @@
 
 EAPI=7
 
-inherit eutils
-
 DESCRIPTION="Update Portage tree, all installed packages, and kernel"
 BASE_SERVER_URI="https://github.com/TheGreatMcPain"
 HOMEPAGE="${BASE_SERVER_URI}/${PN}"

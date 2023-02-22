@@ -1,4 +1,0 @@
-# James McClain <jmcclain2020@protonmail.com> (2021-07-25)
-# Has been segfaulting for a while now, and I'm not sure why.
-# For now please use the binary version (goverlay-bin).
-games-util/goverlay

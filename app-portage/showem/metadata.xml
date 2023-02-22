@@ -5,13 +5,6 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>James McClain</name>
 </maintainer>
-<upstream>
-		<maintainer status="active">
-				<email>james@thegreatmcpain.xyz</email>
-				<name>James McClain</name>
-		</maintainer>
-		<bugs-to>mailto:james@thegreatmcpain.xyz</bugs-to>
-</upstream>
 <longdescription>
 		This is a very simple utility script, which allows you to monitor the
 		progress of a parallel emerge. When invoked, it shows a split-screen

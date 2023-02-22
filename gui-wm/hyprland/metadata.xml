@@ -10,6 +10,8 @@
 			Fix 'hyprctl' issues when using 'greetd' by making '/tmp/hypr' modifiable by everyone.
 			(Definitely not secure!)
 		</flag>
+		<flag name="hwdata">Use system hwdata</flag>
+		<flag name="seatd">Enable libseatd session support</flag>
 		<flag name="vulkan">Enable support for the vulkan backend renderer</flag>
 		<flag name="x11-backend">Enable support for handling input/output devices through <pkg>x11-libs/libxcb</pkg></flag>
 		<flag name="X">Enable support for X11 applications (XWayland)</flag>

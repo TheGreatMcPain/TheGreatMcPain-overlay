@@ -16,7 +16,6 @@ SLOT="0"
 IUSE="opengl vulkan"
 
 DEPEND="
-	!games-util/goverlay
 	opengl? (
 		x11-apps/mesa-progs
 	)
@@ -26,6 +25,7 @@ DEPEND="
 "
 
 RDEPEND="
+	!games-util/goverlay
 	dev-libs/qt5pas
 "
 

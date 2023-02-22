@@ -34,6 +34,8 @@ RDEPEND="${DEPEND}
 	)
 	>=app-shells/bash-4.2"
 
+PATCHES="${FILESDIR}/0001-Remove-eselect-python-requirement.patch"
+
 # ebuild function overrides
 src_prepare() {
 	# if the buildkernel use flag not set, set script variable accordingly

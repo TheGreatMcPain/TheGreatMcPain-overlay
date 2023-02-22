@@ -1,0 +1,35 @@
+From c9af27dc3a4785d6f1581cdfe07a7f347d449287 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Wed, 22 Feb 2023 01:08:02 -0600
+Subject: [PATCH] Remove eselect-python requirement
+
+---
+ genup | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/genup b/genup
+index 3cad1d4..79b5552 100755
+--- a/genup
++++ b/genup
+@@ -380,10 +380,6 @@ bring_old_perl_modules_up_to_date() {
+         perl-cleaner ${VERBOSITYFLAG} --all
+     fi
+ }
+-cleanup_python_config() {
+-    # remove uninstalled versions from /etc/python-exec/python-exec.conf
+-    eselect python cleanup
+-}
+ run_custom_updaters_if_present() {
+     # if not inhibited, find any executable files in the /etc/genup/updaters.d
+     # top-level directory (resolving symlinks) and execute them in turn,
+@@ -820,7 +816,6 @@ remove_unreferenced_packages
+ rebuild_external_modules_if_necessary
+ rebuild_packages_depending_on_stale_libraries
+ bring_old_perl_modules_up_to_date
+-cleanup_python_config
+ interactively_resolve_clashing_config_file_changes
+ offer_kernel_upgrade_to_staging_if_available
+ remove_unreferenced_packages
+-- 
+2.39.2
+

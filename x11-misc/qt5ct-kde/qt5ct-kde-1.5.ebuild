@@ -5,8 +5,8 @@ EAPI=8
 
 inherit cmake
 
-DESCRIPTION="Qt5 configuration tool, similar to qtconfig for Qt4"
-HOMEPAGE="https://sourceforge.net/projects/qt5ct/"
+DESCRIPTION="Qt5 configuration tool, similar to qtconfig for Qt4 (KDE fixes)"
+HOMEPAGE="https://aur.archlinux.org/packages/qt5ct-kde"
 SRC_URI="https://download.sourceforge.net/qt5ct/qt5ct-${PV}.tar.bz2"
 
 LICENSE="BSD-2"

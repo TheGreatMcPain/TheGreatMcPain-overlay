@@ -1,0 +1,40 @@
+From eb9a70103b3e031c2495921ecf61509285bd276a Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Tue, 28 Feb 2023 01:34:11 -0600
+Subject: [PATCH] Workaround Screencast for Nvidia
+
+---
+ types/output/render.c | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/subprojects/wlroots/types/output/render.c b/subprojects/wlroots/types/output/render.c
+index 8e0895a6..c271f72a 100644
+--- a/subprojects/wlroots/types/output/render.c
++++ b/subprojects/wlroots/types/output/render.c
+@@ -338,22 +338,7 @@ struct wlr_drm_format *output_pick_format(struct wlr_output *output,
+ }
+ 
+ uint32_t wlr_output_preferred_read_format(struct wlr_output *output) {
+-	struct wlr_renderer *renderer = output->renderer;
+-	assert(renderer != NULL);
+-
+-	if (!renderer->impl->preferred_read_format || !renderer->impl->read_pixels) {
+-		return DRM_FORMAT_INVALID;
+-	}
+-
+-	if (!output_attach_back_buffer(output, &output->pending, NULL)) {
+-		return false;
+-	}
+-
+-	uint32_t fmt = renderer->impl->preferred_read_format(renderer);
+-
+-	output_clear_back_buffer(output);
+-
+-	return fmt;
++	return DRM_FORMAT_XRGB8888;
+ }
+ 
+ bool output_is_direct_scanout(struct wlr_output *output,
+-- 
+2.39.2
+

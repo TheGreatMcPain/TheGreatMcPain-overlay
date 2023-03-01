@@ -24,7 +24,6 @@ else
 		https://github.com/KhronosGroup/Vulkan-Headers/archive/${HASH_VULKAN}.tar.gz
 			-> ${PN}-vulkan-headers-${HASH_VULKAN::10}.tar.gz
 	"
-	ASYNC_PATCH_HASH="ab1d629"
 	KEYWORDS="-* amd64 x86"
 fi
 

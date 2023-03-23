@@ -3,19 +3,17 @@
 
 EAPI=8
 
-inherit meson cmake toolchain-funcs
+inherit meson cmake toolchain-funcs git-r3
 
 DESCRIPTION="A dymanic tiling Wayland compositor that doesn't sacrifice on its looks."
 HOMEPAGE="https://github.com/hyprwm/Hyprland"
 
-MY_PV="${PV/_/}"
-
-SRC_URI="https://github.com/hyprwm/Hyprland/releases/download/v${MY_PV}/source-v${MY_PV}.tar.gz -> ${P}.tar.gz"
+EGIT_REPO_URI="https://github.com/hyprwm/Hyprland.git"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64"
-IUSE="+hwdata +seatd +udev vulkan +x11-backend X video_cards_nvidia"
+KEYWORDS=""
+IUSE="+hwdata source +seatd +udev vulkan +x11-backend X video_cards_nvidia"
 
 # Copied from gui-libs/wlroots-9999
 DEPEND="
@@ -23,6 +21,7 @@ DEPEND="
 	>=dev-libs/wayland-1.21.0
 	>=dev-libs/wayland-protocols-1.28
 	media-libs/mesa[egl(+),gles2]
+	>=media-libs/libdisplay-info-0.1.1:=
 	hwdata? ( sys-apps/hwdata:= )
 	seatd? ( sys-auth/seatd:= )
 	udev? ( virtual/libudev )
@@ -70,6 +69,15 @@ pkg_setup() {
 	fi
 }
 
+compile_udis86() {
+	local S="$S/subprojects/udis86"
+	local BUILD_DIR="${S}/build"
+	local CMAKE_USE_DIR="${S}"
+
+	cmake_src_configure
+	cmake_src_compile
+}
+
 compile_wlroots() {
 	local S="$S/subprojects/wlroots"
 	local BUILD_DIR="${S}/build"
@@ -84,12 +92,6 @@ compile_wlroots() {
 	)
 	meson_src_configure
 	meson_src_compile
-}
-
-src_unpack() {
-	unpack ${A}
-
-	mv "${PN}-source" "${S}"
 }
 
 src_prepare() {
@@ -114,6 +116,9 @@ src_configure() {
 
 	einfo "Compiling 'wlroots'"
 	compile_wlroots
+
+	einfo "Compiling 'udis86'"
+	compile_udis86
 
 	# Use latest gcc
 	latest_gcc=$(ls /usr/bin/gcc-* | grep -vE 'ar|nm|ranlib|config' | sort -r | head -n1)
@@ -154,6 +159,17 @@ src_install() {
 	doins assets/*
 
 	dodoc example/hyprland.conf
+
+	# Probably not the best way.
+	if use "source"; then
+		emake clear
+		emake protocols
+
+		insinto "/usr/share/hyprland/src"
+		doins "${S}"/*.{c,h}
+
+		doins -r "${S}/src"
+	fi
 }
 
 pkg_postinst() {

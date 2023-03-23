@@ -34,3 +34,11 @@ src_install() {
 
 	doins hyprbars.so
 }
+
+pkg_postinst() {
+	einfo
+	einfo "Plugin is located in /usr/share/hyprland/plugins/hyprbars.so"
+	einfo
+	einfo "To load just run: hyprctl plugin load /usr/share/hyprland/plugins/hyprbars.so"
+	einfo
+}

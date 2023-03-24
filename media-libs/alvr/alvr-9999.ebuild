@@ -485,6 +485,7 @@ HOMEPAGE="https://github.com/alvr-org/ALVR"
 #SRC_URI="https://github.com/alvr-org/ALVR/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 #SRC_URI+=" $(cargo_crate_uris) "
 EGIT_REPO_URI="https://github.com/alvr-org/ALVR.git"
+RESTRICT="network-sandbox" # Temp solution for bundled ffmpeg
 
 LICENSE="MIT"
 SLOT="0"
@@ -521,10 +522,19 @@ src_unpack() {
 	# Patch one of ALVR's Cargo.toml files to fix an error produced
 	# by 'cargo vendor'.
 	pushd "${S}"
-	eapply "${FILESDIR}/0001-Use-same-ndk-and-egui-Use-egui-fork-with-updated-glu.patch"
+	eapply "${FILESDIR}/0001-Fix-cargo-vendor.patch"
 	popd
 
 	cargo_live_src_unpack
+}
+
+src_prepare() {
+	default
+
+	cargo_src_prepare
+
+	PKG_CONFIG_PATH="${FILESDIR}" \
+		cargo xtask prepare-deps --platform linux
 }
 
 src_configure() {

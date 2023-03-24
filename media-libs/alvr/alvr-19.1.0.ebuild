@@ -504,7 +504,7 @@ RESTRICT="network-sandbox" # Temp solution for bundled ffmpeg
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS=""
+KEYWORDS="~amd64"
 
 S="${WORKDIR}/${P^^}"
 

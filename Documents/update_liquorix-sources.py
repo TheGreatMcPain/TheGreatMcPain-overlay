@@ -2,6 +2,8 @@
 #
 # Script used to update sys-kernel/liquorix-sources ebuild
 #
+# Usage: Just run while inside liquorix-sources ebuild directory.
+#
 import urllib.request
 import json
 import os

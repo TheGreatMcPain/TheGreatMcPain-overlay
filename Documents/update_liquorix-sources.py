@@ -16,13 +16,13 @@ def main():
     ebuild_tags = get_tags_from_ebuilds(ebuilds)
 
     latest_ebuild = max(ebuilds)
-    latest_tag = max(tags)
+    latest_tag = get_max_tag(tags)
 
     print("Latest tag from upstream:", latest_tag)
-    print("Latest tag from ebuilds:", max(ebuild_tags))
+    print("Latest tag from ebuilds:", get_max_tag(ebuild_tags))
 
     # Exit if there are no updates
-    if latest_tag > max(ebuild_tags):
+    if is_tag_greater(latest_tag, get_max_tag(ebuild_tags)):
         print("Upstream is newer!")
     else:
         print("Nothing new! Exiting...")
@@ -162,6 +162,47 @@ def get_github_repo_filelist(
     file_list = [x["name"] for x in data]
 
     return file_list
+
+
+def is_tag_greater(tag1: str, tag2: str) -> bool:
+    tag1_base = tag1.split("-")[0]
+    tag2_base = tag2.split("-")[0]
+
+    if float(tag1_base) > float(tag2_base):
+        return True
+
+    if float(tag1_base) < float(tag2_base):
+        return False
+
+    tag1_revision = tag1.split("-")[1]
+    tag2_revision = tag2.split("-")[1]
+
+    if int(tag1_revision) > int(tag2_revision):
+        return True
+
+    if int(tag1_revision) < int(tag2_revision):
+        return False
+
+    return False
+
+
+# The format of liquorix-package's tags isn't compatible with Python's
+# built-in sort functions.
+def get_max_tag(tags: list) -> str:
+    max_base = max(tags).split("-")[0]
+
+    cur_revision_max = 0
+
+    for tag in tags:
+        if max_base == tag.split("-")[0]:
+            tag_revision = tag.split("-")[1]
+
+            if int(tag_revision) > int(cur_revision_max):
+                cur_revision_max = tag_revision
+        else:
+            continue
+
+    return max_base + "-" + cur_revision_max
 
 
 if __name__ == "__main__":

@@ -64,7 +64,6 @@ src_unpack() {
 multilib_src_configure() {
 	local emesonargs=(
 		-Dappend_libdir_mangohud=false
-		-Duse_system_vulkan=enabled
 		-Duse_system_spdlog=enabled
 		-Dinclude_doc=false
 		-Dwith_nvml=$(usex video_cards_nvidia enabled disabled)

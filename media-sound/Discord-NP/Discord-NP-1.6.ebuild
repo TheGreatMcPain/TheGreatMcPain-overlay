@@ -7,7 +7,7 @@ DIST_AUTHOR="TESMITH"
 inherit perl-module
 
 DESCRIPTION="Last.FM Now Playing info in your Discord status message"
-
+HOMEPAGE="https://github.com/vsTerminus/Discord-NP"
 SRC_URI="https://github.com/vsTerminus/Discord-NP/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"

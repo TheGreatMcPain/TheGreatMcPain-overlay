@@ -1,8 +1,8 @@
-# Copyright 2021-2022 Gentoo Authors
+# Copyright 2021-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-
+#
 # You will need games-util/steam-client-meta from the steam-overlay for this to work
-
+#
 # CRATES list was generated using the script found in 'Documents/alvr_get_crates.py'
 
 EAPI=8
@@ -528,6 +528,8 @@ BDEPEND="${RDEPEND}
 	virtual/pkgconfig
 	client? ( media-gfx/imagemagick )
 "
+
+PATCHES="${FILESDIR}/0001-vulkan_layer-Use-negotiate-function.patch"
 
 S="${WORKDIR}/ALVR-${PV}"
 

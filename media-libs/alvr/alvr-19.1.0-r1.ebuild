@@ -508,11 +508,7 @@ KEYWORDS="~amd64"
 
 S="${WORKDIR}/${P^^}"
 
-IUSE="+client +server vaapi vulkan x264 x265"
-
 RDEPEND="
-	>=media-video/ffmpeg-4.3[encode,vulkan?,x264?,x265?]
-	vaapi? ( media-video/ffmpeg[libdrm,vaapi] )
 	sys-libs/libunwind
 	|| (
 		www-client/chromium
@@ -520,13 +516,10 @@ RDEPEND="
 	)
 "
 
-DEPEND="${RDEPEND}
-	vulkan? ( dev-util/vulkan-headers )
-"
+DEPEND="${RDEPEND}"
 
 BDEPEND="${RDEPEND}
 	virtual/pkgconfig
-	client? ( media-gfx/imagemagick )
 "
 
 PATCHES="${FILESDIR}/0001-vulkan_layer-Use-negotiate-function.patch"
@@ -546,15 +539,21 @@ src_unpack() {
 src_configure() {
 	local ECARGO_EXTRA_ARGS="
 		-p alvr_vrcompositor_wrapper
-		$(usex server "-p alvr_server" "" )
-		$(usex client "-p alvr_client_core -p alvr_launcher" "" )
-		$(usex vulkan "-p alvr_vulkan_layer" "" )
-		"
+		-p alvr_server
+		-p alvr_launcher
+		-p alvr_vulkan_layer
+	"
 	cargo_gen_config
 	cargo_src_configure
 }
 
 src_compile() {
+	export ALVR_ROOT_DIR=/usr
+	export ALVR_LIBRARIES_DIR="$ALVR_ROOT_DIR/$(get_libdir)/"
+
+	export ALVR_OPENVR_DRIVER_ROOT_DIR="$ALVR_ROOT_DIR/lib/steamvr/alvr/"
+	export ALVR_VRCOMPOSITOR_WRAPPER_DIR="$ALVR_ROOT_DIR/libexec/alvr/"
+
 	PKG_CONFIG_PATH="${FILESDIR}" \
 		cargo xtask prepare-deps --platform linux
 
@@ -562,50 +561,49 @@ src_compile() {
 }
 
 src_install() {
-	if use client; then
-		dobin target/release/alvr_launcher
-		dolib.so target/release/libalvr_client_core.so
-		domenu packaging/freedesktop/alvr.desktop
-		for size in {16,32,48,64,128,256}; do
-			convert alvr/launcher/res/launcher.ico \
-				-thumbnail ${size} -alpha on -background none -flatten \
-				${PN}-${size}.png || die
-			newicon -s ${size} ${PN}-${size}.png ${PN}.png
-		done
-	fi
-
-	if use server; then
-		exeinto /usr/lib64/alvr/bin/linux64/
-		newexe target/release/libalvr_server.so driver_alvr_server.so
-
-		insinto /usr/lib64/alvr/
-		doins alvr/xtask/resources/driver.vrdrivermanifest
-
-	fi
-
-	if use vulkan; then
-		dolib.so target/release/libalvr_vulkan_layer.so
-		insinto /usr/share/vulkan/explicit_layer.d/
-		doins alvr/vulkan_layer/layer/alvr_x86_64.json
-	fi
-
-	exeinto /usr/libexec/alvr
+	# vrcompositor wrapper
+	exeinto /usr/libexec/alvr/
 	newexe target/release/alvr_vrcompositor_wrapper vrcompositor-wrapper
-	doexe packaging/firewall/alvr_fw_config.sh
 
-	insinto /usr/share/${PN}/selinux/
-	doins packaging/selinux/*
+	# OpenVR Driver
+	exeinto /usr/lib/steamvr/alvr/bin/linux64/
+	newexe target/release/libalvr_server.so driver_alvr_server.so
 
-	## Was removed upstream.
-	#insinto /usr/share/${PN}/presets/
-	#doins alvr/xtask/resources/presets/*
+	insinto /usr/lib/steamvr/alvr/
+	doins alvr/xtask/resources/driver.vrdrivermanifest
 
-	insinto /usr/share/${PN}/
+	# Vulkan layer
+	dolib.so target/release/libalvr_vulkan_layer.so
+	insinto /usr/share/vulkan/explicit_layer.d/
+	doins alvr/vulkan_layer/layer/alvr_x86_64.json
+
+	# dashboard resources
+	insinto /usr/share/alvr/
 	doins -r dashboard
+
+	# Launcher
+	dobin target/release/alvr_launcher
+
+	# Desktop
+	domenu packaging/freedesktop/alvr.desktop
+
+	# Icons
+	for size in {16,32,48,64,128,256}; do
+		convert alvr/launcher/res/launcher.ico \
+			-thumbnail ${size} -alpha on -background none -flatten \
+			${PN}-${size}.png || die
+		newicon -s ${size} ${PN}-${size}.png ${PN}.png
+	done
+
+	# Firewall and SELinux
+	insinto /etc/ufw/applications.d/
+	doins packaging/firewall/ufw-alvr
 
 	insinto /usr/lib/firewalld/services/
 	doins packaging/firewall/alvr-firewalld.xml
 
-	insinto /etc/ufw/applications.d/
-	doins packaging/firewall/ufw-alvr
+	doexe packaging/firewall/alvr_fw_config.sh
+
+	insinto /usr/share/alvr/selinux/
+	doins packaging/selinux/*
 }

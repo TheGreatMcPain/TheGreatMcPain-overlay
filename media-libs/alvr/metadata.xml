@@ -5,12 +5,4 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>James McClain</name>
 	</maintainer>
-
-	<use>
-		<flag name="x264">Use x264 for h264 software encoding</flag>
-		<flag name="x265">Use x265 for h265 software encoding</flag>
-		<flag name="client">Build ALVR client and launcher</flag>
-		<flag name="server">Build ALVR server</flag>
-		<flag name="vulkan">Build ALVR vulkan layer</flag>
-	</use>
 </pkgmetadata>

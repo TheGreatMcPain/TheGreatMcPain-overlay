@@ -1,4 +1,4 @@
-# Copyright 2020 Gentoo Authors
+# Copyright 2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -14,7 +14,7 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-IUSE="+gtk2 +icons"
+IUSE="+gtk2 +icons hidpi"
 
 DEPEND="
 	x11-libs/gtk+:3
@@ -31,6 +31,11 @@ src_configure() {
 src_install() {
 	insinto /usr/share/themes
 	doins -r themes/Gruvbox-Material-Dark
+
+	if use hidpi; then
+		insinto /usr/share/themes
+		doins -r themes/Gruvbox-Material-Dark-HIDPI
+	fi
 
 	if use icons; then
 		insinto /usr/share/icons

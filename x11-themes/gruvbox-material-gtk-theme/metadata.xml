@@ -8,5 +8,6 @@
 	<use>
 		<flag name="gtk2">Install <pkg>x11-themes/gtk-engines-murrine</pkg> for GTK2 support</flag>
 		<flag name="icons">Install icon theme</flag>
+		<flag name="hidpi">Install HIDPI version</flag>
 	</use>
 </pkgmetadata>

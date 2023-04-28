@@ -22,8 +22,7 @@ else
 		https://github.com/KhronosGroup/SPIRV-Headers/archive/${HASH_SPIRV}.tar.gz
 			-> ${PN}-spirv-headers-${HASH_SPIRV::10}.tar.gz
 		https://github.com/KhronosGroup/Vulkan-Headers/archive/${HASH_VULKAN}.tar.gz
-			-> ${PN}-vulkan-headers-${HASH_VULKAN::10}.tar.gz
-	"
+			-> ${PN}-vulkan-headers-${HASH_VULKAN::10}.tar.gz"
 	KEYWORDS="-* amd64 x86"
 fi
 
@@ -42,6 +41,10 @@ REQUIRED_USE="
 BDEPEND="
 	dev-util/glslang
 	!crossdev-mingw? ( dev-util/mingw64-toolchain[${MULTILIB_USEDEP}] )"
+
+PATCHES=(
+	"${FILESDIR}/${PN}-1.10.3-gcc13.patch"
+)
 
 pkg_pretend() {
 	[[ ${MERGE_TYPE} == binary ]] && return

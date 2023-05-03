@@ -1,11 +1,11 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_10 )
+PYTHON_COMPAT=( python3_{10..11} )
 
-inherit multilib python-r1 git-r3
+inherit python-r1 git-r3
 
 DESCRIPTION="A Python script that displays your Plex status on Discord using Rich Presence."
 HOMEPAGE="https://github.com/Phineas05/discord-rich-presence-plex"
@@ -18,13 +18,17 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS=""
 IUSE=""
+REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 DEPEND="
 	dev-python/websocket-client[${PYTHON_USEDEP}]
 	dev-python/plexapi[${PYTHON_USEDEP}]
 "
 
-RDEPEND="${DEPEND}"
+RDEPEND="
+	${PYTHON_DEPS}
+	${DEPEND}
+"
 
 PATCHES=(
 	"${FILESDIR}/add-external-config.patch"

@@ -1,9 +1,9 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6..10} )
+PYTHON_COMPAT=( python3_{9..11} )
 
 inherit meson python-single-r1 xdg-utils gnome2-utils
 
@@ -18,7 +18,7 @@ if [[ ${PV} == "9999" ]]; then
 	SRC_URI=""
 	KEYWORDS=""
 else
-	SRC_URI="https://gitlab.com/leinardi/gwe/-/archive/${PV}/${P}.tar.gz"
+	SRC_URI="https://gitlab.com/leinardi/gwe/-/archive/${PV}/${P}.tar.bz2"
 	KEYWORDS="~amd64"
 fi
 

@@ -4,4 +4,7 @@
 	<maintainer type="person">
 		<email>james@thegreatmcpain.xyz</email>
 	</maintainer>
+	<use>
+		<flag name="systray">Install <pkg>dev-libs/libappindicator</pkg> to enable systray</flag>
+	</use>
 </pkgmetadata>

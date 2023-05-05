@@ -522,7 +522,10 @@ BDEPEND="${RDEPEND}
 	virtual/pkgconfig
 "
 
-PATCHES="${FILESDIR}/0001-vulkan_layer-Use-negotiate-function.patch"
+PATCHES="
+	${FILESDIR}/0001-vulkan_layer-Use-negotiate-function.patch
+	${FILESDIR}/19.1.0-Add-missing-cstdint.patch
+"
 
 S="${WORKDIR}/ALVR-${PV}"
 

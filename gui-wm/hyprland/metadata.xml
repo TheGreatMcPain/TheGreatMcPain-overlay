@@ -6,10 +6,6 @@
 		<name>James McClain</name>
 	</maintainer>
 	<use>
-		<flag name="greetd-fix">
-			Fix 'hyprctl' issues when using 'greetd' by making '/tmp/hypr' modifiable by everyone.
-			(Definitely not secure!)
-		</flag>
 		<flag name="hwdata">Use system hwdata</flag>
 		<flag name="seatd">Enable libseatd session support</flag>
 		<flag name="source">Installs source files and headers for compiling Hyprland plugins.</flag>

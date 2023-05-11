@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit meson cmake toolchain-funcs
+inherit meson cmake
 
 DESCRIPTION="A dymanic tiling Wayland compositor that doesn't sacrifice on its looks."
 HOMEPAGE="https://github.com/hyprwm/Hyprland"

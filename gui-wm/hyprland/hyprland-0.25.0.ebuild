@@ -126,16 +126,6 @@ src_configure() {
 	einfo "Compiling 'udis86'"
 	compile_udis86
 
-	# Use latest gcc
-	latest_gcc=$(ls /usr/bin/gcc-* | grep -vE 'ar|nm|ranlib|config' | sort -r | head -n1)
-	latest_gxx=$(ls /usr/bin/g++-* | grep -vE 'ar|nm|ranlib|config' | sort -r | head -n1)
-
-	einfo "Will compile 'Hyprland' with '${latest_gxx}'"
-
-	CC=${latest_gcc}
-	CXX=${latest_gxx}
-	tc-export CC CXX
-
 	local mycmakeargs=(
 		-DCMAKE_SKIP_RPATH=ON
 		-DNO_XWAYLAND=$(usex X false true)

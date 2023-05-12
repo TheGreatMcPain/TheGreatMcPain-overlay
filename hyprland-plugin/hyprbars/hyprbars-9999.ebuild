@@ -15,8 +15,7 @@ SLOT="0"
 KEYWORDS=""
 
 DEPEND="
-	gui-wm/hyprland[source]
-	gui-libs/wlroots
+	>=gui-wm/hyprland-0.25.0
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""
@@ -24,8 +23,6 @@ BDEPEND=""
 export S="${WORKDIR}/${P}/hyprbars"
 
 src_compile() {
-	export HYPRLAND_HEADERS="/usr/share/hyprland/src"
-
 	emake all
 }
 

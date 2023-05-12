@@ -13,7 +13,7 @@ SRC_URI="https://github.com/hyprwm/Hyprland/releases/download/v${PV}/source-v${P
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="+hwdata source +seatd +udev vulkan +x11-backend X video_cards_nvidia"
+IUSE="+hwdata +seatd +udev vulkan +x11-backend X video_cards_nvidia"
 
 # Copied from gui-libs/wlroots-9999
 DEPEND="
@@ -137,9 +137,7 @@ src_configure() {
 src_compile() {
 	cmake_src_compile
 
-	pushd hyprctl
-	emake all
-	popd
+	emake -C hyprctl all
 }
 
 src_install() {
@@ -156,16 +154,24 @@ src_install() {
 
 	dodoc example/hyprland.conf
 
-	# Probably not the best way.
-	if use "source"; then
-		emake clear
-		emake protocols
+	doman docs/Hyprland.1
+	doman docs/hyprctl.1
 
-		insinto "/usr/share/hyprland/src"
-		doins "${S}"/*.{c,h}
+	mkdir "${S}"/headers
+	mkdir "${S}"/headers/protocols
+	mkdir "${S}"/headers/wlroots
 
-		doins -r "${S}/src"
-	fi
+	find src -name '*.h*' -print0 | cpio --quiet -0dump headers
+	pushd subprojects/wlroots/include
+	find . -name '*.h*' -print0 | cpio --quiet -0dump ../../../headers/wlroots
+	popd
+	cp protocols/*-protocol.h headers/protocols
+
+	insinto /usr/include/hyprland
+	doins -r headers/*
+
+	insinto /usr/share/pkgconfig
+	doins ${BUILD_DIR}/hyprland.pc
 }
 
 pkg_postinst() {

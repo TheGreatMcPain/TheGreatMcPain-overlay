@@ -10,21 +10,17 @@ HOMEPAGE="https://github.com/Duckonaut/split-monitor-workspaces"
 
 EGIT_REPO_URI="https://github.com/Duckonaut/split-monitor-workspaces"
 
-# Upstream needs to pick a LICENSE
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS=""
 
 DEPEND="
-	gui-wm/hyprland[source]
-	gui-libs/wlroots
+	>=gui-wm/hyprland-0.25.0
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
 src_compile() {
-	export HYPRLAND_HEADERS="/usr/share/hyprland/src"
-
 	emake all
 }
 

@@ -1,0 +1,388 @@
+From 248a7d0d1dde7bbcd7a4ed540125b1b2221d39c2 Mon Sep 17 00:00:00 2001
+From: LaserEyess <lasereyess@users.noreply.github.com>
+Date: Fri, 21 Oct 2022 20:11:25 -0400
+Subject: [PATCH] drm: add --drm-hdr-metadata optopn
+
+This commit allows HDR metadata to be sent to the display when using mpv
+in a DRM context on Linux. This commit is based off of two former
+patches by medvedvvs and wsldankers. Their commit messages are below.
+This commit has been updated to build on meson and address other
+comments made in review on #8648.
+
+This commit extends the previous ones by automatically setting the
+colorspace information and enabling HDR metadata by default.
+
+Co-Authored-By: medvedvvs <38043594+medvedvvs@users.noreply.github.com>
+Co-Authored-By: Wessel Dankers <wsl@fruit.je>
+---
+ DOCS/interface-changes.rst         |   1 +
+ DOCS/man/vo.rst                    |   6 ++
+ meson.build                        |   2 +
+ video/out/drm_atomic.c             | 119 ++++++++++++++++++++++++++++-
+ video/out/drm_atomic.h             |  14 ++++
+ video/out/drm_common.c             |   2 +
+ video/out/drm_common.h             |   1 +
+ video/out/opengl/context_drm_egl.c |  37 +++++++--
+ wscript                            |   5 ++
+ 9 files changed, 180 insertions(+), 7 deletions(-)
+
+diff --git a/DOCS/interface-changes.rst b/DOCS/interface-changes.rst
+index c1d24496b34d..07c2adb0b747 100644
+--- a/DOCS/interface-changes.rst
++++ b/DOCS/interface-changes.rst
+@@ -27,6 +27,7 @@ Interface changes
+ ::
+ 
+  --- mpv 0.36.0 ---
++    - add `--drm-hdr-metadata`
+     - add `--force-render`
+     - add `--wayland-content-type`
+     - deprecate `--drm-atomic`
+diff --git a/DOCS/man/vo.rst b/DOCS/man/vo.rst
+index 213699fc64d8..d3e239f05b1a 100644
+--- a/DOCS/man/vo.rst
++++ b/DOCS/man/vo.rst
+@@ -657,6 +657,12 @@ Available video output drivers are:
+         :yes:   Attempt to enable VRR, whether the capability is reported or not.
+         :auto:  Attempt to enable VRR if support is reported.
+ 
++    ``--drm-hdr-metadata=<no|auto>``
++        Signal to the display that HDR metadata, if present, should be sent over
++        the connector.
++
++        (default: auto)
++
+ ``mediacodec_embed`` (Android)
+     Renders ``IMGFMT_MEDIACODEC`` frames directly to an ``android.view.Surface``.
+     Requires ``--hwdec=mediacodec`` for hardware decoding, along with
+diff --git a/meson.build b/meson.build
+index ae744236b326..7c8f57343485 100644
+--- a/meson.build
++++ b/meson.build
+@@ -905,6 +905,8 @@ if features['drm']
+                      'video/out/vo_drm.c')
+ endif
+ 
++features += {'drm-hdr': features['drm'] and drm.version().version_compare('>= 2.4.104')}
++
+ # This can be removed roughly when Debian 12 is released.
+ features += {'drm-is-kms': features['drm'] and drm.version().version_compare('>= 2.4.105')}
+ 
+diff --git a/video/out/drm_atomic.c b/video/out/drm_atomic.c
+index dfd27c6f524e..815daa42c30b 100644
+--- a/video/out/drm_atomic.c
++++ b/video/out/drm_atomic.c
+@@ -17,11 +17,38 @@
+ 
+ #include <errno.h>
+ #include <inttypes.h>
++#include <math.h>
+ 
+ #include "common/common.h"
+ #include "common/msg.h"
+ #include "drm_atomic.h"
+ 
++/* CTA‐861‐G says:
++ * EOTF        EOTF of stream
++ * 0           Traditional gamma - SDR Luminance Range
++ * 1           Traditional gamma - HDR Luminance Range
++ * 2           SMPTE ST 2084 (mpv's PQ)
++ * 3           Hybrid Log-Gamma (HLG) based on ITU-R BT.2100-0 (mpv's HLG)
++ * 4-7         Reserved for future use
++ */
++enum drm_metadata_eotf {
++    DRM_METADATA_EOTF_TRADITIONAL_SDR = 0,
++    DRM_METADATA_EOTF_TRADITIONAL_HDR,
++    DRM_METADATA_EOTF_SMPTE_2084,
++    DRM_METADATA_EOTF_HLG,
++    DRM_METADATA_EOTF_RESERVED // unused
++};
++
++/* CTA-861-G says:
++ * Static_Metadata_Descriptor_ID   Metadata Descriptor
++ * 0                               Static Metadata Type 1
++ * 1-7                             Reserved
++ */
++enum drm_static_metadata_id {
++    DRM_STATIC_METADATA_TYPE1 = 0,
++    DRM_STATIC_METADATA_TYPE_RESERVED // unused
++};
++
+ int drm_object_create_properties(struct mp_log *log, int fd,
+                                  struct drm_object *object)
+ {
+@@ -440,7 +467,7 @@ bool drm_mode_ensure_blob(int fd, struct drm_mode *mode)
+     int ret = 0;
+ 
+     if (!mode->blob_id) {
+-        ret = drmModeCreatePropertyBlob(fd, &mode->mode, sizeof(drmModeModeInfo),
++        ret = drmModeCreatePropertyBlob(fd, &mode->mode, sizeof(mode->mode),
+                                         &mode->blob_id);
+     }
+ 
+@@ -458,3 +485,93 @@ bool drm_mode_destroy_blob(int fd, struct drm_mode *mode)
+ 
+     return (ret == 0);
+ }
++
++static inline uint16_t clamp16(float x)
++{
++    return (uint16_t)MPCLAMP(x, 0.0, 65535.0);
++}
++
++static inline uint16_t clamp16_round(float x)
++{
++    return clamp16(roundf(x * 50000.0));
++}
++
++int drm_create_hdr_metadata(struct drm_atomic_context *ctx, struct drm_hdr *hdr_data)
++{
++#if HAVE_DRM_HDR
++    if (mp_colorspace_equal(hdr_data->new_csp, hdr_data->current_csp))
++        return 0;
++
++    if (hdr_data->blob_id != 0)
++        drm_destroy_hdr_metadata(ctx, hdr_data);
++
++    struct hdr_output_metadata metadata = {0};
++    metadata.metadata_type = DRM_STATIC_METADATA_TYPE1;
++    metadata.hdmi_metadata_type1.metadata_type = DRM_STATIC_METADATA_TYPE1;
++
++    hdr_data->current_csp = hdr_data->new_csp;
++    struct mp_colorspace *csp = &hdr_data->current_csp;
++    struct mp_csp_primaries colors = mp_get_csp_primaries(csp->primaries);
++
++    switch (csp->gamma) {
++    case MP_CSP_TRC_BT_1886:
++        metadata.hdmi_metadata_type1.eotf = DRM_METADATA_EOTF_TRADITIONAL_HDR;
++        break;
++    case MP_CSP_TRC_PQ:
++        metadata.hdmi_metadata_type1.eotf = DRM_METADATA_EOTF_SMPTE_2084;
++        break;
++    case MP_CSP_TRC_HLG:
++        metadata.hdmi_metadata_type1.eotf = DRM_METADATA_EOTF_HLG;
++        break;
++    default:
++        // Default is SDR
++        metadata.hdmi_metadata_type1.eotf = DRM_METADATA_EOTF_TRADITIONAL_SDR;
++    }
++
++    if (metadata.hdmi_metadata_type1.eotf != DRM_METADATA_EOTF_TRADITIONAL_SDR) {
++        // Convert to nits (cd/m2):
++        float min_luminance = 0.0;
++        float max_luminance = csp->sig_peak * MP_REF_WHITE;
++        float max_cll = max_luminance;
++        float max_fall = max_luminance;
++ 
++        // 0x0000 to 0xC350 maps to 0.0 - 1.0000. Step of 0.00002
++        metadata.hdmi_metadata_type1.display_primaries[0].x = clamp16_round(colors.red.x);
++        metadata.hdmi_metadata_type1.display_primaries[0].y = clamp16_round(colors.red.y);
++        metadata.hdmi_metadata_type1.display_primaries[1].x = clamp16_round(colors.green.x);
++        metadata.hdmi_metadata_type1.display_primaries[1].y = clamp16_round(colors.green.y);
++        metadata.hdmi_metadata_type1.display_primaries[2].x = clamp16_round(colors.blue.x);
++        metadata.hdmi_metadata_type1.display_primaries[2].y = clamp16_round(colors.blue.y);
++
++        // White point, same mapping as display primaries
++        metadata.hdmi_metadata_type1.white_point.x = clamp16_round(colors.white.x);
++        metadata.hdmi_metadata_type1.white_point.y = clamp16_round(colors.white.y);
++
++        // Min Luminance: 16-bit value in units of 0.0001 cd/m2
++        // 0x0001 represents 0.0001 cd/m2 and 0xFFFF represents 6.5535 cd/m2.
++        metadata.hdmi_metadata_type1.min_display_mastering_luminance = clamp16(floorf(min_luminance * 10000.0));
++
++        // Max Luminance: 16-bit value in units of 1 cd/m2
++        // 0x0001 represents 1 cd/m2 and 0xFFFF represents 65535 cd/m2.
++        metadata.hdmi_metadata_type1.max_display_mastering_luminance = clamp16(ceilf(max_luminance));
++
++        // Max Content Light Level: 16-bit value in units of 1 cd/m2
++        // 0x0001 represents 1 cd/m2 and 0xFFFF represents 65535 cd/m2.
++        metadata.hdmi_metadata_type1.max_cll = clamp16(ceilf(max_cll));
++
++        // Max Frame Average Light Level: 16-bit value in units of 1 cd/m2
++        // 0x0001 represents 1 cd/m2 and 0xFFFF represents 65535 cd/m2.
++        metadata.hdmi_metadata_type1.max_fall = clamp16(ceilf(max_fall));
++    }
++
++    return drmModeCreatePropertyBlob(ctx->connector->fd, &metadata, sizeof(metadata), &hdr_data->blob_id);
++#else
++    return 0;
++#endif
++}
++
++void drm_destroy_hdr_metadata(struct drm_atomic_context *ctx, struct drm_hdr *hdr_data)
++{
++    drmModeDestroyPropertyBlob(ctx->connector->fd, hdr_data->blob_id);
++    hdr_data->blob_id = 0;
++}
+diff --git a/video/out/drm_atomic.h b/video/out/drm_atomic.h
+index 32e56c7f976d..191591f758ce 100644
+--- a/video/out/drm_atomic.h
++++ b/video/out/drm_atomic.h
+@@ -23,7 +23,10 @@
+ #include <xf86drm.h>
+ #include <xf86drmMode.h>
+ 
++#include "config.h"
++
+ #include "common/msg.h"
++#include "video/csputils.h"
+ 
+ #define DRM_OPTS_PRIMARY_PLANE -1
+ #define DRM_OPTS_OVERLAY_PLANE -2
+@@ -33,6 +36,12 @@ struct drm_mode {
+     uint32_t blob_id;
+ };
+ 
++struct drm_hdr {
++    struct mp_colorspace new_csp;
++    struct mp_colorspace current_csp;
++    uint32_t blob_id;
++};
++
+ struct drm_atomic_plane_state {
+     uint64_t fb_id;
+     uint64_t crtc_id;
+@@ -84,6 +93,7 @@ struct drm_atomic_context {
+ };
+ 
+ 
++
+ int drm_object_create_properties(struct mp_log *log, int fd, struct drm_object *object);
+ void drm_object_free_properties(struct drm_object *object);
+ int drm_object_get_property(struct drm_object *object, char *name, uint64_t *value);
+@@ -102,4 +112,8 @@ bool drm_atomic_restore_old_state(drmModeAtomicReq *request, struct drm_atomic_c
+ bool drm_mode_ensure_blob(int fd, struct drm_mode *mode);
+ bool drm_mode_destroy_blob(int fd, struct drm_mode *mode);
+ 
++// append HDR blob to the connector properties
++int drm_create_hdr_metadata(struct drm_atomic_context *ctx, struct drm_hdr *hdr_data);
++void drm_destroy_hdr_metadata(struct drm_atomic_context *ctx, struct drm_hdr *hdr_data);
++
+ #endif // MP_DRMATOMIC_H
+diff --git a/video/out/drm_common.c b/video/out/drm_common.c
+index 7845edb73464..f397dcc6d605 100644
+--- a/video/out/drm_common.c
++++ b/video/out/drm_common.c
+@@ -102,6 +102,7 @@ const struct m_sub_options drm_conf = {
+         {"drm-osd-size", OPT_REPLACED("drm-draw-surface-size")},
+         {"drm-vrr-enabled", OPT_CHOICE(drm_vrr_enabled,
+             {"no", 0}, {"yes", 1}, {"auto", -1})},
++        {"drm-hdr-metadata", OPT_CHOICE(drm_hdr_metadata, {"no", 0}, {"auto", 1})},
+         {0},
+     },
+     .defaults = &(const struct drm_opts) {
+@@ -110,6 +111,7 @@ const struct m_sub_options drm_conf = {
+         .drm_draw_plane = DRM_OPTS_PRIMARY_PLANE,
+         .drm_drmprime_video_plane = DRM_OPTS_OVERLAY_PLANE,
+         .drm_vrr_enabled = 0,
++        .drm_hdr_metadata = 1,
+     },
+     .size = sizeof(struct drm_opts),
+ };
+diff --git a/video/out/drm_common.h b/video/out/drm_common.h
+index 9a8b20427c8b..ee247649cdda 100644
+--- a/video/out/drm_common.h
++++ b/video/out/drm_common.h
+@@ -58,6 +58,7 @@ struct drm_opts {
+     int drm_format;
+     struct m_geometry drm_draw_surface_size;
+     int drm_vrr_enabled;
++    int drm_hdr_metadata;
+ };
+ 
+ struct drm_vsync_tuple {
+diff --git a/video/out/opengl/context_drm_egl.c b/video/out/opengl/context_drm_egl.c
+index 350c3d82e8f2..4a2d6bfb44ef 100644
+--- a/video/out/opengl/context_drm_egl.c
++++ b/video/out/opengl/context_drm_egl.c
+@@ -104,7 +104,7 @@ struct priv {
+     struct mpv_opengl_drm_params_v2 drm_params;
+     struct mpv_opengl_drm_draw_surface_size draw_surface_size;
+ 
+-    struct mp_colorspace out_color;
++    struct drm_hdr hdr_data;
+ };
+ 
+ // Not general. Limited to only the formats being used in this module
+@@ -498,16 +498,27 @@ static void queue_flip(struct ra_ctx *ctx, struct gbm_frame *frame)
+     data->waiting_for_flip = &p->waiting_for_flip;
+     data->log = ctx->log;
+ 
++    int flags = DRM_MODE_PAGE_FLIP_EVENT | DRM_MODE_ATOMIC_NONBLOCK;
++    if(ctx->vo->opts->drm_opts->drm_hdr_metadata) {
++        ret = drm_create_hdr_metadata(atomic_ctx, &p->hdr_data);
++        if (ret) {
++            MP_WARN(ctx->vo, "Failed to create HDR metadata (%d)\n", ret);
++        } else if (p->hdr_data.blob_id != 0) {
++            drm_object_set_property(atomic_ctx->request, atomic_ctx->connector,
++                                    "HDR_OUTPUT_METADATA", p->hdr_data.blob_id);
++            flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;
++        }
++    }
+     drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "FB_ID", p->fb->id);
+     drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "CRTC_ID", atomic_ctx->crtc->id);
+     drm_object_set_property(atomic_ctx->request, atomic_ctx->draw_plane, "ZPOS", 1);
+ 
+-    ret = drmModeAtomicCommit(p->kms->fd, atomic_ctx->request,
+-                              DRM_MODE_ATOMIC_NONBLOCK | DRM_MODE_PAGE_FLIP_EVENT, data);
++    ret = drmModeAtomicCommit(p->kms->fd, atomic_ctx->request, flags, data);
+     if (ret) {
+         MP_WARN(ctx->vo, "Failed to commit atomic request (%d)\n", ret);
+         talloc_free(data);
+     }
++
+     p->waiting_for_flip = !ret;
+ 
+     drmModeAtomicFree(atomic_ctx->request);
+@@ -654,7 +665,7 @@ static bool drm_egl_colorspace_hint(struct ra_swapchain *sw,
+     struct priv *p = sw->ctx->priv;
+ 
+     if (csp_hint_frame) {
+-        p->out_color = csp_hint_frame->params.color;
++        p->hdr_data.new_csp = csp_hint_frame->params.color;
+         return true;
+     }
+     return false;
+@@ -671,10 +682,24 @@ static void drm_egl_uninit(struct ra_ctx *ctx)
+ {
+     struct priv *p = ctx->priv;
+     struct drm_atomic_context *atomic_ctx = p->kms->atomic_context;
+-
+-    int ret = drmModeAtomicCommit(p->kms->fd, atomic_ctx->request, 0, NULL);
++    int flags = 0;
++    int ret = 0;
++
++     if (p->hdr_data.blob_id != 0) {
++        p->hdr_data.new_csp = (struct mp_colorspace){0};
++        ret = drm_create_hdr_metadata(atomic_ctx, &p->hdr_data);
++        if (ret) {
++            MP_WARN(ctx->vo, "Failed to reset HDR state on display (%d)\n", ret);
++        } else {
++            drm_object_set_property(atomic_ctx->request, atomic_ctx->connector,
++                                    "HDR_OUTPUT_METADATA", p->hdr_data.blob_id);
++            flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;
++        }
++    }
++    ret = drmModeAtomicCommit(p->kms->fd, atomic_ctx->request, flags, NULL);
+     if (ret)
+         MP_ERR(ctx->vo, "Failed to commit atomic request (%d)\n", ret);
++    drm_destroy_hdr_metadata(atomic_ctx, &p->hdr_data);
+     drmModeAtomicFree(atomic_ctx->request);
+ 
+     ra_gl_ctx_uninit(ctx);
+diff --git a/wscript b/wscript
+index 1acba8a7566f..dcc795fbb53d 100644
+--- a/wscript
++++ b/wscript
+@@ -510,6 +510,11 @@ video_output_features = [
+         'desc': 'DRM',
+         'deps': 'vt.h || consio.h',
+         'func': check_pkg_config('libdrm', '>= 2.4.75'),
++    }, {
++        'name': 'drm-hdr',
++        'desc': 'DRM HDR metadata support',
++        'deps': 'drm',
++        'func': check_pkg_config('libdrm', '>= 2.4.104'),
+     }, {
+         'name': '--gbm',
+         'desc': 'GBM',

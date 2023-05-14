@@ -1,0 +1,98 @@
+From 879bb47466473e2a2366d463b2f52137daf57e59 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Ekstr=C3=B6m?= <jeebjp@gmail.com>
+Date: Thu, 20 Oct 2022 00:18:39 +0300
+Subject: [PATCH] video/out/gpu{,_next}: add colorspace hint to
+ ra_swapchain_fns
+
+Additionally, wire it up in both vo_gpu and vo_gpu_next, before
+start_frame, which would be where vo_gpu receives the configured
+csp via fbo_csp.
+---
+ video/out/gpu/context.h |  6 ++++++
+ video/out/vo_gpu.c      | 13 +++++++++++++
+ video/out/vo_gpu_next.c | 19 ++++++++++++++++++-
+ 3 files changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/video/out/gpu/context.h b/video/out/gpu/context.h
+index 72ad65f470ce..c02fb881c4e0 100644
+--- a/video/out/gpu/context.h
++++ b/video/out/gpu/context.h
+@@ -80,6 +80,12 @@ struct ra_swapchain_fns {
+     // Gets the current framebuffer depth in bits (0 if unknown). Optional.
+     int (*color_depth)(struct ra_swapchain *sw);
+ 
++    // Called to provide the output context with color space metadata and
++    // CLL and MDCV side data.
++    bool (*colorspace_hint)(struct ra_swapchain *sw,
++                            const struct mp_image *csp_hint_frame,
++                            struct mp_colorspace *configured_csp);
++
+     // Called when rendering starts. Returns NULL on failure. This must be
+     // followed by submit_frame, to submit the rendered frame. This function
+     // can also fail sporadically, and such errors should be ignored unless
+diff --git a/video/out/vo_gpu.c b/video/out/vo_gpu.c
+index 404b7e77d70c..6709a82e26db 100644
+--- a/video/out/vo_gpu.c
++++ b/video/out/vo_gpu.c
+@@ -78,6 +78,19 @@ static void draw_frame(struct vo *vo, struct vo_frame *frame)
+     struct gpu_priv *p = vo->priv;
+     struct ra_swapchain *sw = p->ctx->swapchain;
+ 
++    // vo_gpu utilizes the fbo color space to receive the configured result,
++    // so nullptr is passed for the result.
++    if (frame->current && sw->fns->colorspace_hint &&
++        !sw->fns->colorspace_hint(sw, frame->current, NULL)) {
++        MP_WARN(vo, "Passing a color space hint of %s/%s to context failed!\n",
++                m_opt_choice_str(
++                    mp_csp_prim_names,
++                    frame->current->params.color.primaries),
++                m_opt_choice_str(
++                    mp_csp_trc_names,
++                    frame->current->params.color.gamma));
++    }
++
+     struct ra_fbo fbo;
+     if (!sw->fns->start_frame(sw, &fbo))
+         return;
+diff --git a/video/out/vo_gpu_next.c b/video/out/vo_gpu_next.c
+index e88f5c8f9f9e..06b762201b72 100644
+--- a/video/out/vo_gpu_next.c
++++ b/video/out/vo_gpu_next.c
+@@ -879,19 +879,36 @@ static void draw_frame(struct vo *vo, struct vo_frame *frame)
+     }
+ 
+     const struct gl_video_opts *opts = p->opts_cache->opts;
++    struct ra_swapchain *sw = p->ra_ctx->swapchain;
++
+     if (p->target_hint && frame->current) {
+         struct pl_color_space hint = get_mpi_csp(vo, frame->current);
++        struct mp_colorspace mpv_context_csp = { 0 };
+         if (opts->target_prim)
+             hint.primaries = mp_prim_to_pl(opts->target_prim);
+         if (opts->target_trc)
+             hint.transfer = mp_trc_to_pl(opts->target_trc);
++
++        // FIXME: placebo vs mpv context order of call, actually making use
++        //        of the result.
++        if (sw->fns->colorspace_hint &&
++            !sw->fns->colorspace_hint(sw, frame->current,
++                                      &mpv_context_csp)) {
++            MP_WARN(vo, "Passing a color space hint of %s/%s to context failed!\n",
++                    m_opt_choice_str(
++                        mp_csp_prim_names,
++                        frame->current->params.color.primaries),
++                    m_opt_choice_str(
++                        mp_csp_trc_names,
++                        frame->current->params.color.gamma));
++        }
++
+         pl_swapchain_colorspace_hint(p->sw, &hint);
+     } else if (!p->target_hint) {
+         pl_swapchain_colorspace_hint(p->sw, NULL);
+     }
+ 
+     struct pl_swapchain_frame swframe;
+-    struct ra_swapchain *sw = p->ra_ctx->swapchain;
+     double vsync_offset = opts->interpolation ? frame->vsync_offset : 0;
+     bool should_draw = sw->fns->start_frame(sw, NULL); // for wayland logic
+     if (!should_draw || !pl_swapchain_start_frame(p->sw, &swframe)) {

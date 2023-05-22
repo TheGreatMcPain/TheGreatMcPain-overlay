@@ -1,7 +1,7 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit cmake desktop xdg flag-o-matic
 
@@ -11,31 +11,26 @@ HOMEPAGE="https://zdoom.org"
 if ver_test -eq "9999"; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/coelckers/${PN}.git"
-	# EGIT_SUBMODULES="non-free? (wadsrc_widescreen/static)"
-	EGIT_SUBMODULES=()
 	KEYWORDS=""
 else
-	SRC_URI="https://github.com/coelckers/${PN}/archive/g${PV}.tar.gz -> ${P}.tar.gz
-		non-free? ( https://github.com/nashmuhandes/WidePix/archive/92738042ca3a37f28153a09809d80a7d61090532.tar.gz -> widepix-9273804.tar.gz )"
-	KEYWORDS="~amd64 ~arm ~x86"
+	SRC_URI="https://github.com/coelckers/${PN}/archive/g${PV}.tar.gz -> ${P}.tar.gz"
+	KEYWORDS="~amd64 ~arm64"
 fi
 
 LICENSE="Apache-2.0 BSD BZIP2 GPL-3 LGPL-2.1+ LGPL-3 MIT
 	non-free? ( Activision ChexQuest3 DOOM-COLLECTORS-EDITION freedist WidePix )"
 SLOT="0"
-IUSE="debug gtk gtk2 +non-free openmp"
+IUSE="debug gles2 gtk +non-free openmp +swr telemetry vulkan"
 
 DEPEND="
 	app-arch/bzip2
-	media-libs/libsdl2[opengl]
+	media-libs/libjpeg-turbo:0=
+	media-libs/libsdl2[gles2?,opengl,vulkan?]
+	media-libs/libvpx:=
 	media-libs/openal
 	media-libs/zmusic
 	sys-libs/zlib
-	virtual/jpeg:0
-	gtk? (
-		gtk2? ( x11-libs/gtk+:2 )
-		!gtk2? ( x11-libs/gtk+:3 )
-	)"
+	gtk? ( x11-libs/gtk+:3 )"
 RDEPEND="${DEPEND}"
 
 if ver_test -ne "9999"; then
@@ -48,7 +43,6 @@ PATCHES=(
 
 src_unpack() {
 	if ver_test -eq "9999"; then
-		use non-free && EGIT_SUBMODULES+=('wadsrc_widescreen/static')
 		git-r3_src_unpack
 	else
 		default
@@ -59,34 +53,34 @@ src_prepare() {
 	rm -rf docs/licenses || die
 	rm -rf libraries/{bzip2,jpeg,zlib} || die
 	if ! use non-free ; then
-		rm -rf wadsrc_bm wadsrc_extra wadsrc_widescreen || die
-	else
-		if ver_test -ne "9999"; then
-			mv "${WORKDIR}/WidePix-92738042ca3a37f28153a09809d80a7d61090532/filter" wadsrc_widescreen/static/ || die
-		fi
+		rm -rf wadsrc_bm wadsrc_extra wadsrc_widepix || die
 	fi
 
 	cmake_src_prepare
 }
 
 src_configure() {
+	# https://bugs.gentoo.org/858749
+	filter-lto
+	append-flags -fno-strict-aliasing
+
 	local mycmakeargs=(
+		-DBUILD_SHARED_LIBS=OFF
 		-DINSTALL_DOCS_PATH="${EPREFIX}/usr/share/doc/${PF}"
 		-DINSTALL_PK3_PATH="${EPREFIX}/usr/share/doom"
 		-DINSTALL_SOUNDFONT_PATH="${EPREFIX}/usr/share/doom"
 		-DDYN_OPENAL=OFF
 		-DNO_GTK="$(usex !gtk)"
 		-DNO_OPENAL=OFF
+		-DHAVE_VULKAN="$(usex vulkan)"
+		-DHAVE_GLES2="$(usex gles2)"
 		-DNO_OPENMP="$(usex !openmp)"
+		-DZDOOM_ENABLE_SWR="$(usex swr)"
 		-DBUILD_NONFREE="$(usex non-free)"
 	)
 
-	# Has issues with LTO
-	filter-flags "-flto=*"
-
-	# Disable asserts for slight performance improvement
-	# at the cost of not catching certain errors in the code.
 	use debug || append-cppflags -DNDEBUG
+	use telemetry || append-cppflags -DNO_SEND_STATS
 
 	cmake_src_configure
 }

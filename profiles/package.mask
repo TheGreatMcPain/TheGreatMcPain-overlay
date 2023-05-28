@@ -1,0 +1,3 @@
+# Should only be used if testing HDR on DRM pull-request
+# See: https://github.com/mpv-player/mpv/pull/10762
+=media-video/mpv-05122022

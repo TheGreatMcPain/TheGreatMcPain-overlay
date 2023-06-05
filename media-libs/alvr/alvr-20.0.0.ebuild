@@ -534,6 +534,10 @@ BDEPEND="${RDEPEND}
 	virtual/pkgconfig
 "
 
+PATCHES=(
+	"${FILESDIR}/0001-Tweaks-for-Gentoo-ebuild.patch"
+)
+
 S="${WORKDIR}/ALVR-${PV}"
 
 src_unpack() {

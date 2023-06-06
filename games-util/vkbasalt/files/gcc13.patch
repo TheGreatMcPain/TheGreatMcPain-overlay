@@ -1,0 +1,36 @@
+From 4f97f09ffe91900e6ca136cc26cf7966f8f6970d Mon Sep 17 00:00:00 2001
+From: Georg Lehmann <dadschoorse@gmail.com>
+Date: Mon, 8 May 2023 18:31:14 +0200
+Subject: [PATCH] add missing GCC13 includes
+
+Closes: #213
+Closes: #209
+---
+ src/reshade/effect_expression.hpp | 1 +
+ src/reshade/effect_lexer.cpp      | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/reshade/effect_expression.hpp b/src/reshade/effect_expression.hpp
+index d6ad413e..243e5412 100644
+--- a/src/reshade/effect_expression.hpp
++++ b/src/reshade/effect_expression.hpp
+@@ -6,6 +6,7 @@
+ #pragma once
+ 
+ #include "effect_token.hpp"
++#include <stdint.h>
+ 
+ namespace reshadefx
+ {
+diff --git a/src/reshade/effect_lexer.cpp b/src/reshade/effect_lexer.cpp
+index d88d7f13..26a8ae20 100644
+--- a/src/reshade/effect_lexer.cpp
++++ b/src/reshade/effect_lexer.cpp
+@@ -5,6 +5,7 @@
+ 
+ #include "effect_lexer.hpp"
+ #include <unordered_map> // Used for static lookup tables
++#include <stdint.h>
+ 
+ using namespace reshadefx;
+ 

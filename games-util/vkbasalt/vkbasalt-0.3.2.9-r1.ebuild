@@ -41,6 +41,10 @@ BDEPEND="
 
 DEPEND="${RDEPEND}"
 
+PATCHES=(
+	"${FILESDIR}/gcc13.patch"
+)
+
 multilib_src_configure() {
 	meson_src_configure
 }

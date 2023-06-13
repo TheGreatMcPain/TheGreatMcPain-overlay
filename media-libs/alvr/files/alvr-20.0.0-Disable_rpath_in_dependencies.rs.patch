@@ -1,0 +1,24 @@
+From ad1bc94ddfdc5355c2c3b28b6848423009d8d4bb Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Tue, 13 Jun 2023 02:09:26 -0500
+Subject: [PATCH] Disable rpath in dependencies.rs
+
+---
+ alvr/xtask/src/dependencies.rs | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/alvr/xtask/src/dependencies.rs b/alvr/xtask/src/dependencies.rs
+index 830ab72d..77f44507 100644
+--- a/alvr/xtask/src/dependencies.rs
++++ b/alvr/xtask/src/dependencies.rs
+@@ -135,7 +135,6 @@ pub fn build_ffmpeg_linux(nvenc_flag: bool) {
+         "--enable-vulkan",
+         "--enable-libdrm",
+         "--enable-pic",
+-        "--enable-rpath",
+     ];
+     let install_prefix = format!("--prefix={}", final_path.join("alvr_build").display());
+     // The reason for 4x$ in LDSOFLAGS var refer to https://stackoverflow.com/a/71429999
+-- 
+2.39.3
+

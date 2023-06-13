@@ -535,7 +535,9 @@ BDEPEND="${RDEPEND}
 "
 
 PATCHES=(
-	"${FILESDIR}/0001-Tweaks-for-Gentoo-ebuild.patch"
+	"${FILESDIR}/alvr-20.0.0-Workaround_buggy_audio_device_query_on_linux.patch"
+	"${FILESDIR}/alvr-20.0.0-Update_dependencies.rs.patch"
+	"${FILESDIR}/alvr-20.0.0-Disable_rpath_in_dependencies.rs.patch"
 )
 
 S="${WORKDIR}/ALVR-${PV}"

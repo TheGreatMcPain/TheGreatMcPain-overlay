@@ -1,4 +1,4 @@
-From ad1bc94ddfdc5355c2c3b28b6848423009d8d4bb Mon Sep 17 00:00:00 2001
+From e093eed722fee8a16b7c42a56a0aac1255edc6d8 Mon Sep 17 00:00:00 2001
 From: TheGreatMcPain <james@thegreatmcpain.xyz>
 Date: Tue, 13 Jun 2023 02:09:26 -0500
 Subject: [PATCH] Disable rpath in dependencies.rs

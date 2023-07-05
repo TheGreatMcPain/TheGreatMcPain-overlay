@@ -5,11 +5,10 @@ EAPI=7
 
 PYTHON_COMPAT=( python3_{10..11} )
 DISTUTILS_USE_PEP517=setuptools
-inherit distutils-r1
+inherit distutils-r1 pypi
 
 DESCRIPTION="A lightweight cross-platform wrapper around a webview component"
 HOMEPAGE="https://github.com/r0x0r/pywebview"
-SRC_URI="mirror://pypi/${P:0:1}/${PN}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"

@@ -35,7 +35,6 @@ DEPEND="
 	dev-util/glslang
 	>=dev-util/vulkan-headers-1.2
 	media-libs/vulkan-loader[${MULTILIB_USEDEP}]
-	dev-libs/spdlog[${MULTILIB_USEDEP}]
 	media-libs/libglvnd[${MULTILIB_USEDEP}]
 	dbus? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
 	tools? (
@@ -64,7 +63,7 @@ src_unpack() {
 multilib_src_configure() {
 	local emesonargs=(
 		-Dappend_libdir_mangohud=false
-		-Duse_system_spdlog=enabled
+		-Duse_system_spdlog=disabled
 		-Dinclude_doc=false
 		-Dwith_nvml=$(usex video_cards_nvidia enabled disabled)
 		-Dwith_xnvctrl=$(usex xnvctrl enabled disabled)

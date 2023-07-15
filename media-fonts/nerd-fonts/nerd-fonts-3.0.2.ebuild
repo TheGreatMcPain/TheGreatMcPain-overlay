@@ -1,7 +1,7 @@
-# Copyright 2020 Gentoo Authors
+# Copyright 2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit font check-reqs
 
@@ -22,6 +22,7 @@ DIRNAME=(
 	BitstreamVeraSansMono
 	CascadiaCode
 	CodeNewRoman
+	ComicShannsMono
 	Cousine
 	DaddyTimeMono
 	DejaVuSansMono
@@ -29,8 +30,8 @@ DIRNAME=(
 	FantasqueSansMono
 	FiraCode
 	FiraMono
-	Go-Mono
 	Gohu
+	Go-Mono
 	Hack
 	Hasklig
 	HeavyData
@@ -41,9 +42,11 @@ DIRNAME=(
 	InconsolataGo
 	InconsolataLGC
 	Iosevka
+	IosevkaTerm
 	JetBrainsMono
 	Lekton
 	LiberationMono
+	Lilex
 	Meslo
 	Monofur
 	Monoid
@@ -58,6 +61,7 @@ DIRNAME=(
 	ShareTechMono
 	SourceCodePro
 	SpaceMono
+	SymbolsOnly
 	Terminus
 	Tinos
 	Ubuntu
@@ -79,6 +83,7 @@ SRC_URI="3270?            ( "${MY_URI}/3270.zip" )
 	bitstreamverasansmono?  ( "${MY_URI}/BitstreamVeraSansMono.zip" )
 	cascadiacode?           ( "${MY_URI}/CascadiaCode.zip" )
 	codenewroman?           ( "${MY_URI}/CodeNewRoman.zip" )
+	comicshannsmono?        ( "${MY_URI}/ComicShannsMono.zip" )
 	cousine?                ( "${MY_URI}/Cousine.zip" )
 	daddytimemono?          ( "${MY_URI}/DaddyTimeMono.zip" )
 	dejavusansmono?         ( "${MY_URI}/DejaVuSansMono.zip" )
@@ -86,8 +91,8 @@ SRC_URI="3270?            ( "${MY_URI}/3270.zip" )
 	fantasquesansmono?      ( "${MY_URI}/FantasqueSansMono.zip" )
 	firacode?               ( "${MY_URI}/FiraCode.zip" )
 	firamono?               ( "${MY_URI}/FiraMono.zip" )
-	go-mono?                ( "${MY_URI}/Go-Mono.zip" )
 	gohu?                   ( "${MY_URI}/Gohu.zip" )
+	go-mono?                ( "${MY_URI}/Go-Mono.zip" )
 	hack?                   ( "${MY_URI}/Hack.zip" )
 	hasklig?                ( "${MY_URI}/Hasklig.zip" )
 	heavydata?              ( "${MY_URI}/HeavyData.zip" )
@@ -98,9 +103,11 @@ SRC_URI="3270?            ( "${MY_URI}/3270.zip" )
 	inconsolatago?          ( "${MY_URI}/InconsolataGo.zip" )
 	inconsolatalgc?         ( "${MY_URI}/InconsolataLGC.zip" )
 	iosevka?                ( "${MY_URI}/Iosevka.zip" )
+	iosevkaterm?            ( "${MY_URI}/IosevkaTerm.zip" )
 	jetbrainsmono?          ( "${MY_URI}/JetBrainsMono.zip" )
 	lekton?                 ( "${MY_URI}/Lekton.zip" )
 	liberationmono?         ( "${MY_URI}/LiberationMono.zip" )
+	lilex?                  ( "${MY_URI}/Lilex.zip" )
 	meslo?                  ( "${MY_URI}/Meslo.zip" )
 	monofur?                ( "${MY_URI}/Monofur.zip" )
 	monoid?                 ( "${MY_URI}/Monoid.zip" )
@@ -115,6 +122,7 @@ SRC_URI="3270?            ( "${MY_URI}/3270.zip" )
 	sharetechmono?          ( "${MY_URI}/ShareTechMono.zip" )
 	sourcecodepro?          ( "${MY_URI}/SourceCodePro.zip" )
 	spacemono?              ( "${MY_URI}/SpaceMono.zip" )
+	symbolsonly?            ( "${MY_URI}/NerdFontsSymbolsOnly.zip" )
 	terminus?               ( "${MY_URI}/Terminus.zip" )
 	tinos?                  ( "${MY_URI}/Tinos.zip" )
 	ubuntu?                 ( "${MY_URI}/Ubuntu.zip" )

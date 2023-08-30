@@ -1,9 +1,9 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit eutils git-r3
+inherit git-r3
 
 DESCRIPTION="Build secure boot EFI kernel with LUKS, LVM and plymouth (Dracut version)"
 BASE_SERVER_URI="https://github.com/TheGreatMcPain"

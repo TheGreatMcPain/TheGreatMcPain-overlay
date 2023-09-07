@@ -48,7 +48,7 @@ def main():
     new_ebuild = latest_ebuild.replace(get_pv_from_ebuild(latest_ebuild), new_ebuild_pv)
 
     option = input(
-        "Will create {} from {}. Continue? (y or n): ".format(latest_ebuild, new_ebuild)
+        "Will create {} from {}. Continue? (y or n): ".format(new_ebuild, latest_ebuild)
     )
     while option.lower() not in ("y", "n"):
         option = input("Invalid input! (y or n): ")

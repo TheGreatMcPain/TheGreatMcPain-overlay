@@ -43,7 +43,6 @@ RDEPEND="
 		>=dev-python/python-xlib-0.31[${PYTHON_USEDEP}]
 		>=dev-python/pyxdg-0.27[${PYTHON_USEDEP}]
 		>=dev-python/requests-2.27.1[${PYTHON_USEDEP}]
-		>=dev-python/Rx-3.2.0[${PYTHON_USEDEP}]
 		dev-python/reactivex[${PYTHON_USEDEP}]
 	')
 "

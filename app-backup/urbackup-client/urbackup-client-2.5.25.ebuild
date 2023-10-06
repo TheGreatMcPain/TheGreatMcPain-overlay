@@ -29,14 +29,9 @@ RDEPEND="
 	zlib? ( sys-libs/zlib )"
 DEPEND="${RDEPEND}"
 
-#PATCHES=(
-#	"${FILESDIR}/${P}-gcc-fortify.patch"
-#	"${FILESDIR}/${P}-autoupdate.patch"
-#	"${FILESDIR}/${P}-manpage.patch"
-#	"${FILESDIR}/${P}-conf.patch"
-#	"${FILESDIR}/${P}-locale.patch"
-#	"${FILESDIR}/${P}-etc-perms.patch"
-#)
+PATCHES=(
+	"${FILESDIR}/0001-Fix-compile-with-GCC13.patch"
+)
 
 src_configure() {
 	econf \

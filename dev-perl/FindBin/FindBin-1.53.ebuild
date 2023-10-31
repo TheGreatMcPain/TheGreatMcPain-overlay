@@ -14,7 +14,6 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	virtual/perl-Carp
-	dev-perl/PathTools
 	virtual/perl-Exporter
 	virtual/perl-File-Spec
 "

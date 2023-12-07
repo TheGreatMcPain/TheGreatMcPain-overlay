@@ -16,6 +16,7 @@ if [[ "${PV}" == "9999" ]]; then
 else
 	MY_PV="${PV/_beta/}"
 	SRC_URI="https://github.com/captainayy/BDSup2SubPlusPlus/archive/${MY_PV}.tar.gz"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 LICENSE="Apache-2.0"

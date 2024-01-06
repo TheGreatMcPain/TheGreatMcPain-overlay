@@ -10,7 +10,6 @@ K_SECURITY_UNSUPPORTED="1"
 GIT_COMMIT="5.19-28"
 
 CKV="$(ver_cut 1-2)"
-ETYPE="sources"
 
 inherit kernel-2
 #detect_version
@@ -24,7 +23,6 @@ LIQUORIX_URI="https://github.com/damentz/liquorix-package/archive/${LIQUORIX_VER
 SRC_URI="${KERNEL_URI} ${LIQUORIX_URI}";
 
 KEYWORDS="-* ~amd64 ~ppc ~ppc64 ~x86"
-IUSE=""
 
 KV_FULL="${PVR/_p/-pf}"
 S="${WORKDIR}"/linux-"${KV_FULL}"

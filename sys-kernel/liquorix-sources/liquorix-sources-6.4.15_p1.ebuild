@@ -16,7 +16,7 @@ inherit kernel-2
 #detect_version
 K_NOSETEXTRAVERSION="don't_set_it"
 
-DESCRIPTION="The Liquorix Kernel Sources v5.x"
+DESCRIPTION="The Liquorix Kernel Sources v6.x"
 HOMEPAGE="https://liquorix.net/"
 LIQUORIX_VERSION="${GIT_COMMIT/_p[0-9]*}"
 LIQUORIX_FILE="${P}.tar.gz"

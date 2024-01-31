@@ -1,17 +1,17 @@
-# Copyright 2022 Gentoo Authors
+# Copyright 2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit cmake
+inherit cmake git-r3
 
 DESCRIPTION="Convert SUP graphic subtitles to text-based SRT format"
 HOMEPAGE="https://github.com/retrontology/sup2srt"
-SRC_URI="https://github.com/retrontology/sup2srt/archive/${PV}.tar.gz -> ${P}.tar.gz"
+EGIT_REPO_URI="https://github.com/retrontology/sup2srt.git"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS=""
 
 DEPEND="
 	media-libs/tiff[cxx]

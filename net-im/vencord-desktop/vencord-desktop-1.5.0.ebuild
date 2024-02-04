@@ -36,7 +36,11 @@ src_install() {
 	fperms +x /usr/lib/vencord/vesktop
 	fperms +x /usr/lib/vencord/chrome_crashpad_handler
 	fperms +x /usr/lib/vencord/chrome-sandbox
-	fperms +x /usr/lib/vencord/*.so*
+	fperms +x /usr/lib/vencord/libEGL.so
+	fperms +x /usr/lib/vencord/libGLESv2.so
+	fperms +x /usr/lib/vencord/libffmpeg.so
+	fperms +x /usr/lib/vencord/libvk_swiftshader.so
+	fperms +x /usr/lib/vencord/libvulkan.so.1
 
 	domenu "${FILESDIR}/vesktop.desktop"
 	doicon static/icon.png

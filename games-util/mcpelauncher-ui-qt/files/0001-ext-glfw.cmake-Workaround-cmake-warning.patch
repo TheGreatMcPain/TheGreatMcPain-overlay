@@ -1,0 +1,24 @@
+From d9f9887290519b998e920e2b2ee516263f682fb2 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <sixsupersonic@gmail.com>
+Date: Sun, 4 Feb 2024 16:29:39 -0600
+Subject: [PATCH] ext/glfw.cmake: Workaround cmake warning
+
+---
+ ext/glfw.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mcpelauncher-ui-qt/ext/glfw.cmake b/ext/glfw.cmake
+index c49e88a..5fa17f4 100644
+--- a/mcpelauncher-ui-qt/ext/glfw.cmake
++++ b/mcpelauncher-ui-qt/ext/glfw.cmake
+@@ -9,6 +9,7 @@ set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+ FetchContent_Declare(
+         glfw3_ext
+         URL "https://github.com/glfw/glfw/archive/master.zip"
++        DOWNLOAD_EXTRACT_TIMESTAMP true
+ )
+ 
+ FetchContent_GetProperties(glfw3_ext)
+-- 
+2.43.0
+

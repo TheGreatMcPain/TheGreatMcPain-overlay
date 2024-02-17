@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit git-r3 cmake flag-o-matic
+inherit git-r3 cmake flag-o-matic xdg-utils
 
 DESCRIPTION="mcpelauncher-linux UI"
 HOMEPAGE="https://github.com/minecraft-linux/mcpelauncher-ui-manifest"
@@ -38,4 +38,12 @@ src_configure() {
 	)
 
 	cmake_src_configure
+}
+
+pkg_postinst() {
+	xdg_desktop_database_update
+}
+
+pkg_postrm() {
+	xdg_desktop_database_update
 }

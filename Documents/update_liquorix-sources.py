@@ -34,7 +34,7 @@ def main():
     )
     patch_file = None
     for f in filelist:
-        if ".patch" in f:
+        if "-lqx" in f:
             patch_file = f
             break
 
@@ -63,9 +63,10 @@ def main():
         print("Something went wrong!")
         return 1
 
-    # TODO also automate testing, and commiting
+    print("Running 'pkgdev manifest'")
+    os.system("pkgdev manifest -f")
     print("Done!")
-    print("You'll need to update the 'Manifest' and test the ebuild.")
+    print("You may need to test ebuild before commiting.")
 
 
 def update_liquorix_ebuild(src_ebuild: str, dst_ebuild: str, new_tag: str) -> int:

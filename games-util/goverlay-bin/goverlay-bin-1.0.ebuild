@@ -1,14 +1,14 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit desktop xdg-utils
 
 DESCRIPTION="GOverlay is a Graphical UI to help manage Linux overlays. (binary version)"
 HOMEPAGE="https://github.com/benjamimgois/goverlay"
 
-SRC_URI="https://github.com/benjamimgois/goverlay/releases/download/0.8.1-2/goverlay_0_8_1.tar.xz -> ${P}.tar.xz"
+SRC_URI="https://github.com/benjamimgois/goverlay/releases/download/${PV}/goverlay_1.tar.xz -> ${P}.tar.xz"
 KEYWORDS="~amd64"
 
 LICENSE="GPL-3"

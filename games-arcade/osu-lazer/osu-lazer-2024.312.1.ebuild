@@ -1,7 +1,7 @@
-# Copyright 2022 Gentoo Authors
+# Copyright 2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit desktop xdg-utils
 
@@ -27,7 +27,7 @@ DEPEND="
 	virtual/opengl
 	media-libs/libsdl2
 	x11-misc/shared-mime-info
-	virtual/dotnet-sdk:6.0
+	virtual/dotnet-sdk:8.0
 "
 RDEPEND="${DEPEND}"
 

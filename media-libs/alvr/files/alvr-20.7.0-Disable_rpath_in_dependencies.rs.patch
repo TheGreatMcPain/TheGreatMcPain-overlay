@@ -1,0 +1,24 @@
+From 738deaa1fe0f52f64e2a6c865e21cefd7c4e9e73 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Sat, 6 Apr 2024 17:01:24 -0500
+Subject: [PATCH] Disable rpath in dependencies.rs
+
+---
+ alvr/xtask/src/dependencies.rs | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/alvr/xtask/src/dependencies.rs b/alvr/xtask/src/dependencies.rs
+index 9a403046..35917608 100644
+--- a/alvr/xtask/src/dependencies.rs
++++ b/alvr/xtask/src/dependencies.rs
+@@ -174,7 +174,6 @@ pub fn build_ffmpeg_linux(nvenc_flag: bool, deps_path: &Path) {
+         "--enable-vulkan",
+         "--enable-libdrm",
+         "--enable-pic",
+-        "--enable-rpath",
+         "--fatal-warnings",
+     ];
+     let install_prefix = format!("--prefix={}", final_path.join("alvr_build").display());
+-- 
+2.43.2
+

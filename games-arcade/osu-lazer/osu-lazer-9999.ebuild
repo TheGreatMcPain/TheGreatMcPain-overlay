@@ -31,7 +31,7 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
-dotnet_ver=6.0
+dotnet_ver=8.0
 output="./osu.Desktop/bin/Release/netcoreapp$dotnet_ver/linux-x64"
 
 if ! [[ ${PV} = "9999" ]]; then

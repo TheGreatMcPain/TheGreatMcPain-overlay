@@ -1,0 +1,21 @@
+From b728a9c6331292620bf527d91341c22f5faeca4f Mon Sep 17 00:00:00 2001
+From: Kcchouette <Kcchouette@users.noreply.github.com>
+Date: Tue, 15 Nov 2022 15:34:41 +0100
+Subject: [PATCH] Fix compiling problem
+
+---
+ src/nntp/NntpArticle.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/nntp/NntpArticle.cpp b/nntp/NntpArticle.cpp
+index daddf83..823b65a 100644
+--- a/nntp/NntpArticle.cpp
++++ b/nntp/NntpArticle.cpp
+@@ -23,6 +23,7 @@
+ #include "nntp/NntpFile.h"
+ #include "nntp/Nntp.h"
+ #include "utils/Yenc.h"
++#include <cstring>
+ #include <sstream>
+ 
+ ushort NntpArticle::sNbMaxTrySending = 5;

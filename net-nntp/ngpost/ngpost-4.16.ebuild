@@ -1,7 +1,7 @@
-# Copyright 2021 Gentoo Authors
+# Copyright 2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit qmake-utils desktop
 
@@ -31,6 +31,8 @@ DEPEND="
 	7z? ( app-arch/p7zip )"
 RDEPEND="${DEPEND}"
 BDEPEND=""
+
+PATCHES="${FILESDIR}/fix-strcpy.patch"
 
 if ! ver_test -eq "9999"; then
 	S="${WORKDIR}/ngPost-${PV}"

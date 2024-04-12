@@ -27,14 +27,6 @@ RDEPEND="
 	zlib? ( sys-libs/zlib )"
 DEPEND="${RDEPEND}"
 
-#PATCHES=(
-#	"${FILESDIR}/${P}-autoupdate-config.patch"
-#	"${FILESDIR}/${P}-autoupdate-datafiles.patch"
-#	"${FILESDIR}/${P}-gcc-fortify.patch"
-#	"${FILESDIR}/${P}-gentoo-prefix.patch"
-#	"${FILESDIR}/${P}-manpage.patch"
-#)
-
 src_configure() {
 	econf \
 	$(use_with crypt crypto) \

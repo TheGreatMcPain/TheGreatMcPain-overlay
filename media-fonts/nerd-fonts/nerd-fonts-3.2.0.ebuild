@@ -71,7 +71,7 @@ DIRNAME=(
 
 IUSE_FLAGS=(${DIRNAME[*],,})
 IUSE="${IUSE_FLAGS[*]}"
-REQUIRED_USE="X || ( ${IUSE_FLAGS[*]} )"
+REQUIRED_USE="|| ( ${IUSE_FLAGS[*]} )"
 
 MY_URI="https://github.com/ryanoasis/${PN}/releases/download/v${PV}"
 SRC_URI="3270?            ( "${MY_URI}/3270.zip" )

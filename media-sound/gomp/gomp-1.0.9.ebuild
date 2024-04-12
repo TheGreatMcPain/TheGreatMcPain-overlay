@@ -1,4 +1,4 @@
-# Copyright 2023 Gentoo Authors
+# Copyright 2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -6,7 +6,7 @@ EAPI=8
 inherit go-module
 
 # Pulled from fem-overlay
-GO_DEP_ARCHIVE_VER="2023-09-03"
+GO_DEP_ARCHIVE_VER="2024-04-12"
 GO_DEP_ARCHIVE_PV="${PV}+${GO_DEP_ARCHIVE_VER}"
 GO_DEP_ARCHIVE_P="${PN}-deps-${GO_DEP_ARCHIVE_PV}"
 GO_VENDOR_BASEURI="https://gitlab.com/api/v4/projects/42159594/packages/generic"

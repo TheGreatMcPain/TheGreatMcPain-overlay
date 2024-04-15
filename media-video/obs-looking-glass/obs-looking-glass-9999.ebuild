@@ -29,3 +29,8 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 
 CMAKE_USE_DIR="${S}"/obs
+
+src_install() {
+	exeinto "/usr/$(get_libdir)/obs-plugins"
+	doexe "${BUILD_DIR}"/liblooking-glass-obs.so
+}

@@ -60,6 +60,9 @@ src_install() {
 	doins "${FILESDIR}"/dattobd_remove_filesystem_snapshot
 	doins "${FILESDIR}"/lvm_create_filesystem_snapshot
 	doins "${FILESDIR}"/lvm_remove_filesystem_snapshot
+	doins "${FILESDIR}"/dm_create_snapshot
+	doins "${FILESDIR}"/dm_remove_snapshot
+	doins "${FILESDIR}"/filesystem_snapshot_common
 
 	# Already installed by urbackup-certificate
 	rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"

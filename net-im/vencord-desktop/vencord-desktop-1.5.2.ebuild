@@ -24,8 +24,8 @@ S="${WORKDIR}/Vesktop-${PV}"
 
 src_compile() {
 	# TODO Figure out how to do offline install with pnpm
-	pnpm i
-	pnpm package:dir
+	COREPACK_ENABLE_STRICT=0 pnpm i
+	COREPACK_ENABLE_STRICT=0 pnpm package:dir
 }
 
 src_install() {

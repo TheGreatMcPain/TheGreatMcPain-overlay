@@ -1,7 +1,7 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 MULTILIB_COMPAT=( abi_x86_{32,64} )
 
@@ -35,7 +35,7 @@ RDEPEND="
 BDEPEND="
 	>dev-util/vulkan-headers-1.1
 	dev-util/glslang
-	>=dev-util/meson-0.49
+	>=dev-build/meson-0.49
 	x11-libs/libX11[${MULTILIB_USEDEP}]
 "
 

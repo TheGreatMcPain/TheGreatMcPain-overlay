@@ -1,4 +1,4 @@
-# Copyright 2023 Gentoo Authors
+# Copyright 2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -6,26 +6,23 @@ EAPI=8
 inherit desktop xdg-utils
 
 NODE_MODULES_SRC_URI="
-	https://registry.npmjs.org/@fontsource/fira-code/-/fira-code-5.0.8.tgz -> webcord-dep--fira-code-5.0.8.tgz
-	https://registry.npmjs.org/@fontsource/roboto/-/roboto-5.0.8.tgz -> webcord-dep--roboto-5.0.8.tgz
-	https://registry.npmjs.org/@fontsource/ubuntu/-/ubuntu-5.0.8.tgz -> webcord-dep--ubuntu-5.0.8.tgz
-	https://registry.npmjs.org/@spacingbat3/disconnection/-/disconnection-1.3.0.tgz -> webcord-dep--disconnection-1.3.0.tgz
-	https://registry.npmjs.org/@spacingbat3/kolor/-/kolor-3.2.2.tgz -> webcord-dep--kolor-3.2.2.tgz
+	https://registry.npmjs.org/@spacingbat3/disconnection/-/disconnection-1.3.2.tgz -> webcord-dep--disconnection-1.3.2.tgz
+	https://registry.npmjs.org/@spacingbat3/kolor/-/kolor-4.0.0.tgz -> webcord-dep--kolor-4.0.0.tgz
 	https://registry.npmjs.org/@spacingbat3/lss/-/lss-1.2.0.tgz -> webcord-dep--lss-1.2.0.tgz
 	https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.2.tgz -> webcord-dep--buffer-from-1.1.2.tgz
 	https://registry.npmjs.org/deepmerge-ts/-/deepmerge-ts-5.1.0.tgz -> webcord-dep--deepmerge-ts-5.1.0.tgz
-	https://registry.npmjs.org/dompurify/-/dompurify-3.0.5.tgz -> webcord-dep--dompurify-3.0.5.tgz
-	https://registry.npmjs.org/highlight.js/-/highlight.js-11.8.0.tgz -> webcord-dep--highlight.js-11.8.0.tgz
-	https://registry.npmjs.org/marked/-/marked-9.0.3.tgz -> webcord-dep--marked-9.0.3.tgz
-	https://registry.npmjs.org/marked-highlight/-/marked-highlight-2.0.6.tgz -> webcord-dep--marked-highlight-2.0.6.tgz
-	https://registry.npmjs.org/semver/-/semver-7.5.4.tgz -> webcord-dep--semver-7.5.4.tgz
-	https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz -> webcord-dep--lru-cache-6.0.0.tgz
+	https://registry.npmjs.org/dompurify/-/dompurify-3.1.3.tgz -> webcord-dep--dompurify-3.1.3.tgz
+	https://registry.npmjs.org/github-slugger/-/github-slugger-2.0.0.tgz -> webcord-dep--github-slugger-2.0.0.tgz
+	https://registry.npmjs.org/highlight.js/-/highlight.js-11.9.0.tgz -> webcord-dep--highlight.js-11.9.0.tgz
+	https://registry.npmjs.org/marked/-/marked-12.0.2.tgz -> webcord-dep--marked-12.0.2.tgz
+	https://registry.npmjs.org/marked-gfm-heading-id/-/marked-gfm-heading-id-3.1.3.tgz -> webcord-dep--marked-gfm-heading-id-3.1.3.tgz
+	https://registry.npmjs.org/marked-highlight/-/marked-highlight-2.1.1.tgz -> webcord-dep--marked-highlight-2.1.1.tgz
+	https://registry.npmjs.org/semver/-/semver-7.6.2.tgz -> webcord-dep--semver-7.6.2.tgz
 	https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz -> webcord-dep--source-map-0.6.1.tgz
 	https://registry.npmjs.org/source-map-support/-/source-map-support-0.5.21.tgz -> webcord-dep--source-map-support-0.5.21.tgz
 	https://registry.npmjs.org/tslib/-/tslib-2.6.2.tgz -> webcord-dep--tslib-2.6.2.tgz
 	https://registry.npmjs.org/twemoji-colr-font/-/twemoji-colr-font-14.1.3.tgz -> webcord-dep--twemoji-colr-font-14.1.3.tgz
-	https://registry.npmjs.org/ws/-/ws-8.14.1.tgz -> webcord-dep--ws-8.14.1.tgz
-	https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz -> webcord-dep--yallist-4.0.0.tgz
+	https://registry.npmjs.org/ws/-/ws-8.17.0.tgz -> webcord-dep--ws-8.17.0.tgz
 "
 
 DESCRIPTION="A Discord and Fosscord client made with the Electron API."

@@ -5,4 +5,7 @@
 		<name>James McClain</name>
 		<email>james@thegreatmcpain.xyz</email>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">lucc/nvimpager</remote-id>
+	</upstream>
 </pkgmetadata>

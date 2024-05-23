@@ -4,6 +4,9 @@
 	<maintainer type="person">
 		<email>james@thegreatmcpain.xyz</email>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">SpacingBat3/WebCord</remote-id>
+	</upstream>
 	<use>
 		<flag name="systray">Install <pkg>dev-libs/libappindicator</pkg> to enable systray</flag>
 	</use>

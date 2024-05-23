@@ -32,6 +32,8 @@ SRC_URI="
 	${NODE_MODULES_SRC_URI}
 "
 
+S="${WORKDIR}/WebCord-${PV}"
+
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
@@ -46,8 +48,6 @@ RDEPEND="${DEPEND}
 BDEPEND="
 	dev-util/esbuild
 "
-
-S="${WORKDIR}/WebCord-${PV}"
 
 src_unpack() {
 	# From dev-util/electron from electron overlay

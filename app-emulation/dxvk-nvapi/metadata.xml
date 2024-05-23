@@ -5,12 +5,12 @@
     <email>james@thegreatmcpain.xyz</email>
   </maintainer>
   <upstream>
-    <bugs-to>https://github.com/jp7677/dxvk-nvapi/issues</bugs-to>
+    <remote-id type="github">jp7677/dxvk-nvapi</remote-id>
   </upstream>
   <use>
-	<flag name="crossdev-mingw">
-		Use <pkg>sys-devel/crossdev</pkg> for the toolchain rather than
-		<pkg>dev-util/mingw64-toolchain</pkg> (requires manual setting up)
-	</flag>
+    <flag name="crossdev-mingw">
+      Use <pkg>sys-devel/crossdev</pkg> for the toolchain rather than
+      <pkg>dev-util/mingw64-toolchain</pkg> (requires manual setting up)
+    </flag>
   </use>
 </pkgmetadata>

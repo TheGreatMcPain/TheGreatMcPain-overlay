@@ -6,24 +6,18 @@ EAPI=8
 MULTILIB_COMPAT=( abi_x86_{32,64} )
 inherit flag-o-matic meson-multilib
 
-if [[ ${PV} == 9999 ]]; then
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/jp7677/dxvk-nvapi.git"
-else
-	VULKAN_HEADERS_HASH="217e93c664ec6704ec2d8c36fa116c1a4a1e2d40"
-	SRC_URI="
-		https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz
-			-> ${P}.tar.gz
-		https://github.com/KhronosGroup/Vulkan-Headers/archive/${VULKAN_HEADERS_HASH}.tar.gz
-			-> ${P}-vulkan-headers.tar.gz"
-	KEYWORDS="-* ~amd64 ~x86"
-fi
-
 DESCRIPTION="Alternative NVAPI implementation on top of DXVK"
 HOMEPAGE="https://github.com/jp7677/dxvk-nvapi"
+VULKAN_HEADERS_HASH="217e93c664ec6704ec2d8c36fa116c1a4a1e2d40"
+SRC_URI="
+	https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz
+		-> ${P}.tar.gz
+	https://github.com/KhronosGroup/Vulkan-Headers/archive/${VULKAN_HEADERS_HASH}.tar.gz
+		-> ${P}-vulkan-headers.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
+KEYWORDS="-* ~amd64 ~x86"
 IUSE="+abi_x86_32 crossdev-mingw debug"
 
 BDEPEND="

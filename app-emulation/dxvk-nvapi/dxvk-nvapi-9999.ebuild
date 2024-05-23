@@ -4,18 +4,9 @@
 EAPI=8
 
 MULTILIB_COMPAT=( abi_x86_{32,64} )
-inherit flag-o-matic meson-multilib
+inherit flag-o-matic meson-multilib git-r3
 
-if [[ ${PV} == 9999 ]]; then
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/jp7677/dxvk-nvapi.git"
-else
-	#SRC_URI="https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/jp7677/dxvk-nvapi.git"
-	EGIT_COMMIT="v${PV}"
-	KEYWORDS="-* ~amd64 ~x86"
-fi
+EGIT_REPO_URI="https://github.com/jp7677/dxvk-nvapi.git"
 
 DESCRIPTION="Alternative NVAPI implementation on top of DXVK"
 HOMEPAGE="https://github.com/jp7677/dxvk-nvapi"

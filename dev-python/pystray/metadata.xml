@@ -5,4 +5,7 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>TheGreatMcPain</name>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">moses-palmer/pystray</remote-id>
+	</upstream>
 </pkgmetadata>

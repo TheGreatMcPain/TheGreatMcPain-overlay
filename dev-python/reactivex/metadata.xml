@@ -7,4 +7,7 @@
 	<maintainer type="person">
 		<email>james@thegreatmcpain.xyz</email>
 	</maintainer>
+	<upstream>
+		<remote-id type="pypi">reactivex</remote-id>
+	</upstream>
 </pkgmetadata>

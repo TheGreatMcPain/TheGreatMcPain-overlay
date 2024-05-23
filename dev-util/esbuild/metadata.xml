@@ -3,5 +3,9 @@
 <pkgmetadata>
 	<maintainer type="person">
 		<email>james@thegreatmcpain.xyz</email>
+		<name>James McClain</name>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">evanw/esbuild</remote-id>
+	</upstream>
 </pkgmetadata>

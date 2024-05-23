@@ -6,7 +6,7 @@ EAPI=8
 inherit go-module
 
 # Pulled from fem-overlay
-GO_DEP_ARCHIVE_VER="2024-04-13"
+GO_DEP_ARCHIVE_VER="2024-05-23"
 GO_DEP_ARCHIVE_PV="${PV}+${GO_DEP_ARCHIVE_VER}"
 GO_DEP_ARCHIVE_P="${PN}-deps-${GO_DEP_ARCHIVE_PV}"
 GO_VENDOR_BASEURI="https://gitlab.com/api/v4/projects/42159594/packages/generic"
@@ -22,10 +22,6 @@ SRC_URI="
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-
-DEPEND=""
-RDEPEND="${DEPEND}"
-BDEPEND=""
 
 src_install() {
 	dobin esbuild

@@ -11,4 +11,7 @@
 		<flag name="shaders">Install MPV shader pack</flag>
 		<flag name="discord">Enable discord rich presence</flag>
 	</use>
+	<upstream>
+		<remote-id type="github">jellyfin/jellyfin-mpv-shim</remote-id>
+	</upstream>
 </pkgmetadata>

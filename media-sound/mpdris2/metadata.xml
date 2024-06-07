@@ -4,4 +4,7 @@
 	<maintainer type="person">
 		<email>james@thegreatmcpain.xyz</email>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">eonpatapon/mpDris2</remote-id>
+	</upstream>
 </pkgmetadata>

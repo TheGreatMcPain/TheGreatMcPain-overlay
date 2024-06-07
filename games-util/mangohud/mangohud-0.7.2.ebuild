@@ -1,11 +1,12 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-PYTHON_COMPAT=( python3_{9..11} )
+DISTUTILS_USE_PEP517=no
+PYTHON_COMPAT=( python3_{10..13} )
 
-inherit meson distutils-r1 multilib-minimal flag-o-matic
+inherit meson distutils-r1 multilib-minimal
 
 DESCRIPTION="A Vulkan/OpenGL overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 HOMEPAGE="https://github.com/flightlessmango/MangoHud"
@@ -17,7 +18,7 @@ if [[ ${PV} == "9999" ]]; then
 	KEYWORDS=""
 else
 	SRC_URI="
-		https://github.com/flightlessmango/MangoHud/releases/download/v${PV}-1/MangoHud-v${PV}-1-Source.tar.xz -> ${P}.tar.xz
+		https://github.com/flightlessmango/MangoHud/releases/download/v${PV}/MangoHud-v${PV}-Source.tar.xz -> ${P}.tar.xz
 	"
 	KEYWORDS="-* ~amd64 ~x86"
 fi

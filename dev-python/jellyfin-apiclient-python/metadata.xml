@@ -5,4 +5,9 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>TheGreatMcPain</name>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">
+			jellyfin/jellyfin-apiclient-python
+		</remote-id>
+	</upstream>
 </pkgmetadata>

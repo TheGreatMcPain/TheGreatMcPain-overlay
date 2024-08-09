@@ -15,10 +15,7 @@ KEYWORDS="~amd64"
 
 # Taking from net-im/discord (Since both are electron applications.)
 RDEPEND="
-	|| (
-		>=app-accessibility/at-spi2-core-2.46.0:2
-		( app-accessibility/at-spi2-atk dev-libs/atk )
-	)
+	>=app-accessibility/at-spi2-core-2.46.0:2
 	dev-libs/expat
 	dev-libs/glib:2
 	dev-libs/nspr

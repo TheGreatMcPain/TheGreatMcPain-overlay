@@ -706,7 +706,7 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 
 BDEPEND="${RDEPEND}
-	nvidia? ( dev-util/nvidia-cuda-toolkit )
+	video_cards_nvidia? ( dev-util/nvidia-cuda-toolkit )
 	virtual/pkgconfig
 	media-gfx/imagemagick
 "

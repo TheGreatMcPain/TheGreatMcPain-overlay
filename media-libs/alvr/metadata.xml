@@ -5,7 +5,4 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>James McClain</name>
 	</maintainer>
-	<use>
-		<flag name="nvidia">Enables nvidia support</flag>
-	</use>
 </pkgmetadata>

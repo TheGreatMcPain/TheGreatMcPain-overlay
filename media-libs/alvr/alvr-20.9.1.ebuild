@@ -696,7 +696,7 @@ EGIT_COMMIT="v${PV}"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="nvidia"
+IUSE="video_cards_nvidia"
 RESTRICT="network-sandbox" # Temp solution for bundled ffmpeg
 
 RDEPEND="
@@ -747,7 +747,7 @@ src_compile() {
 	export ALVR_VRCOMPOSITOR_WRAPPER_DIR="$ALVR_ROOT_DIR/libexec/alvr/"
 	export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
-	if use nvidia; then
+	if use video_cards_nvidia; then
 		PKG_CONFIG_PATH="${FILESDIR}" \
 			cargo run -p alvr_xtask -- prepare-deps --platform linux
 	else

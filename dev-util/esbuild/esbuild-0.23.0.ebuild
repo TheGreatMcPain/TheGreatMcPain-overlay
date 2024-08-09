@@ -6,7 +6,7 @@ EAPI=8
 inherit go-module
 
 # Pulled from fem-overlay
-GO_DEP_ARCHIVE_VER="2024-05-23"
+GO_DEP_ARCHIVE_VER="2024-08-09"
 GO_DEP_ARCHIVE_PV="${PV}+${GO_DEP_ARCHIVE_VER}"
 GO_DEP_ARCHIVE_P="${PN}-deps-${GO_DEP_ARCHIVE_PV}"
 GO_VENDOR_BASEURI="https://gitlab.com/api/v4/projects/42159594/packages/generic"

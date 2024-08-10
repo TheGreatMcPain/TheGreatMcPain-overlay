@@ -684,7 +684,7 @@ CRATES="
 	gloo-net@0.5.0
 "
 
-inherit desktop cargo xdg git-r3
+inherit desktop cargo rust-toolchain xdg git-r3
 
 DESCRIPTION="ALVR is an open source remote VR display for the Oculus Go/Quest"
 HOMEPAGE="https://github.com/alvr-org/ALVR"
@@ -760,22 +760,23 @@ src_compile() {
 src_install() {
 	# vrcompositor wrapper
 	exeinto /usr/libexec/alvr/
-	newexe target/release/alvr_vrcompositor_wrapper vrcompositor-wrapper
+	newexe target/$(rust_abi)/release/alvr_vrcompositor_wrapper vrcompositor-wrapper
+	doexe target/$(rust_abi)/release/alvr_drm_lease_shim.so
 
 	# OpenVR Driver
 	exeinto /usr/lib/steamvr/alvr/bin/linux64/
-	newexe target/release/libalvr_server.so driver_alvr_server.so
+	newexe target/$(rust_abi)/release/libalvr_server.so driver_alvr_server.so
 
 	insinto /usr/lib/steamvr/alvr/
 	doins alvr/xtask/resources/driver.vrdrivermanifest
 
 	# Vulkan layer
-	dolib.so target/release/libalvr_vulkan_layer.so
+	dolib.so target/$(rust_abi)/release/libalvr_vulkan_layer.so
 	insinto /usr/share/vulkan/explicit_layer.d/
 	doins alvr/vulkan_layer/layer/alvr_x86_64.json
 
 	# Launcher
-	dobin target/release/alvr_dashboard
+	dobin target/$(rust_abi)/release/alvr_dashboard
 
 	# Desktop
 	domenu alvr/xtask/resources/alvr.desktop
@@ -796,8 +797,4 @@ src_install() {
 	doins alvr/xtask/firewall/alvr-firewalld.xml
 
 	doexe alvr/xtask/firewall/alvr_fw_config.sh
-
-	## Removed in 20.2.0
-	# insinto /usr/share/alvr/selinux/
-	# doins packaging/selinux/*
 }

@@ -43,7 +43,7 @@ DEPEND="
 	dev-util/electron:31
 "
 RDEPEND="${DEPEND}
-	systray? ( dev-libs/libappindicator:3 )
+	systray? ( dev-libs/libayatana-appindicator )
 "
 BDEPEND="
 	dev-util/esbuild

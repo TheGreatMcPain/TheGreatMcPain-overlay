@@ -165,9 +165,23 @@ def get_github_repo_filelist(
     return file_list
 
 
+def format_tags(tag: str):
+    base = tag.split("-")[0]
+    nums = base.split(".")
+
+    strings = []
+    for num in nums:
+        strings.append("{0:0=2d}".format(int(num)))
+
+    return ".".join(strings) + "-" + tag.split("-")[1]
+
+
 def is_tag_greater(tag1: str, tag2: str) -> bool:
-    tag1_base = tag1.split("-")[0]
-    tag2_base = tag2.split("-")[0]
+    tag1_formatted = format_tags(tag1)
+    tag2_formatted = format_tags(tag2)
+
+    tag1_base = tag1_formatted.split("-")[0]
+    tag2_base = tag2_formatted.split("-")[0]
 
     if float(tag1_base) > float(tag2_base):
         return True
@@ -175,8 +189,8 @@ def is_tag_greater(tag1: str, tag2: str) -> bool:
     if float(tag1_base) < float(tag2_base):
         return False
 
-    tag1_revision = tag1.split("-")[1]
-    tag2_revision = tag2.split("-")[1]
+    tag1_revision = tag1_formatted.split("-")[1]
+    tag2_revision = tag2_formatted.split("-")[1]
 
     if int(tag1_revision) > int(tag2_revision):
         return True
@@ -190,20 +204,13 @@ def is_tag_greater(tag1: str, tag2: str) -> bool:
 # The format of liquorix-package's tags isn't compatible with Python's
 # built-in sort functions.
 def get_max_tag(tags: list) -> str:
-    max_base = max(tags).split("-")[0]
-
-    cur_revision_max = 0
+    maxtag = "0.0-1"
 
     for tag in tags:
-        if max_base == tag.split("-")[0]:
-            tag_revision = tag.split("-")[1]
+        if is_tag_greater(tag, maxtag):
+            maxtag = tag
 
-            if int(tag_revision) > int(cur_revision_max):
-                cur_revision_max = tag_revision
-        else:
-            continue
-
-    return max_base + "-" + cur_revision_max
+    return maxtag
 
 
 if __name__ == "__main__":

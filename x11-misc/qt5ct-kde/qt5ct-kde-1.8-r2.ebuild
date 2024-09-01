@@ -21,6 +21,7 @@ RDEPEND="
 	dev-qt/qtdbus:5
 	dev-qt/qtgui:5=[dbus]
 	dev-qt/qtwidgets:5
+	dev-qt/qtquickcontrols2:5
 "
 DEPEND="${RDEPEND}"
 BDEPEND="

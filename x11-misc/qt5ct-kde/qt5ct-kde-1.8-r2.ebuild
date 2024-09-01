@@ -15,13 +15,12 @@ KEYWORDS="amd64 ~arm ~ppc64 x86"
 
 RDEPEND="
 	!x11-misc/qt5ct
-	kde-frameworks/qqc2-desktop-style
+	kde-frameworks/qqc2-desktop-style:5
 	dev-qt/qtconcurrent:5
 	dev-qt/qtcore:5
 	dev-qt/qtdbus:5
 	dev-qt/qtgui:5=[dbus]
 	dev-qt/qtwidgets:5
-	dev-qt/qtquickcontrols2:5
 "
 DEPEND="${RDEPEND}"
 BDEPEND="

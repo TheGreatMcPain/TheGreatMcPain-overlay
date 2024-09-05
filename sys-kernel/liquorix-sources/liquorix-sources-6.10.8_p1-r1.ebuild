@@ -7,7 +7,7 @@ ETYPE="sources"
 K_USEPV="yes"
 UNIPATCH_STRICTORDER="yes"
 K_SECURITY_UNSUPPORTED="1"
-GIT_COMMIT="6.10-8"
+GIT_COMMIT="6.10-9"
 
 CKV="$(ver_cut 1-2)"
 
@@ -46,7 +46,11 @@ src_prepare(){
 	# Taken from
 	# https://github.com/damentz/liquorix-package/blob/6.7/linux-liquorix/debian/patches/series
 	local lqx_patches="${WORKDIR}/liquorix-package-${GIT_COMMIT}/linux-liquorix/debian/patches"
-	eapply "${lqx_patches}/zen/v${PV/_p/-lqx}.patch"
+	grep -P '^(zen|lqx)/' "${lqx_patches}/series" | while IFS= read -r line
+	do
+		einfo "Patching sources with $line"
+		eapply "${lqx_patches}/${line}"
+	done
 
 	# Adds config options for OpenRC/Systemd
 	eapply "${FILESDIR}"/4567_distro-Gentoo-Kconfig.patch

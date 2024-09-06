@@ -44,7 +44,7 @@ src_unpack() {
 
 src_prepare(){
 	# Taken from
-	# https://github.com/damentz/liquorix-package/blob/6.7/linux-liquorix/debian/patches/series
+	# linux-lqx AUR package
 	local lqx_patches="${WORKDIR}/liquorix-package-${GIT_COMMIT}/linux-liquorix/debian/patches"
 	grep -P '^(zen|lqx)/' "${lqx_patches}/series" | while IFS= read -r line
 	do

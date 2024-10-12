@@ -1,0 +1,97 @@
+#!/bin/sh
+
+set -e
+
+SNAP_ID=$1
+SNAP_MOUNTPOINT="$2"
+SNAP_ORIG_PATH="$5"
+SNAP_ORIG_PATH_SAN=$(echo "$SNAP_ORIG_PATH" | sed 's@/@_@g')
+
+CDIR=`dirname $0`
+
+get_path()
+{
+        echo $1/$2 | sed 's@//@/@g'
+}
+
+remove_overlay() {
+	if test -e $(get_path "$SNAP_ORIG_PATH" "/.overlay_2fefd007-3e48-4162-b2c6-45ccdda22f37_$SNAP_ID")
+	then
+		LODEV=`losetup -j $(get_path "$SNAP_ORIG_PATH" "/.overlay_2fefd007-3e48-4162-b2c6-45ccdda22f37_$SNAP_ID") | cut -d':' -f1`
+		if [ "x$LODEV" != x ]
+		then
+			losetup -d $LODEV
+		fi
+		rm $(get_path "$SNAP_ORIG_PATH" "/.overlay_2fefd007-3e48-4162-b2c6-45ccdda22f37_$SNAP_ID")
+	fi
+}
+
+if ! test -e $SNAP_MOUNTPOINT
+then
+    echo "Snapshot at $SNAP_MOUNTPOINT was already removed"
+    [ ! -e $(get_path "$SNAP_ORIG_PATH" "/.datto_3d41c58e-6724-4d47-8981-11c766a08a24_$SNAP_ID") ] || rm $(get_path "$SNAP_ORIG_PATH" "/.datto_3d41c58e-6724-4d47-8981-11c766a08a24_$SNAP_ID")
+    [ ! -e "${SNAP_MOUNTPOINT}-num" ] || rm "${SNAP_MOUNTPOINT}-num"
+	remove_overlay
+    exit 0
+fi
+
+TYPE=$(df -T -P | egrep " ${SNAP_MOUNTPOINT}\$" | head -n 1 | tr -s " " | cut -d" " -f2)
+
+if [ "x$TYPE" = "x" ]
+then
+        if btrfs subvolume list -o "$SNAP_MOUNTPOINT" > /dev/null 2>&1
+        then
+                TYPE="btrfs"
+        fi
+fi
+
+if [ "x$TYPE" = "xbtrfs" ]
+then
+    $CDIR/btrfs_remove_filesystem_snapshot "$@"
+    exit $?
+fi
+
+if ! df -T -P | egrep " ${SNAP_MOUNTPOINT}\$" > /dev/null 2>&1
+then
+    echo "Snapshot is not mounted. Already removed"
+    rm "${SNAP_MOUNTPOINT}-num"
+    rmdir "${SNAP_MOUNTPOINT}"
+    [ ! -e $(get_path "$SNAP_ORIG_PATH" "/.datto_3d41c58e-6724-4d47-8981-11c766a08a24_$SNAP_ID") ] || rm $(get_path "$SNAP_ORIG_PATH" "/.datto_3d41c58e-6724-4d47-8981-11c766a08a24_$SNAP_ID")
+    remove_overlay
+    exit 0
+fi
+
+NUM=`cat "${SNAP_MOUNTPOINT}-num"` || true
+
+if [ "x$NUM" = "x" ]
+then
+    echo "Cannot get device number from ${SNAP_MOUNTPOINT}-num"
+    exit 1
+fi
+
+echo "Unmounting /dev/datto$NUM at /mnt/urbackup_snaps/$SNAP_ID..."
+
+if ! umount /mnt/urbackup_snaps/$SNAP_ID
+then
+	lsof | grep /mnt/urbackup_snaps/$SNAP_ID || true
+    echo "Unmounting /mnt/urbackup_snaps/$SNAP_ID failed. Retrying in 10s..."
+    sleep 10
+    umount /mnt/urbackup_snaps/$SNAP_ID
+fi
+
+
+rm "${SNAP_MOUNTPOINT}-num"
+rm "${SNAP_MOUNTPOINT}-dev"
+rmdir "${SNAP_MOUNTPOINT}"
+
+echo "Removing devicemapper snapshot..."
+
+dmsetup remove "wsnap-$SNAP_ID"
+
+remove_overlay
+
+echo "Transitioning dattobd snapshot /dev/datto$NUM to incremental..."
+
+dbdctl transition-to-incremental $NUM
+
+exit 0

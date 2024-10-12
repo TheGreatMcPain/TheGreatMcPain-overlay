@@ -54,15 +54,7 @@ src_install() {
 	doins "${FILESDIR}"/snapshot.cfg
 	insinto /usr/share/urbackup/scripts
 	insopts -m0700
-	doins "${FILESDIR}"/btrfs_create_filesystem_snapshot
-	doins "${FILESDIR}"/btrfs_remove_filesystem_snapshot
-	doins "${FILESDIR}"/dattobd_create_filesystem_snapshot
-	doins "${FILESDIR}"/dattobd_remove_filesystem_snapshot
-	doins "${FILESDIR}"/lvm_create_filesystem_snapshot
-	doins "${FILESDIR}"/lvm_remove_filesystem_snapshot
-	doins "${FILESDIR}"/dm_create_snapshot
-	doins "${FILESDIR}"/dm_remove_snapshot
-	doins "${FILESDIR}"/filesystem_snapshot_common
+	doins "${FILESDIR}"/linux_snapshot/*
 
 	# Already installed by urbackup-certificate
 	rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"

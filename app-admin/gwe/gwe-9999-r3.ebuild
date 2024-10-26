@@ -22,19 +22,19 @@ RDEPEND="
 	${PYTHON_DEPS}
 	dev-libs/appstream-glib
 	dev-libs/gobject-introspection
-	dev-libs/libappindicator:3
+	dev-libs/libayatana-appindicator
 	dev-libs/libdazzle
 
 	$(python_gen_cond_dep '
 		>=dev-python/injector-0.19.0[${PYTHON_USEDEP}]
-		>=dev-python/matplotlib-3.5.1[${PYTHON_USEDEP}]
-		>=dev-python/peewee-3.14.10[${PYTHON_USEDEP}]
+		>=dev-python/matplotlib-3.8.2[${PYTHON_USEDEP}]
+		>=dev-python/peewee-3.17.0[${PYTHON_USEDEP}]
 		>=dev-python/py3nvml-0.2.7[${PYTHON_USEDEP}]
 		dev-python/pygobject:3[${PYTHON_USEDEP}]
-		>=dev-python/python-xlib-0.31[${PYTHON_USEDEP}]
-		>=dev-python/pyxdg-0.27[${PYTHON_USEDEP}]
-		>=dev-python/requests-2.27.1[${PYTHON_USEDEP}]
-		dev-python/reactivex[${PYTHON_USEDEP}]
+		>=dev-python/python-xlib-0.33[${PYTHON_USEDEP}]
+		>=dev-python/pyxdg-0.28[${PYTHON_USEDEP}]
+		>=dev-python/requests-2.31.0[${PYTHON_USEDEP}]
+		>=dev-python/reactivex-4.0.4[${PYTHON_USEDEP}]
 	')
 "
 

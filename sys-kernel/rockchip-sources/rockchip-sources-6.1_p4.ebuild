@@ -18,7 +18,7 @@ detect_version
 DESCRIPTION="Improved Rockchip Linux"
 HOMEPAGE="https://github.com/armbian/linux-rockchip"
 EGIT_REPO_URI="https://github.com/armbian/linux-rockchip.git"
-EGIT_BRANCH="rk-${PVR/_p/-rkr}"
+EGIT_BRANCH="rk-${PVR/_p/-rkr}.1"
 
 KEYWORDS="~arm ~arm64"
 

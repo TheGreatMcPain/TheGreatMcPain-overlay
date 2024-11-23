@@ -40,7 +40,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="systray"
 
 DEPEND="
-	dev-util/electron:31
+	dev-util/electron:32
 "
 RDEPEND="${DEPEND}
 	systray? ( dev-libs/libayatana-appindicator )
@@ -121,7 +121,7 @@ src_install() {
 	dosym "../sources/translations" "/usr/lib/webcord/app/translations"
 
 	echo "#!/bin/sh" > "webcord"
-	echo "electron-31 '/usr/lib/webcord' \"\$@\"" >> "webcord"
+	echo "electron-32 '/usr/lib/webcord' \"\$@\"" >> "webcord"
 	dobin "webcord"
 }
 

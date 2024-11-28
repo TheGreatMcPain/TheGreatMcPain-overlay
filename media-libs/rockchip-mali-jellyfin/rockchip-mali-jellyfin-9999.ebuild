@@ -29,3 +29,10 @@ pkg_pretend() {
 		ewarn
 	fi
 }
+
+src_configure() {
+	local emesonargs=(
+		-Dvendor-package=true
+	)
+	meson_src_configure
+}

@@ -11,7 +11,7 @@ ETYPE="sources"
 inherit kernel-2 git-r3
 
 MY_PVR="${PVR/.9999_p/-rkr}"
-EXTRAVERSION="rk-${MY_PVR}"
+EXTRAVERSION="-rk-${MY_PVR}"
 
 DESCRIPTION="Improved Rockchip Linux"
 HOMEPAGE="https://github.com/armbian/linux-rockchip"

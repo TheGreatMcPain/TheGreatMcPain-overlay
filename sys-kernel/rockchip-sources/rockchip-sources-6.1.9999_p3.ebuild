@@ -23,7 +23,12 @@ KEYWORDS="~arm ~arm64"
 DEPEND="${RDEPEND}
 	>=sys-devel/patch-2.7.6-r5"
 
-PATCHES="${FILESDIR}/4567_distro-Gentoo-Kconfig.patch"
+# Includes some RockPro64 related fixes.
+PATCHES="
+	${FILESDIR}/4567_distro-Gentoo-Kconfig.patch
+	${FILESDIR}/0001-dts-add-rk3399-linux.dtsi-to-rk3399-rockpro64.dtsi.patch
+	${FILESDIR}/0002-dts-enable-HDMI-in-rk3399-linux.dtsi.patch
+"
 #KV_FULL="${MY_PVR}"
 S="${WORKDIR}/linux-${KV_FULL}"
 EGIT_CHECKOUT_DIR="${S}"

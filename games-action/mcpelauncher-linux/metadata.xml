@@ -5,8 +5,4 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>TheGreatMcPain</name>
 	</maintainer>
-	<use>
-		<flag name="msa">Install <pkg>games-util/mcpelauncher-msa-client</pkg></flag>
-		<flag name="ui">Install <pkg>games-util/mcpelauncher-ui-qt</pkg></flag>
-	</use>
 </pkgmetadata>

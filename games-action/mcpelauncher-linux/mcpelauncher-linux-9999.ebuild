@@ -1,7 +1,7 @@
-# Copyright 2023 Gentoo Authors
+# Copyright 2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit git-r3 cmake toolchain-funcs flag-o-matic
 
@@ -14,7 +14,6 @@ EGIT_REPO_URI="https://github.com/minecraft-linux/mcpelauncher-manifest.git"
 LICENSE="MIT GPL-3"
 SLOT="0"
 KEYWORDS=""
-IUSE="+ui +msa"
 
 DEPEND="
 	net-misc/curl
@@ -29,8 +28,7 @@ DEPEND="
 	llvm-core/clang:*
 	llvm-core/llvm:*"
 RDEPEND="${DEPEND}
-	msa? ( games-util/mcpelauncher-msa-client )
-	ui? ( games-util/mcpelauncher-ui-qt )"
+	games-util/mcpelauncher-ui-qt"
 BDEPEND="app-arch/unzip"
 
 # Prevent downloading nlohmann_json sources

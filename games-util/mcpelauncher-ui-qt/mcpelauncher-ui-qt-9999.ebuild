@@ -7,7 +7,7 @@ inherit git-r3 cmake flag-o-matic xdg-utils
 
 DESCRIPTION="mcpelauncher-linux UI"
 HOMEPAGE="https://github.com/minecraft-linux/mcpelauncher-ui-manifest"
-EGIT_BRANCH="ng"
+EGIT_BRANCH="qt6"
 EGIT_REPO_URI="https://github.com/minecraft-linux/mcpelauncher-ui-manifest.git"
 RESTRICT="network-sandbox"
 
@@ -16,17 +16,19 @@ SLOT="0"
 KEYWORDS=""
 
 DEPEND="
-	dev-qt/qtwebengine:5
-	dev-qt/qtdeclarative:5
-	dev-qt/qtquickcontrols:5
-	dev-qt/qtquickcontrols2:5
-	dev-qt/qtsvg:5
+	dev-qt/qtbase:6
+	dev-qt/qtwebengine:6
+	dev-qt/qtdeclarative:6
+	dev-qt/qtsvg:6
 	dev-libs/libzip
 	dev-libs/protobuf"
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
-PATCHES="${FILESDIR}/0001-ext-glfw.cmake-Workaround-cmake-warning.patch"
+PATCHES="
+	${FILESDIR}/0001-cmake-Fix-compatibility-with-newer-protobuf-versions.patch
+	${FILESDIR}/0001-ext-glfw.cmake-Workaround-cmake-warning.patch
+"
 
 src_configure() {
 	# Doesn't like LTO

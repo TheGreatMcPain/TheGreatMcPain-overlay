@@ -1,0 +1,12 @@
+diff --git a/libc-shim/CMakeLists.txt b/libc-shim/CMakeLists.txt
+index afbbcb1..daf72a5 100644
+--- a/libc-shim/CMakeLists.txt
++++ b/libc-shim/CMakeLists.txt
+@@ -4,6 +4,7 @@ project(libc-shim LANGUAGES CXX)
+ 
+ add_library(libc-shim src/common.cpp src/pthreads.cpp src/pthreads.h src/meta.h src/common.h src/semaphore.cpp src/semaphore.h src/network.cpp src/network.h src/dirent.cpp src/dirent.h src/cstdio.cpp src/cstdio.h src/errno.cpp src/errno.h src/ctype_data.h src/ctype_data.cpp src/bionic/strlcpy.cpp src/stat.cpp src/stat.h src/file_misc.cpp src/file_misc.h src/sysconf.cpp src/sysconf.h src/system_properties.cpp src/system_properties.h src/iorewrite.cpp src/iorewrite.h src/statvfs.h src/statvfs.cpp src/sched.h src/sched.cpp)
+ target_include_directories(libc-shim PUBLIC include/)
++target_compile_options(libc-shim PUBLIC "-O0")
+ target_link_libraries(libc-shim logger)
+ 
+ if(APPLE OR FREEBSD)

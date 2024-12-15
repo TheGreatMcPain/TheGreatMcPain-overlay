@@ -8,7 +8,7 @@ inherit git-r3 cmake toolchain-funcs flag-o-matic
 DESCRIPTION="Minecraft Bedrock Launcher for Linux (unofficial)"
 HOMEPAGE="https://github.com/minecraft-linux/mcpelauncher-manifest"
 SRC_URI="https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip -> nlohmann_json-3.7.3.zip"
-EGIT_BRANCH="qt6"
+EGIT_COMMIT="v${PV}-qt6"
 EGIT_REPO_URI="https://github.com/minecraft-linux/mcpelauncher-manifest.git"
 
 LICENSE="MIT GPL-3"

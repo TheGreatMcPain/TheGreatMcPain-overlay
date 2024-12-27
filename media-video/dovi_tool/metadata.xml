@@ -5,4 +5,7 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>James McClain</name>
 	</maintainer>
+	<upstream>
+		<remote-id type="github">quietvoid/dovi_tool</remote-id>
+	</upstream>
 </pkgmetadata>

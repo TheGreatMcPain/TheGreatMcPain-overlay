@@ -35,6 +35,7 @@ RDEPEND="${BDEPEND}"
 # Fix the silly way they implement 'cuda' in the buildsystem.
 # (perhaps it is outdated?)
 PATCHES=(
+	"${FILESDIR}/cuda-segfault-fix.patch"
 	"${FILESDIR}/0001-meson-Simplify-cuda-dependency-and-remove-hard-coded.patch"
 	"${FILESDIR}/0002-meson-Fix-include-paths-in-nvcc-custom-targets.patch"
 )

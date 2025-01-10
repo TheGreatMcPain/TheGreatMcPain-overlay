@@ -1,0 +1,155 @@
+From 85098c0bd6d4accc56013471f0bc05d1f12e7c79 Mon Sep 17 00:00:00 2001
+From: Allen Wild <allenwild93@gmail.com>
+Date: Mon, 9 Dec 2024 11:41:44 -0500
+Subject: [PATCH] Fix segfaults when using CUDA
+
+Summary: switch from using xxd to bin2c when generating the .ptx.c files
+so that the PTX data can be null-terminated.
+
+In newer drivers or cuda versions, vmaf now segfaults when trying to do
+anything from the GPU. The coredumps indicate that the crash happens
+somewhere inside the cuModuleLoadData calls in init_fex_cuda.
+
+Documentation for cuModuleLoadData states that its `image` argument can
+be "obtained by mapping a cubin or PTX or fatbin file, [or] passing
+a cubin or PTX or fatbin file as a NULL-terminated text string...". It
+looks like VMAF is trying to do the latter, encoding PTX text files as
+an ASCII string using xxd, but there's no null-terminator in the data
+because nothing asked for one.
+
+I'm a CUDA noob and don't know how this ever worked on older driver
+versions, but I tried editing the .ptx.c files by hand to add 0x00 bytes
+at the end and it worked!
+
+Switch from xxd to bin2c (which is distributed with the cuda-nvcc
+package) that supports a `--padd` option to add a null byte to the PTX
+data, eliminating the segfaults. The arrays got renamed slightly to
+remove the src_ prefix, since bin2c doesn't do any automatic naming of
+the output array.
+---
+ libvmaf/src/feature/cuda/integer_adm_cuda.c    | 10 +++++-----
+ libvmaf/src/feature/cuda/integer_adm_cuda.h    | 10 +++++-----
+ libvmaf/src/feature/cuda/integer_motion_cuda.c |  2 +-
+ libvmaf/src/feature/cuda/integer_motion_cuda.h |  2 +-
+ libvmaf/src/feature/cuda/integer_vif_cuda.c    |  2 +-
+ libvmaf/src/feature/cuda/integer_vif_cuda.h    |  2 +-
+ libvmaf/src/meson.build                        | 11 ++++++++---
+ 7 files changed, 22 insertions(+), 17 deletions(-)
+
+diff --git a/libvmaf/src/feature/cuda/integer_adm_cuda.c b/libvmaf/src/feature/cuda/integer_adm_cuda.c
+index d8b414436..a44497cbe 100644
+--- a/libvmaf/src/feature/cuda/integer_adm_cuda.c
++++ b/libvmaf/src/feature/cuda/integer_adm_cuda.c
+@@ -1023,11 +1023,11 @@ static int init_fex_cuda(VmafFeatureExtractor *fex, enum VmafPixelFormat pix_fmt
+     CUmodule adm_cm_module, adm_csf_den_module, adm_csf_module, adm_decouple_module, adm_dwt_module;
+ 
+ 
+-    CHECK_CUDA(cuModuleLoadData(&adm_dwt_module, src_adm_dwt2_ptx));
+-    CHECK_CUDA(cuModuleLoadData(&adm_csf_module, src_adm_csf_ptx));
+-    CHECK_CUDA(cuModuleLoadData(&adm_decouple_module, src_adm_decouple_ptx));
+-    CHECK_CUDA(cuModuleLoadData(&adm_csf_den_module, src_adm_csf_den_ptx));
+-    CHECK_CUDA(cuModuleLoadData(&adm_cm_module, src_adm_cm_ptx));
++    CHECK_CUDA(cuModuleLoadData(&adm_dwt_module, adm_dwt2_ptx));
++    CHECK_CUDA(cuModuleLoadData(&adm_csf_module, adm_csf_ptx));
++    CHECK_CUDA(cuModuleLoadData(&adm_decouple_module, adm_decouple_ptx));
++    CHECK_CUDA(cuModuleLoadData(&adm_csf_den_module, adm_csf_den_ptx));
++    CHECK_CUDA(cuModuleLoadData(&adm_cm_module, adm_cm_ptx));
+ 
+     // Get DWT kernel function pointers check adm_dwt2.cu for __global__ templated kernels
+     CHECK_CUDA(cuModuleGetFunction(&s->func_dwt_s123_combined_vert_kernel_0_0_int32_t,  adm_dwt_module, "dwt_s123_combined_vert_kernel_0_0_int32_t"));
+diff --git a/libvmaf/src/feature/cuda/integer_adm_cuda.h b/libvmaf/src/feature/cuda/integer_adm_cuda.h
+index 1a9632447..707dd2c9f 100644
+--- a/libvmaf/src/feature/cuda/integer_adm_cuda.h
++++ b/libvmaf/src/feature/cuda/integer_adm_cuda.h
+@@ -103,10 +103,10 @@ typedef struct AdmBufferCuda {
+     void* results_host;
+ } AdmBufferCuda;
+ 
+-extern unsigned char src_adm_dwt2_ptx[];
+-extern unsigned char src_adm_csf_den_ptx[];
+-extern unsigned char src_adm_csf_ptx[];
+-extern unsigned char src_adm_decouple_ptx[];
+-extern unsigned char src_adm_cm_ptx[];
++extern const unsigned char adm_dwt2_ptx[];
++extern const unsigned char adm_csf_den_ptx[];
++extern const unsigned char adm_csf_ptx[];
++extern const unsigned char adm_decouple_ptx[];
++extern const unsigned char adm_cm_ptx[];
+ 
+ #endif /* _FEATURE_ADM_CUDA_H_ */
+diff --git a/libvmaf/src/feature/cuda/integer_motion_cuda.c b/libvmaf/src/feature/cuda/integer_motion_cuda.c
+index 9615cde98..034e40268 100644
+--- a/libvmaf/src/feature/cuda/integer_motion_cuda.c
++++ b/libvmaf/src/feature/cuda/integer_motion_cuda.c
+@@ -144,7 +144,7 @@ static int init_fex_cuda(VmafFeatureExtractor *fex, enum VmafPixelFormat pix_fmt
+     CHECK_CUDA(cuEventCreate(&s->finished, CU_EVENT_DEFAULT));
+ 
+     CUmodule module;
+-    CHECK_CUDA(cuModuleLoadData(&module, src_motion_score_ptx));
++    CHECK_CUDA(cuModuleLoadData(&module, motion_score_ptx));
+ 
+     CHECK_CUDA(cuModuleGetFunction(&s->funcbpc16, module, "calculate_motion_score_kernel_16bpc"));
+     CHECK_CUDA(cuModuleGetFunction(&s->funcbpc8, module, "calculate_motion_score_kernel_8bpc"));
+diff --git a/libvmaf/src/feature/cuda/integer_motion_cuda.h b/libvmaf/src/feature/cuda/integer_motion_cuda.h
+index 86d8ee88b..74c0110d2 100644
+--- a/libvmaf/src/feature/cuda/integer_motion_cuda.h
++++ b/libvmaf/src/feature/cuda/integer_motion_cuda.h
+@@ -24,5 +24,5 @@
+ #include "integer_motion.h"
+ #include "common.h"
+ 
+-extern unsigned char src_motion_score_ptx[];
++extern const unsigned char motion_score_ptx[];
+ #endif /* _FEATURE_MOTION_CUDA_H_ */
+diff --git a/libvmaf/src/feature/cuda/integer_vif_cuda.c b/libvmaf/src/feature/cuda/integer_vif_cuda.c
+index fcf68f442..39bcac08a 100644
+--- a/libvmaf/src/feature/cuda/integer_vif_cuda.c
++++ b/libvmaf/src/feature/cuda/integer_vif_cuda.c
+@@ -104,7 +104,7 @@ static int init_fex_cuda(VmafFeatureExtractor *fex, enum VmafPixelFormat pix_fmt
+ 
+     // make this static
+     CUmodule filter1d_module;
+-    CHECK_CUDA(cuModuleLoadData(&filter1d_module, src_filter1d_ptx));
++    CHECK_CUDA(cuModuleLoadData(&filter1d_module, filter1d_ptx));
+     CHECK_CUDA(cuModuleGetFunction(&s->func_filter1d_8_vertical_kernel_uint32_t_17_9,
+                 filter1d_module, "filter1d_8_vertical_kernel_uint32_t_17_9"));
+     CHECK_CUDA(cuModuleGetFunction(&s->func_filter1d_8_horizontal_kernel_2_17_9,
+diff --git a/libvmaf/src/feature/cuda/integer_vif_cuda.h b/libvmaf/src/feature/cuda/integer_vif_cuda.h
+index dfb7165b7..0fd7fdc98 100644
+--- a/libvmaf/src/feature/cuda/integer_vif_cuda.h
++++ b/libvmaf/src/feature/cuda/integer_vif_cuda.h
+@@ -84,6 +84,6 @@ typedef struct vif_accums {
+     int64_t den_non_log;
+ } vif_accums;
+ 
+-extern unsigned char src_filter1d_ptx[];
++extern const unsigned char filter1d_ptx[];
+ 
+ #endif /* _FEATURE_VIF_CUDA_H_ */
+diff --git a/libvmaf/src/meson.build b/libvmaf/src/meson.build
+index 5602b6997..3e9164df0 100644
+--- a/libvmaf/src/meson.build
++++ b/libvmaf/src/meson.build
+@@ -333,14 +333,19 @@ if is_cuda_enabled
+ 
+     message('ptx_files = @0@'.format(ptx_files))
+ 
+-    xxd_exe = find_program('xxd')
++    # bin2c is distributed along with cuda tools. Use '--padd 0x00' to add a NULL-terminator byte
++    # to the end of the generated array.
++    bin2c_exe = find_program('bin2c')
+     ptx_arrays = []
+     foreach name, _ptx : ptx_files
+-        t = custom_target('ptx_xxd_@0@'.format(name),
++        t = custom_target('ptx_bin2c_@0@'.format(name),
+             build_by_default: true,
+             output : ['@PLAINNAME@.c'],
+             input : _ptx,
+-            command : [xxd_exe, '--include','@INPUT@', '@OUTPUT@'],
++            capture : true,
++            command : [bin2c_exe, '--const', '--padd', '0x00',
++                '--name', '@BASENAME@_ptx', '@INPUT@',
++            ]
+         )
+         ptx_arrays += t
+     endforeach

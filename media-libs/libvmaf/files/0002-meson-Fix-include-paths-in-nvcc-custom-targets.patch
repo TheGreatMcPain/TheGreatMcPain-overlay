@@ -1,0 +1,31 @@
+From 70e4fa1e599767db816531259b5d3c2caab35858 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Fri, 10 Jan 2025 02:20:54 -0600
+Subject: [PATCH 2/2] meson: Fix include paths in nvcc custom targets
+
+---
+ libvmaf/src/meson.build | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libvmaf/src/meson.build b/libvmaf/src/meson.build
+index 32c4da71..59d1e7ea 100644
+--- a/libvmaf/src/meson.build
++++ b/libvmaf/src/meson.build
+@@ -313,10 +313,10 @@ if is_cuda_enabled
+             input : _cu,
+             command : [nvcc_exe, '--ptx', '@INPUT@', '-o', '@OUTPUT@' ,
+                 '-I', './src',
+-                '-I', '../src',
+-                '-I', '../include',
+-                '-I', '../src/feature',
+-                '-I', '../src/' + cuda_dir,
++                '-I', meson.current_source_dir(),
++                '-I', meson.current_source_dir() + '/../include',
++                '-I', meson.current_source_dir() + '/feature',
++                '-I', meson.current_source_dir() + '/' + cuda_dir,
+             ]
+         )
+         ptx_files += {name : [t]}
+-- 
+2.45.2
+

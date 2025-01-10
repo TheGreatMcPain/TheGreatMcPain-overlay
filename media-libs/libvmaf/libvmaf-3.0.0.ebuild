@@ -32,6 +32,17 @@ BDEPEND="
 
 RDEPEND="${BDEPEND}"
 
+# Fix the silly way they implement 'cuda' in the buildsystem.
+# (perhaps it is outdated?)
+PATCHES=(
+	"${FILESDIR}/0001-meson-Simplify-cuda-dependency-and-remove-hard-coded.patch"
+	"${FILESDIR}/0002-meson-Fix-include-paths-in-nvcc-custom-targets.patch"
+)
+
+MULTILIB_WRAPPED_HEADERS=(
+       /usr/include/libvmaf/libvmaf_cuda.h
+)
+
 if [[ ${PV} == "9999" ]]; then
 	S="${WORKDIR}/libvmaf-${PV}"
 else
@@ -45,43 +56,39 @@ src_prepare() {
 	# The paths in the tests are hard coded to look for the model folder as "../../model"
 	sed -i "s|\"../../model|\"../vmaf-${PV}/model|g" "${S}"/libvmaf/test/* || die
 
-	# CUDA include path is hardcoded for some reason.
-	sed -i "s|/usr/local/cuda/include|/opt/cuda/include/|g" "${S}"/libvmaf/src/meson.build || die
-
-	# Buildsystem directly calls nvcc here, we need to add --compiler-bindir
-	sed -i "s|\[nvcc_exe|\[nvcc_exe, '--compiler-bindir', '$(cuda_gccdir)'|" "${S}"/libvmaf/src/meson.build || die
+	# Remove all 'cuda_inc' instances. (not sure why my patch wasn't working)
+	sed -i "s|cuda_inc += include_directories('/usr/local/cuda/include')||g" \
+		"${S}"/libvmaf/src/meson.build \
+		|| die
 
 	cuda_src_prepare
 }
 
 multilib_src_configure() {
-	export CUDA_PATH="/opt/cuda"
-	elog ${NVCCFLAGS}
+	if use cuda; then
+		export CUDA_PATH="/opt/cuda"
+		export NVCC_PREPEND_FLAGS="--compiler-bindir=$(cuda_gccdir)"
+	fi
+
 	local emesonargs=(
-		-Dcpp_args="-Wno-error -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-implicit-function-declaration"
-		-Dc_args="-Wno-error -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-implicit-function-declaration"
-		-Dwarning_level=0
+		-Dc_args="-Wno-incompatible-pointer-types -Wno-int-conversion -Wno-implicit-function-declaration"
 		$(meson_use embed-models built_in_models)
 		$(meson_use test enable_tests)
 		$(meson_native_use_bool cuda enable_cuda)
 	)
 
 	if use cuda; then
-		emesonargs+=(
-			-Dcuda_ccbindir=$(cuda_gccdir)
-		)
+	        emesonargs+=(
+	                -Dcuda_ccbindir=$(cuda_gccdir)
+	        )
 	fi
 
 	EMESON_SOURCE="${S}/libvmaf"
-	build_base="$(basename ${BUILD_DIR})"
-	export BUILD_DIR="${EMESON_SOURCE}/${build_base}"
 	filter-lto
 	meson_src_configure
 }
 
 multilib_src_compile() {
-	build_base="$(basename ${BUILD_DIR})"
-	export BUILD_DIR="${EMESON_SOURCE}/${build_base}"
 	meson_src_compile
 }
 

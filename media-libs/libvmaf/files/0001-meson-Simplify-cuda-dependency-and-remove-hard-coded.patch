@@ -1,0 +1,46 @@
+From 1dcb847296fcc8fc6c960052534053d61e1a0cfb Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Fri, 10 Jan 2025 02:19:50 -0600
+Subject: [PATCH 1/2] meson: Simplify cuda dependency, and remove hard coded
+ include directory.
+
+---
+ libvmaf/src/meson.build | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/libvmaf/src/meson.build b/libvmaf/src/meson.build
+index 623639d4..32c4da71 100644
+--- a/libvmaf/src/meson.build
++++ b/libvmaf/src/meson.build
+@@ -296,11 +292,7 @@ if is_cuda_enabled
+         cuda_dir + 'ring_buffer.c',
+     ]
+ 
+-    cuda_drv_api_dependency = declare_dependency(link_args : ['-lcuda'])
+-    cuda_rt_api_dependency = dependency('cuda', version : '>=10')
+-
+-    cuda_dependency += cuda_drv_api_dependency
+-    cuda_dependency += cuda_rt_api_dependency
++    cuda_dependency = dependency('cuda', version : '>=10', modules: ['cuda'])
+ 
+     cuda_flags = []
+     if get_option('buildtype').startswith('debug')
+@@ -350,14 +342,13 @@ if is_cuda_enabled
+     cuda_static_lib = static_library(
+         'cuda_common_vmaf_lib',
+         [cuda_sources, ptx_arrays,],
+-        dependencies: [cuda_drv_api_dependency],
++        dependencies: cuda_dependency,
+         include_directories : [
+             libvmaf_include,
+             vmaf_base_include,
+             cuda_dir,
+             feature_src_dir,
+             include_directories('../src/cuda/'),
+-            cuda_inc,
+         ],
+         c_args : vmaf_cflags_common,
+         cuda_args: cuda_flags # + ['-gencode', 'arch=compute_86,code=sm_86' ] #, '--use_fast_math']
+-- 
+2.45.2
+

@@ -16,7 +16,7 @@ EXTRAVERSION="-rk-${MY_PVR}.1"
 DESCRIPTION="Improved Rockchip Linux"
 HOMEPAGE="https://github.com/armbian/linux-rockchip"
 EGIT_REPO_URI="https://github.com/armbian/linux-rockchip.git"
-EGIT_BRANCH="rk-${MY_PVR}"
+EGIT_BRANCH="rk-${MY_PVR}.1"
 
 KEYWORDS="~arm ~arm64"
 

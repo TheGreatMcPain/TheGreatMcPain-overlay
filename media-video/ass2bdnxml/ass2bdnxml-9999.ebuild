@@ -21,3 +21,8 @@ DEPEND="
 	media-gfx/libimagequant
 "
 RDEPEND="${DEPEND}"
+
+src_install() {
+	meson_src_install
+	dobin "${BUILD_DIR}/${PN}"
+}

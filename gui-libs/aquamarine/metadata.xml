@@ -5,9 +5,9 @@
 		<email>james@thegreatmcpain.xyz</email>
 		<name>James McClain</name>
 	</maintainer>
-  <upstream>
-    <changelog>https://github.com/hyprwm/aquamarine/releases</changelog>
-    <bugs-to>https://github.com/hyprwm/aquamarine/issues</bugs-to>
-    <remote-id type="github">hyprwm/aquamarine</remote-id>
-  </upstream>
+	<upstream>
+		<changelog>https://github.com/hyprwm/aquamarine/releases</changelog>
+		<bugs-to>https://github.com/hyprwm/aquamarine/issues</bugs-to>
+		<remote-id type="github">hyprwm/aquamarine</remote-id>
+	</upstream>
 </pkgmetadata>

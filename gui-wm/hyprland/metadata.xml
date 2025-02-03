@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>james@thegreatmcpain.xyz</email>
+		<name>James McClain</name>
+	</maintainer>
+	<upstream>
+		<changelog>https://github.com/hyprwm/Hyprland/releases</changelog>
+		<doc>https://wiki.hyprland.org/</doc>
+		<bugs-to>https://github.com/hyprwm/Hyprland/issues</bugs-to>
+		<remote-id type="github">hyprwm/Hyprland</remote-id>
+	</upstream>
+	<use>
+		<flag name="legacy-renderer">Enable legacy renderer</flag>
+		<flag name="qtutils">Install Hyprland QT utility apps</flag>
+	</use>
+</pkgmetadata>

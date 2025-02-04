@@ -6,7 +6,7 @@ Just a bunch of stuff I wanted to install which were not available in other over
 
 #### eselect-repository
 
-`> eselect-repository enable thegreatmcpain`
+`> eselect-repository enable thegreatmcpain`\
 `> emerge --sync thegreatmcpain`
 
 You can also run this to get faster updates.

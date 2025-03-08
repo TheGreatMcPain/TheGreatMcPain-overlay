@@ -1,0 +1,12 @@
+diff --git a/scripts/bash-based-configure b/scripts/bash-based-configure
+index a6037a7..03cae67 100644
+--- a/scripts/bash-based-configure
++++ b/scripts/bash-based-configure
+@@ -1363,6 +1363,7 @@ EOF
+    CFG_LIBS="$CFG_LIBS $CFG_GLIB2_LIBS"
+ 
+    cat >conftest.c <<EOF
++#include <stdio.h>
+ #include <glib.h>
+ int main(int argc, char *argv[])
+ { g_malloc(1024); 

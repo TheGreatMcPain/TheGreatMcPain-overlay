@@ -1,4 +1,4 @@
-# Copyright 2022 Gentoo Authors
+# Copyright 2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -8,12 +8,15 @@ inherit flag-o-matic meson-multilib
 
 DESCRIPTION="Alternative NVAPI implementation on top of DXVK"
 HOMEPAGE="https://github.com/jp7677/dxvk-nvapi"
-VULKAN_HEADERS_HASH="217e93c664ec6704ec2d8c36fa116c1a4a1e2d40"
+VULKAN_HEADERS_HASH="d4a196d8c84e032d27f999adcea3075517c1c97f"
+NVAPI_HASH="ce6d2a183f9559f717e82b80333966d19edb9c8c"
 SRC_URI="
 	https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz
 		-> ${P}.tar.gz
 	https://github.com/KhronosGroup/Vulkan-Headers/archive/${VULKAN_HEADERS_HASH}.tar.gz
-		-> ${P}-vulkan-headers.tar.gz"
+		-> ${P}-vulkan-headers.tar.gz
+	https://github.com/NVIDIA/nvapi/archive/${NVAPI_HASH}.tar.gz
+		-> ${P}-nvapi.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
@@ -49,6 +52,8 @@ src_prepare() {
 	if [[ ${PV} != "9999" ]]; then
 		rm -r "${S}/external/Vulkan-Headers"
 		mv "${WORKDIR}/Vulkan-Headers-${VULKAN_HEADERS_HASH}" "${S}/external/Vulkan-Headers"
+		rm -r "${S}/external/nvapi"
+		mv "${WORKDIR}/nvapi-${NVAPI_HASH}" "${S}/external/nvapi"
 	fi
 
 	default

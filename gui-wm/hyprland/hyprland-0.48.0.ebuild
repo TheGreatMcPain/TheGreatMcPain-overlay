@@ -65,7 +65,7 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 	>=dev-libs/hyprland-protocols-0.6.2
-	>=dev-libs/wayland-protocols-1.36
+	>=dev-libs/wayland-protocols-1.41
 "
 BDEPEND="
 	|| ( >=sys-devel/gcc-14:* >=llvm-core/clang-18:* )

@@ -1,0 +1,27 @@
+From 1df4362cb90d9a12de888e16c2b4e85f69dcf961 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Thu, 3 Apr 2025 02:01:44 -0500
+Subject: [PATCH 1/2] cargo: Remove custom 'release' profile
+
+---
+ Cargo.toml | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 782589a4..83a3efa3 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -25,10 +25,6 @@ alvr_session = { path = "alvr/session" }
+ alvr_sockets = { path = "alvr/sockets" }
+ alvr_system_info = { path = "alvr/system_info" }
+ 
+-[profile.release]
+-debug = "limited"
+-strip = false
+-
+ [profile.distribution]
+ inherits = "release"
+ lto = true
+-- 
+2.49.0
+

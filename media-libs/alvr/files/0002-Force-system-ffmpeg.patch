@@ -1,0 +1,80 @@
+From 78eeb2b7170ac6bc09efad898c8ca6f940a1082e Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Thu, 3 Apr 2025 02:02:10 -0500
+Subject: [PATCH 2/2] Force system ffmpeg
+
+---
+ alvr/server_openvr/build.rs | 44 ++++++++++++++++++-------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/alvr/server_openvr/build.rs b/alvr/server_openvr/build.rs
+index 2573d07e..36eacd3d 100644
+--- a/alvr/server_openvr/build.rs
++++ b/alvr/server_openvr/build.rs
+@@ -83,12 +83,12 @@ fn main() {
+ 
+     let gpl_or_linux = cfg!(feature = "gpl") || cfg!(target_os = "linux");
+ 
+-    if gpl_or_linux {
+-        let ffmpeg_path = get_ffmpeg_path();
++    //if gpl_or_linux {
++    //    let ffmpeg_path = get_ffmpeg_path();
+ 
+-        assert!(ffmpeg_path.join("include").exists());
+-        build.include(ffmpeg_path.join("include"));
+-    }
++    //    assert!(ffmpeg_path.join("include").exists());
++    //    build.include(ffmpeg_path.join("include"));
++    //}
+ 
+     #[cfg(all(target_os = "linux", feature = "gpl"))]
+     {
+@@ -133,28 +133,28 @@ fn main() {
+ 
+     // ffmpeg
+     if gpl_or_linux {
+-        let ffmpeg_path = get_ffmpeg_path();
+-        let ffmpeg_lib_path = ffmpeg_path.join("lib");
++        //let ffmpeg_path = get_ffmpeg_path();
++        //let ffmpeg_lib_path = ffmpeg_path.join("lib");
+ 
+-        assert!(ffmpeg_lib_path.exists());
++        //assert!(ffmpeg_lib_path.exists());
+ 
+-        println!(
+-            "cargo:rustc-link-search=native={}",
+-            ffmpeg_lib_path.to_string_lossy()
+-        );
++        //println!(
++        //    "cargo:rustc-link-search=native={}",
++        //    ffmpeg_lib_path.to_string_lossy()
++        //);
+ 
+         #[cfg(target_os = "linux")]
+         {
+-            let ffmpeg_pkg_path = ffmpeg_lib_path.join("pkgconfig");
+-            assert!(ffmpeg_pkg_path.exists());
+-
+-            let ffmpeg_pkg_path = ffmpeg_pkg_path.to_string_lossy().to_string();
+-            env::set_var(
+-                "PKG_CONFIG_PATH",
+-                env::var("PKG_CONFIG_PATH").map_or(ffmpeg_pkg_path.clone(), |old| {
+-                    format!("{ffmpeg_pkg_path}:{old}")
+-                }),
+-            );
++            //let ffmpeg_pkg_path = ffmpeg_lib_path.join("pkgconfig");
++            //assert!(ffmpeg_pkg_path.exists());
++
++            //let ffmpeg_pkg_path = ffmpeg_pkg_path.to_string_lossy().to_string();
++            //env::set_var(
++            //    "PKG_CONFIG_PATH",
++            //    env::var("PKG_CONFIG_PATH").map_or(ffmpeg_pkg_path.clone(), |old| {
++            //        format!("{ffmpeg_pkg_path}:{old}")
++            //    }),
++            //);
+ 
+             let pkg = pkg_config::Config::new().statik(true).to_owned();
+ 
+-- 
+2.49.0
+

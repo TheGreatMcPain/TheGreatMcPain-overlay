@@ -7,9 +7,14 @@
 import urllib.request
 import json
 import os
+import sys
 
 
 def main():
+    os.chdir(
+        os.path.join(os.path.dirname(sys.argv[0]), "../sys-kernel/liquorix-sources")
+    )
+
     # Grab version information for ebuilds and upstream
     tags = get_github_repo_tags("damentz", "liquorix-package")
     ebuilds = get_ebuilds("./")

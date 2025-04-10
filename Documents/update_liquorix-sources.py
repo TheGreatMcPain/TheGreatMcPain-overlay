@@ -70,6 +70,9 @@ def main():
 
     print("Running 'pkgdev manifest'")
     os.system("pkgdev manifest -f")
+    print("Running 'pkgdev commit'")
+    os.system("git add .")
+    os.system("pkgdev commit")
     print("Done!")
     print("You may need to test ebuild before commiting.")
 

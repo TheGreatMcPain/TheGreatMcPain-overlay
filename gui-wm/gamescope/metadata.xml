@@ -5,10 +5,6 @@
 		<email>chewi@gentoo.org</email>
 		<name>James Le Cuirot</name>
 	</maintainer>
-	<maintainer type="person">
-		<email>james@thegreatmcpain.xyz</email>
-		<name>James McClain</name>
-	</maintainer>
 	<upstream>
 		<remote-id type="github">ValveSoftware/gamescope</remote-id>
 	</upstream>

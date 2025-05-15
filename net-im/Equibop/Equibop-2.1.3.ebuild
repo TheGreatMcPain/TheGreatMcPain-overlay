@@ -4,7 +4,7 @@ inherit desktop
 
 DESCRIPTION="Equibop is a fork of Vesktop."
 HOMEPAGE="https://github.com/Equicord/Equibop"
-SRC_URI="https://github.com/Equicord/Equibop/archive/refs/tags/v2.1.1.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/Equicord/Equibop/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"

@@ -2,8 +2,8 @@
 <!DOCTYPE pkgmetadata SYSTEM 'https://www.gentoo.org/dtd/metadata.dtd'>
 <pkgmetadata>
 	<maintainer type="person">
-		<email>chewi@gentoo.org</email>
-		<name>James Le Cuirot</name>
+		<email>james@thegreatmcpain.xyz</email>
+		<name>James McClain</name>
 	</maintainer>
 	<upstream>
 		<remote-id type="github">ValveSoftware/gamescope</remote-id>

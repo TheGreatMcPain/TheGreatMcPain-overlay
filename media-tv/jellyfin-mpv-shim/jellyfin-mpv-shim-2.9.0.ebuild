@@ -12,14 +12,17 @@ inherit distutils-r1
 DESCRIPTION="Cast media from Jellyfin to MPV"
 HOMEPAGE="https://github.com/jellyfin/jellyfin-mpv-shim"
 
+SHADERS_PV="2.1.0"
+
 SRC_URI="
 	https://github.com/jellyfin/jellyfin-mpv-shim/archive/v${PV}.tar.gz -> ${P}.tar.gz
+	https://github.com/iwalton3/default-shader-pack/archive/v${SHADERS_PV}.tar.gz -> ${P}-shaders.tar.gz
 "
 
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="systray display-mirroring shaders discord"
+IUSE="systray display-mirroring discord"
 
 DEPEND="
 	media-video/mpv[libmpv]
@@ -32,22 +35,14 @@ DEPEND="
 		dev-python/jinja2[${PYTHON_USEDEP}]
 		dev-python/pywebview[${PYTHON_USEDEP}]
 	)
-	shaders? ( dev-util/mpv-shim-default-shaders )
 	discord? ( dev-python/pypresence[${PYTHON_USEDEP}] )
 "
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
-shaders_symlink() {
-	ln -sv "/usr/share/mpv-shim-default-shaders" \
-		"$(python_get_sitedir)/jellyfin_mpv_shim/default_shader_pack" || die
-}
+src_unpack() {
+	default
 
-src_install() {
-	distutils-r1_src_install
-
-	# Setup symlink to mpv-shim-default-shaders
-	if use shaders; then
-		python_foreach_impl shaders_symlink
-	fi
+	mv "${WORKDIR}/default-shader-pack-${SHADERS_PV}" \
+		"${S}/jellyfin_mpv_shim/default_shader_pack"
 }

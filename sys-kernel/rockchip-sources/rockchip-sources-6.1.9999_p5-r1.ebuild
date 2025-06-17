@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="8"
@@ -16,7 +16,7 @@ EXTRAVERSION="-rk-${MY_PVR}"
 DESCRIPTION="Improved Rockchip Linux"
 HOMEPAGE="https://github.com/armbian/linux-rockchip"
 EGIT_REPO_URI="https://github.com/armbian/linux-rockchip.git"
-EGIT_BRANCH="rk-${MY_PVR}"
+EGIT_BRANCH="rk-${MY_PVR}.1"
 
 KEYWORDS="~arm ~arm64"
 

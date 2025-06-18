@@ -53,7 +53,7 @@ src_prepare(){
 	done
 
 	# Adds config options for OpenRC/Systemd
-	eapply "${FILESDIR}"/4567_distro-Gentoo-Kconfig.patch
+	eapply "${FILESDIR}"/4567_distro-Gentoo-Kconfig-r1.patch
 
 	eapply_user
 }

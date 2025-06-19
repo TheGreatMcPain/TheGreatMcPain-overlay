@@ -20,6 +20,7 @@ RDEPEND="
 		sys-kernel/rt-sources
 		sys-kernel/zen-sources
 		sys-kernel/raspberrypi-sources
+		sys-kernel/rockchip-sources
 		sys-kernel/gentoo-kernel
 		sys-kernel/gentoo-kernel-bin
 		sys-kernel/vanilla-kernel

@@ -33,8 +33,8 @@ pkg_postinst() {
 	elog
 	elog "'jellyfin-ffmpeg' has been installed to '/opt/jellyfin-ffmpeg'."
 	elog
-	elog "To use it with Jellyfin go into the adminisration dashboard,"
-	elog "then go to 'Playback->Transcoding',"
-	elog "and change the 'FFmpeg path' to '/opt/jellyfin-ffmpeg/ffmpeg'."
+	elog "To use it with Jellyfin modify '/etc/init.d/jellyfin',"
+	elog "and add '--ffmpeg /opt/jellyfin-ffmpeg/ffmpeg'"
+	elog "to the 'command_args' variable."
 	elog
 }

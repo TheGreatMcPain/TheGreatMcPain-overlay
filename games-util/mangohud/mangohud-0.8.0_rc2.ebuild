@@ -40,6 +40,7 @@ DEPEND="
 	media-libs/libglvnd[${MULTILIB_USEDEP}]
 	dbus? ( sys-apps/dbus[${MULTILIB_USEDEP}] )
 	tools? (
+		media-libs/glew:=
 		media-libs/glfw
 	)
 	X? ( x11-libs/libX11[${MULTILIB_USEDEP}] )

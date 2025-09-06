@@ -24,4 +24,5 @@ DEPEND="
 	dev-qt/qtwidgets:5
 	dev-qt/qtxml:5
 	media-gfx/imagemagick[cxx]
-	dev-libs/tinyxml2"
+	dev-libs/tinyxml2
+	dev-libs/cxxopts"

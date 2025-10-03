@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>james@thegreatmcpain.xyz</email>
+		<name>James McClain</name>
+	</maintainer>
+	<use>
+		<flag name="ryzen-smu">
+			Use <pkg>app-admin/ryzen_smu</pkg> kernel driver
+			instead of <pkg>sys-apps/pciutils</pkg>.
+		</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">FlyGoat/RyzenAdj</remote-id>
+	</upstream>
+</pkgmetadata>

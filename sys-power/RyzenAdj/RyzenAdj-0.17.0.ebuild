@@ -11,8 +11,8 @@ SRC_URI="https://github.com/FlyGoat/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P
 
 LICENSE="LGPL-3"
 SLOT="0"
-KEYWORDS="amd64 x86"
-IUSE="ryzen-smu"
+KEYWORDS="~amd64 ~x86"
+IUSE="+ryzen-smu"
 
 DEPEND="
 	ryzen-smu? (

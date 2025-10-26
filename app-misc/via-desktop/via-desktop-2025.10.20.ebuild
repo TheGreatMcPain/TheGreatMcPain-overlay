@@ -30,7 +30,6 @@ RDEPEND="
 	media-libs/mesa
 	net-print/cups
 	sys-apps/dbus
-	sys-fs/fuse:0
 	sys-libs/zlib
 	x11-libs/cairo
 	x11-libs/gtk+:3

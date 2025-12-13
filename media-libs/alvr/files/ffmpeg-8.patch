@@ -1,0 +1,38 @@
+diff --git a/alvr/server_openvr/cpp/platform/linux/EncodePipelineVAAPI.cpp b/alvr/server_openvr/cpp/platform/linux/EncodePipelineVAAPI.cpp
+index e303f22..db3c584 100644
+--- a/alvr/server_openvr/cpp/platform/linux/EncodePipelineVAAPI.cpp
++++ b/alvr/server_openvr/cpp/platform/linux/EncodePipelineVAAPI.cpp
+@@ -177,14 +177,14 @@ alvr::EncodePipelineVAAPI::EncodePipelineVAAPI(
+     case ALVR_CODEC_H264:
+         switch (settings.m_h264Profile) {
+         case ALVR_H264_PROFILE_BASELINE:
+-            encoder_ctx->profile = FF_PROFILE_H264_BASELINE;
++            encoder_ctx->profile = AV_PROFILE_H264_BASELINE;
+             break;
+         case ALVR_H264_PROFILE_MAIN:
+-            encoder_ctx->profile = FF_PROFILE_H264_MAIN;
++            encoder_ctx->profile = AV_PROFILE_H264_MAIN;
+             break;
+         default:
+         case ALVR_H264_PROFILE_HIGH:
+-            encoder_ctx->profile = FF_PROFILE_H264_HIGH;
++            encoder_ctx->profile = AV_PROFILE_H264_HIGH;
+             break;
+         }
+ 
+@@ -199,12 +199,12 @@ alvr::EncodePipelineVAAPI::EncodePipelineVAAPI(
+ 
+         break;
+     case ALVR_CODEC_HEVC:
+-        encoder_ctx->profile = Settings::Instance().m_use10bitEncoder ? FF_PROFILE_HEVC_MAIN_10
+-                                                                      : FF_PROFILE_HEVC_MAIN;
++        encoder_ctx->profile = Settings::Instance().m_use10bitEncoder ? AV_PROFILE_HEVC_MAIN_10
++                                                                      : AV_PROFILE_HEVC_MAIN;
+         encoder_ctx->gop_size = INT16_MAX;
+         break;
+     case ALVR_CODEC_AV1:
+-        encoder_ctx->profile = FF_PROFILE_AV1_MAIN;
++        encoder_ctx->profile = AV_PROFILE_AV1_MAIN;
+         break;
+     }
+ 

@@ -10,7 +10,7 @@ EAPI=8
 CRATES=""
 
 # Pulled from fem-overlay
-CARGO_DEP_ARCHIVE_VER="2025-04-02"
+CARGO_DEP_ARCHIVE_VER="2025-12-13"
 CARGO_DEP_ARCHIVE_PV="${PV}+${CARGO_DEP_ARCHIVE_VER}"
 CARGO_DEP_ARCHIVE_P="${PN}-deps-${CARGO_DEP_ARCHIVE_PV}"
 CARGO_VENDOR_BASEURI="https://gitlab.com/api/v4/projects/42159594/packages/generic"
@@ -54,6 +54,7 @@ BDEPEND="${RDEPEND}
 PATCHES=(
 	"${FILESDIR}/0001-cargo-Remove-custom-release-profile.patch"
 	"${FILESDIR}/0002-Force-system-ffmpeg.patch"
+	"${FILESDIR}/ffmpeg-8.patch"
 )
 
 src_unpack() {

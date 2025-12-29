@@ -1,4 +1,4 @@
-# Copyright 2020-2024 Gentoo Authors
+# Copyright 2020-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -9,26 +9,17 @@ DESCRIPTION="Linux kernel driver for reading sensors of AMD Zen family CPUs"
 HOMEPAGE="
 	https://github.com/koweda/zenpower3
 	https://github.com/ocerman/zenpower
+	https://github.com/AliEmreSenel/zenpower3
 "
 
-if [[ ${PV} == "9999" ]]; then
-	inherit git-r3
-	# Mantain fork of zenpower3
-	EGIT_REPO_URI="https://github.com/AliEmreSenel/zenpower3"
-else
-	SRC_URI="https://github.com/koweda/zenpower3/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	S="${WORKDIR}/${P}"
-	KEYWORDS="~amd64"
-fi
+inherit git-r3
+# Mantain fork of zenpower3
+EGIT_REPO_URI="https://github.com/AliEmreSenel/zenpower3.git"
 
 LICENSE="GPL-2"
 SLOT="0"
 
 CONFIG_CHECK="HWMON PCI AMD_NB"
-
-PATCHES="
-	${FILESDIR}/${P}-use-symlink-to-detect-kernel-version.patch
-"
 
 src_compile() {
 	MODULES_MAKEARGS+=(

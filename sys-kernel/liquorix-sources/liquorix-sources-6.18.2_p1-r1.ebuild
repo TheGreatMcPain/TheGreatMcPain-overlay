@@ -58,5 +58,11 @@ src_prepare(){
 	eapply_user
 }
 
+src_install() {
+	dodoc "${WORKDIR}/liquorix-package-${GIT_COMMIT}/linux-liquorix/debian/config/kernelarch-x86/config-arch-64"
+
+	kernel-2_src_install
+}
+
 K_EXTRAEINFO="For more info on liquorix-sources and details on how to report problems, see: \
 ${HOMEPAGE}."

@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{9..13} )
+PYTHON_COMPAT=( python3_{9..14} )
 
 inherit meson python-single-r1 gnome2-utils git-r3
 
@@ -26,7 +26,7 @@ RDEPEND="
 	dev-libs/libdazzle
 
 	$(python_gen_cond_dep '
-		>=dev-python/injector-0.19.0[${PYTHON_USEDEP}]
+		>=dev-python/injector-0.21.0[${PYTHON_USEDEP}]
 		>=dev-python/matplotlib-3.8.2[${PYTHON_USEDEP}]
 		>=dev-python/peewee-3.17.0[${PYTHON_USEDEP}]
 		>=dev-python/py3nvml-0.2.7[${PYTHON_USEDEP}]

@@ -1,4 +1,3 @@
-diff '--color=auto' -Naur a/build/linux/unbundle/absl_algorithm.gn b/build/linux/unbundle/absl_algorithm.gn
 --- a/build/linux/unbundle/absl_algorithm.gn
 +++ b/build/linux/unbundle/absl_algorithm.gn
 @@ -20,3 +20,5 @@ source_set("algorithm_test") {
@@ -63,6 +62,37 @@ diff '--color=auto' -Naur a/build/linux/unbundle/absl_algorithm.gn b/build/linux
 +}
 +source_set("utf8_for_code_point_test") {
 +}
+--- a/build/linux/unbundle/absl_flags.gn
++++ b/build/linux/unbundle/absl_flags.gn
+@@ -89,3 +89,5 @@ source_set("usage") {
+ 
+ source_set("flag_test") {
+ }
++source_set("marshalling") {
++}
+--- a/build/linux/unbundle/absl_functional.gn
++++ b/build/linux/unbundle/absl_functional.gn
+@@ -46,8 +46,19 @@ source_set("function_ref") {
+   public_configs = [ ":system_absl_function_ref" ]
+ }
+ 
++pkg_config("system_absl_overload") {
++  packages = [ "absl_overload" ]
++}
++
++shim_headers("overload_shim") {
++  root_path = "."
++  prefix = "absl/functional/"
++  headers = [ "overload.h" ]
++}
++
+ source_set("overload") {
+-  # Dummy — unavailable with abseil 202308 and chromium 122 does not use it
++  deps = [ ":overload_shim" ]
++  public_configs = [ ":system_absl_overload" ]
+ }
+ 
+ source_set("any_invocable_test") {
 --- a/build/linux/unbundle/absl_log.gn
 +++ b/build/linux/unbundle/absl_log.gn
 @@ -138,3 +138,11 @@ source_set("stripping_test") {
@@ -106,10 +136,12 @@ diff '--color=auto' -Naur a/build/linux/unbundle/absl_algorithm.gn b/build/linux
    ]
  }
  
-@@ -136,3 +138,11 @@ source_set("str_replace_test") {
+@@ -136,3 +138,13 @@ source_set("str_replace_test") {
  }
  source_set("string_view_test") {
  }
++source_set("charset") {
++}
 +source_set("cord_test") {
 +}
 +source_set("cordz_handle_test") {
@@ -132,3 +164,13 @@ diff '--color=auto' -Naur a/build/linux/unbundle/absl_algorithm.gn b/build/linux
 +}
 +source_set("per_thread_sem_test") {
 +}
+--- a/third_party/protobuf/src/google/protobuf/repeated_field.h
++++ b/third_party/protobuf/src/google/protobuf/repeated_field.h
+@@ -33,6 +33,7 @@
+ #include <utility>
+ 
+ #include "absl/base/attributes.h"
++#include "absl/base/dynamic_annotations.h"
+ #include "absl/base/optimization.h"
+ #include "absl/log/absl_check.h"
+ #include "absl/meta/type_traits.h"

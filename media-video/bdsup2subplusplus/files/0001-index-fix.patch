@@ -1,0 +1,26 @@
+From 0860d8c9a1aa4d55d5b491aa95adce7312832b24 Mon Sep 17 00:00:00 2001
+From: Georg Pelz <hybrid@selur.de>
+Date: Sat, 17 May 2025 14:10:35 +0200
+Subject: [PATCH] index fix
+
+---
+ src/Subtitles/palette.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/Subtitles/palette.cpp b/src/Subtitles/palette.cpp
+index 72d1d85..486e3f0 100644
+--- a/src/Subtitles/palette.cpp
++++ b/src/Subtitles/palette.cpp
+@@ -62,7 +62,8 @@ Palette::Palette(int paletteSize, bool use601) :
+ Palette::Palette(QVector<uchar> inRed, QVector<uchar> inGreen, QVector<uchar> inBlue, QVector<uchar> inAlpha, bool use601) :
+     useBT601(use601)
+ {
+-    for (int i = 0; i < inRed.size(); ++i)
++    int size = qMin(qMin(qMin(inRed.size(), inGreen.size()), inBlue.size()), inAlpha.size());
++    for (int i = 0; i < size; ++i)
+     {
+         colors.push_back(qRgba(inRed.at(i), inGreen.at(i), inBlue.at(i), inAlpha.at(i)));
+     }
+-- 
+2.52.0
+

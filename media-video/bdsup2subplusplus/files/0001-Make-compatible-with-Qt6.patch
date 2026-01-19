@@ -1,0 +1,3315 @@
+From cb935452479472959cb108c83ba6468775f09610 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Sun, 18 Jan 2026 20:37:22 -0600
+Subject: [PATCH] Make compatible with Qt6
+
+---
+ src/Filters/filterop.cpp            |  22 ++--
+ src/Filters/filterop.h              |  14 +--
+ src/Subtitles/bitmap.cpp            |  26 ++---
+ src/Subtitles/bitmap.h              |   8 +-
+ src/Subtitles/imageobject.h         |   6 +-
+ src/Subtitles/palette.cpp           |  16 +--
+ src/Subtitles/palette.h             |  24 ++---
+ src/Subtitles/subdvd.cpp            |  38 +++----
+ src/Subtitles/subdvd.h              |  26 ++---
+ src/Subtitles/subpicture.h          |   8 +-
+ src/Subtitles/subpicturebd.cpp      |   6 +-
+ src/Subtitles/subpicturebd.h        |  10 +-
+ src/Subtitles/subpicturedvd.cpp     |   2 +-
+ src/Subtitles/subpicturedvd.h       |  12 +--
+ src/Subtitles/subpicturexml.h       |   4 +-
+ src/Subtitles/substreamdvd.cpp      |  14 +--
+ src/Subtitles/substreamdvd.h        |  18 ++--
+ src/Subtitles/subtitleprocessor.cpp |  38 +++----
+ src/Subtitles/subtitleprocessor.h   |  30 +++---
+ src/Subtitles/supbd.cpp             |  40 +++----
+ src/Subtitles/supbd.h               |  24 ++---
+ src/Subtitles/supdvd.cpp            |  32 +++---
+ src/Subtitles/supdvd.h              |  16 +--
+ src/Subtitles/suphd.cpp             |   4 +-
+ src/Subtitles/suphd.h               |   4 +-
+ src/Subtitles/supxml.cpp            |  67 ++++++++++--
+ src/Subtitles/supxml.h              |  21 +++-
+ src/Tools/bitstream.cpp             |   2 +-
+ src/Tools/bitstream.h               |   6 +-
+ src/Tools/filebuffer.h              |   2 +-
+ src/Tools/numberutil.cpp            |   2 +-
+ src/Tools/numberutil.h              |  10 +-
+ src/Tools/quantizefilter.cpp        |  16 +--
+ src/Tools/quantizefilter.h          |  16 +--
+ src/Tools/timeutil.cpp              |  36 +++----
+ src/Tools/timeutil.h                |  13 +--
+ src/bdsup2sub++.pro                 |  15 ++-
+ src/bdsup2sub.cpp                   | 162 ++++++++++++++--------------
+ src/colordialog.cpp                 |   2 +-
+ src/colordialog.h                   |  10 +-
+ src/conversiondialog.cpp            |  10 +-
+ src/conversiondialog.h              |   6 +-
+ src/editdialog.cpp                  |  11 +-
+ src/editdialog.h                    |   6 +-
+ src/editpane.cpp                    |   4 +-
+ src/editpane.h                      |   2 +-
+ src/framepalettedialog.cpp          |  28 ++---
+ src/framepalettedialog.h            |   6 +-
+ src/qxtcommandoptions.cpp           |  12 +--
+ src/types.h                         |  10 +-
+ 50 files changed, 500 insertions(+), 417 deletions(-)
+
+diff --git a/src/Filters/filterop.cpp b/src/Filters/filterop.cpp
+index 366eb81..5b0ba28 100644
+--- a/src/Filters/filterop.cpp
++++ b/src/Filters/filterop.cpp
+@@ -31,7 +31,7 @@ FilterOp::FilterOp(Filter& filter) :
+ {
+ }
+ 
+-QVector<QRgb> FilterOp::filter(Bitmap &src, Palette &palette, int w, int h)
++QList<QRgb> FilterOp::filter(Bitmap &src, Palette &palette, int w, int h)
+ {
+     dstWidth = w;
+     dstHeight = h;
+@@ -45,11 +45,11 @@ QVector<QRgb> FilterOp::filter(Bitmap &src, Palette &palette, int w, int h)
+     horizontalSubsamplingData = createSubSampling(srcWidth, dstWidth, xscale);
+     verticalSubsamplingData = createSubSampling(srcHeight, dstHeight, yscale);
+ 
+-    QVector<QRgb> workPixels(srcHeight * dstWidth);
++    QList<QRgb> workPixels(srcHeight * dstWidth);
+     QImage inImage = src.image(palette);
+     filterHorizontally(inImage, workPixels.data(), palette.colorTable().constData());
+ 
+-    QVector<QRgb> outPixels(dstHeight * dstWidth);
++    QList<QRgb> outPixels(dstHeight * dstWidth);
+     filterVertically(workPixels, outPixels);
+ 
+     return outPixels;
+@@ -57,10 +57,10 @@ QVector<QRgb> FilterOp::filter(Bitmap &src, Palette &palette, int w, int h)
+ 
+ FilterOp::SubSamplingData FilterOp::createSubSampling(int srcSize, int dstSize, float scale)
+ {
+-    QVector<int> arrN(dstSize);
++    QList<int> arrN(dstSize);
+     int numContributors;
+-    QVector<float> arrWeight;
+-    QVector<int> arrPixel;
++    QList<float> arrWeight;
++    QList<int> arrPixel;
+ 
+     float fwidth = internalFilter.radius();
+ 
+@@ -69,8 +69,8 @@ FilterOp::SubSamplingData FilterOp::createSubSampling(int srcSize, int dstSize,
+         // scale down -> subsampling
+         float width = fwidth / scale;
+         numContributors = (int)((width * 2.0f) + 2); // Heinz: added 1 to be safe with the ceiling
+-        arrWeight = QVector<float>(dstSize * numContributors);
+-        arrPixel = QVector<int>(dstSize * numContributors);
++        arrWeight = QList<float>(dstSize * numContributors);
++        arrPixel = QList<int>(dstSize * numContributors);
+ 
+         float fNormFac = (float)(1.0f / (ceil(width) / fwidth));
+         //
+@@ -135,8 +135,8 @@ FilterOp::SubSamplingData FilterOp::createSubSampling(int srcSize, int dstSize,
+     {
+         // scale up -> super-sampling
+         numContributors = (int)((fwidth * 2.0f) + 1);
+-        arrWeight = QVector<float>(dstSize * numContributors);
+-        arrPixel = QVector<int>(dstSize * numContributors);
++        arrWeight = QList<float>(dstSize * numContributors);
++        arrPixel = QList<int>(dstSize * numContributors);
+         //
+         for (int i = 0; i < dstSize; ++i)
+         {
+@@ -195,7 +195,7 @@ FilterOp::SubSamplingData FilterOp::createSubSampling(int srcSize, int dstSize,
+     return SubSamplingData(arrN, arrPixel, arrWeight, numContributors);
+ }
+ 
+-void FilterOp::filterVertically(QVector<QRgb>& src, QVector<QRgb>& trg)
++void FilterOp::filterVertically(QList<QRgb>& src, QVector<QRgb>& trg)
+ {
+     const QRgb *inPixels = src.constData();
+ 
+diff --git a/src/Filters/filterop.h b/src/Filters/filterop.h
+index 7499f8c..9e8ed04 100644
+--- a/src/Filters/filterop.h
++++ b/src/Filters/filterop.h
+@@ -21,7 +21,7 @@
+ #define FILTEROP_H
+ 
+ #include <QColor>
+-#include <QVector>
++#include <QList>
+ 
+ class Bitmap;
+ class Filter;
+@@ -33,21 +33,21 @@ class FilterOp
+ public:
+     FilterOp(Filter& filter);
+ 
+-    QVector<QRgb> filter(Bitmap &src, Palette &palette, int w, int h);
++    QList<QRgb> filter(Bitmap &src, Palette &palette, int w, int h);
+ 
+     class SubSamplingData {
+     public:
+         SubSamplingData() { }
+-        SubSamplingData(QVector<int>& s, QVector<int>& p, QVector<float>& w, int width) :
++        SubSamplingData(QList<int>& s, QVector<int>& p, QVector<float>& w, int width) :
+             matrixWidth(width),
+             numberOfSamples(s),
+             pixelPositions(p),
+             weights(w)
+         { }
+         int matrixWidth = 0;
+-        QVector<int> numberOfSamples;
+-        QVector<int> pixelPositions;
+-        QVector<float> weights;
++        QList<int> numberOfSamples;
++        QList<int> pixelPositions;
++        QList<float> weights;
+     };
+ 
+ private:
+@@ -61,7 +61,7 @@ private:
+     SubSamplingData horizontalSubsamplingData;
+     SubSamplingData verticalSubsamplingData;
+ 
+-    void filterVertically(QVector<QRgb>& src, QVector<QRgb>& trg);
++    void filterVertically(QList<QRgb>& src, QVector<QRgb>& trg);
+     void filterHorizontally(QImage &src, QRgb *trg, const QRgb *rgba);
+ 
+     SubSamplingData createSubSampling(int srcSize, int dstSize, float scale);
+diff --git a/src/Subtitles/bitmap.cpp b/src/Subtitles/bitmap.cpp
+index 6e3734e..40a13df 100644
+--- a/src/Subtitles/bitmap.cpp
++++ b/src/Subtitles/bitmap.cpp
+@@ -27,7 +27,7 @@
+ #include <QHash>
+ #include <QFile>
+ #include <QRect>
+-#include <QVector>
++#include <QList>
+ 
+ #include <cassert>
+ 
+@@ -63,7 +63,7 @@ Bitmap::Bitmap(QImage image) :
+ 
+ QRect Bitmap::bounds(Palette &palette, int alphaThreshold)
+ {
+-    QVector<QRgb> a = palette.colorTable();
++    QList<QRgb> a = palette.colorTable();
+     int xMin, xMax, yMin, yMax;
+ 
+     yMax = subtitleImage.height() - 1;
+@@ -193,10 +193,10 @@ int Bitmap::primaryColorIndex(Palette &palette, int alphaThreshold)
+     return color;
+ }
+ 
+-Bitmap Bitmap::convertLm(Palette &palette, int alphaThreshold, QVector<int>& lumaThreshold)
++Bitmap Bitmap::convertLm(Palette &palette, int alphaThreshold, QList<int>& lumaThreshold)
+ {
+-    QVector<uchar> cy = palette.Y();
+-    QVector<QRgb> a = palette.colorTable();
++    QList<uchar> cy = palette.Y();
++    QList<QRgb> a = palette.colorTable();
+ 
+     int height = subtitleImage.height();
+     int width = subtitleImage.width();
+@@ -262,10 +262,10 @@ Bitmap Bitmap::convertLm(Palette &palette, int alphaThreshold, QVector<int>& lum
+ 
+ Bitmap Bitmap::scaleFilter(int sizeX, int sizeY, Palette &palette, Filter &filter)
+ {
+-    QVector<QRgb> rgb = palette.colorTable();
++    QList<QRgb> rgb = palette.colorTable();
+ 
+     FilterOp filterOp(filter);
+-    QVector<QRgb> trg = filterOp.filter(*this, palette, sizeX, sizeY);
++    QList<QRgb> trg = filterOp.filter(*this, palette, sizeX, sizeY);
+ 
+     Bitmap bm(sizeX, sizeY);
+ 
+@@ -334,7 +334,7 @@ Bitmap Bitmap::scaleFilter(int sizeX, int sizeY, Palette &palette, Filter &filte
+ PaletteBitmap Bitmap::scaleFilter(int sizeX, int sizeY, Palette &palette, Filter &filter, bool dither)
+ {
+     FilterOp fOp(filter);
+-    QVector<QRgb> trgPixels = fOp.filter(*this, palette, sizeX, sizeY);
++    QList<QRgb> trgPixels = fOp.filter(*this, palette, sizeX, sizeY);
+ 
+     QImage trg(sizeX, sizeY, QImage::Format_ARGB32);
+     int offset = 0;
+@@ -355,7 +355,7 @@ PaletteBitmap Bitmap::scaleFilter(int sizeX, int sizeY, Palette &palette, Filter
+     // quantize image
+     QuantizeFilter qf;
+     Bitmap bm(sizeX, sizeY);
+-    QVector<QRgb> ct = qf.quantize(trg, &bm.image(), sizeX, sizeY, 255, dither, dither);
++    QList<QRgb> ct = qf.quantize(trg, &bm.image(), sizeX, sizeY, 255, dither, dither);
+     int size = ct.size();
+     size = std::min(size, 255);
+ 
+@@ -370,10 +370,10 @@ PaletteBitmap Bitmap::scaleFilter(int sizeX, int sizeY, Palette &palette, Filter
+     return bitmap;
+ }
+ 
+-Bitmap Bitmap::scaleFilterLm(int sizeX, int sizeY, Palette &palette, int alphaThreshold, QVector<int> &lumaThreshold, Filter &filter)
++Bitmap Bitmap::scaleFilterLm(int sizeX, int sizeY, Palette &palette, int alphaThreshold, QList<int> &lumaThreshold, Filter &filter)
+ {
+     FilterOp filterOp(filter);
+-    QVector<QRgb> trg = filterOp.filter(*this, palette, sizeX, sizeY);
++    QList<QRgb> trg = filterOp.filter(*this, palette, sizeX, sizeY);
+ 
+     Bitmap bm(sizeX, sizeY);
+ 
+@@ -660,7 +660,7 @@ PaletteBitmap Bitmap::scaleBilinear(int sizeX, int sizeY, Palette &palette, bool
+     // quantize image
+     QuantizeFilter qf;
+     Bitmap bm(sizeX, sizeY, QImage::Format_Indexed8);
+-    QVector<QRgb> ct = qf.quantize(trg, &bm.image(), sizeX, sizeY, 255, dither, dither);
++    QList<QRgb> ct = qf.quantize(trg, &bm.image(), sizeX, sizeY, 255, dither, dither);
+     int size = ct.size();
+     size = std::min(size, 255);
+ 
+@@ -683,7 +683,7 @@ QImage Bitmap::image(Palette &palette)
+     return newImage;
+ }
+ 
+-Bitmap Bitmap::scaleBilinearLm(int sizeX, int sizeY, Palette &palette, int alphaThreshold, QVector<int> &lumaThreshold)
++Bitmap Bitmap::scaleBilinearLm(int sizeX, int sizeY, Palette &palette, int alphaThreshold, QList<int> &lumaThreshold)
+ {
+     const uchar *cy = palette.Y().constData();
+     const QRgb *a = palette.colorTable().constData();
+diff --git a/src/Subtitles/bitmap.h b/src/Subtitles/bitmap.h
+index 73dd018..2263fc8 100644
+--- a/src/Subtitles/bitmap.h
++++ b/src/Subtitles/bitmap.h
+@@ -22,7 +22,7 @@
+ 
+ #include <QImage>
+ 
+-template <typename T> class QVector;
++template <typename T> class QList;
+ 
+ class Filter;
+ class Palette;
+@@ -50,14 +50,14 @@ public:
+     int primaryColorIndex(Palette &palette, int alphaThreshold);
+ 
+     Bitmap crop(int x1, int y1, int width, int height);
+-    Bitmap convertLm(Palette &palette, int alphaThreshold, QVector<int> &lumaThreshold);
++    Bitmap convertLm(Palette &palette, int alphaThreshold, QList<int> &lumaThreshold);
+ 
+     Bitmap scaleFilter(int sizeX, int sizeY, Palette &palette, Filter &filter);
+     Bitmap scaleFilterLm(int sizeX, int sizeY, Palette &palette,
+-                          int alphaThreshold, QVector<int> &lumaThreshold, Filter& filter);
++                          int alphaThreshold, QList<int> &lumaThreshold, Filter& filter);
+     Bitmap scaleBilinear(int sizeX, int sizeY, Palette &palette);
+     Bitmap scaleBilinearLm(int sizeX, int sizeY, Palette &palette,
+-                            int alphaThreshold, QVector<int> &lumaThreshold);
++                            int alphaThreshold, QList<int> &lumaThreshold);
+ 
+     PaletteBitmap scaleFilter(int sizeX, int sizeY, Palette &palette, Filter &filter, bool dither);
+     PaletteBitmap scaleBilinear(int sizeX, int sizeY, Palette &palette, bool dither);
+diff --git a/src/Subtitles/imageobject.h b/src/Subtitles/imageobject.h
+index c167ecf..311d443 100644
+--- a/src/Subtitles/imageobject.h
++++ b/src/Subtitles/imageobject.h
+@@ -22,7 +22,7 @@
+ 
+ #include "imageobjectfragment.h"
+ 
+-#include <QVector>
++#include <QList>
+ 
+ class ImageObject
+ {
+@@ -66,7 +66,7 @@ public:
+     int objectVersion() { return objVer; }
+     void setObjectVersion(int objectVersion) { objVer = objectVersion; }
+ 
+-    QVector<ImageObjectFragment> &fragmentList() { return fragments; }
++    QList<ImageObjectFragment> &fragmentList() { return fragments; }
+ 
+ private:
+     int paletteId = -1;
+@@ -82,7 +82,7 @@ private:
+     int objVer = 0;
+     int objSeq = 0;
+ 
+-    QVector<ImageObjectFragment> fragments;
++    QList<ImageObjectFragment> fragments;
+ };
+ 
+ #endif // IMAGEOBJECT_H
+diff --git a/src/Subtitles/palette.cpp b/src/Subtitles/palette.cpp
+index 72d1d85..3324c7d 100644
+--- a/src/Subtitles/palette.cpp
++++ b/src/Subtitles/palette.cpp
+@@ -49,7 +49,7 @@ Palette::Palette(int paletteSize, bool use601) :
+     useBT601(use601),
+     colors(paletteSize, 0)
+ {
+-    QVector<int> yCbCr;
++    QList<int> yCbCr;
+     for (int i = 0; i < paletteSize; ++i)
+     {
+         yCbCr = Palette::RGB2YCbCr(qRgb(0, 0, 0), useBT601);
+@@ -59,7 +59,7 @@ Palette::Palette(int paletteSize, bool use601) :
+     }
+ }
+ 
+-Palette::Palette(QVector<uchar> inRed, QVector<uchar> inGreen, QVector<uchar> inBlue, QVector<uchar> inAlpha, bool use601) :
++Palette::Palette(QList<uchar> inRed, QVector<uchar> inGreen, QVector<uchar> inBlue, QVector<uchar> inAlpha, bool use601) :
+     useBT601(use601)
+ {
+     for (int i = 0; i < inRed.size(); ++i)
+@@ -67,7 +67,7 @@ Palette::Palette(QVector<uchar> inRed, QVector<uchar> inGreen, QVector<uchar> in
+         colors.push_back(qRgba(inRed.at(i), inGreen.at(i), inBlue.at(i), inAlpha.at(i)));
+     }
+ 
+-    QVector<int> yCbCr;
++    QList<int> yCbCr;
+     for (int i = 0; i < colors.size(); ++i)
+     {
+         yCbCr = RGB2YCbCr(colors.at(i), useBT601);
+@@ -94,15 +94,15 @@ void Palette::setAlpha(int index, int alpha)
+ void Palette::setRGB(int index, QRgb rgb)
+ {
+     colors.replace(index, qRgba(qRed(rgb), qGreen(rgb), qBlue(rgb), qAlpha(colors.at(index))));
+-    QVector<int> yCbCr = RGB2YCbCr(rgb, useBT601);
++    QList<int> yCbCr = RGB2YCbCr(rgb, useBT601);
+     y.replace(index, yCbCr[0]);
+     cb.replace(index, yCbCr[1]);
+     cr.replace(index, yCbCr[2]);
+ }
+ 
+-QVector<int> Palette::RGB2YCbCr(QRgb rgb, bool use601)
++QList<int> Palette::RGB2YCbCr(QRgb rgb, bool use601)
+ {
+-    QVector<int> yCbCr;
++    QList<int> yCbCr;
+     double y, cb, cr;
+     int r = qRed(rgb);
+     int g = qGreen(rgb);
+@@ -229,9 +229,9 @@ void Palette::setYCbCr(int index, int yn, int cbn, int crn)
+     colors.replace(index, qRgba(qRed(rgb), qGreen(rgb), qBlue(rgb), qAlpha(colors.at(index))));
+ }
+ 
+-QVector<int> Palette::YCbCr(int index)
++QList<int> Palette::YCbCr(int index)
+ {
+-    QVector<int> yCbCr;
++    QList<int> yCbCr;
+     yCbCr.push_back(y[index] & 0xff);
+     yCbCr.push_back(cb[index] & 0xff);
+     yCbCr.push_back(cr[index] & 0xff);
+diff --git a/src/Subtitles/palette.h b/src/Subtitles/palette.h
+index cdaa3d0..e168461 100644
+--- a/src/Subtitles/palette.h
++++ b/src/Subtitles/palette.h
+@@ -21,7 +21,7 @@
+ #define PALETTE_H
+ 
+ #include <QtGlobal>
+-#include <QVector>
++#include <QList>
+ #include <QColor>
+ 
+ class Palette
+@@ -31,7 +31,7 @@ public:
+     Palette(const Palette& other);
+     Palette(const Palette* other);
+     Palette(int paletteSize, bool use601 = false);
+-    Palette(QVector<uchar> r, QVector<uchar> g, QVector<uchar> b, QVector<uchar> a, bool use601);
++    Palette(QList<uchar> r, QVector<uchar> g, QVector<uchar> b, QVector<uchar> a, bool use601);
+     ~Palette();
+ 
+     void setAlpha(int index, int alpha);
+@@ -54,25 +54,25 @@ public:
+     QRgb rgb(int index) { return qRgba(qRed(colors[index]), qGreen(colors[index]), qBlue(colors[index]), 0); }
+     QRgb rgba(int index) { return colors[index]; }
+ 
+-    QVector<uchar> Y() { return y; }
+-    QVector<uchar> Cb() { return cb; }
+-    QVector<uchar> Cr() { return cr; }
++    QList<uchar> Y() { return y; }
++    QList<uchar> Cb() { return cb; }
++    QList<uchar> Cr() { return cr; }
+ 
+-    QVector<int> YCbCr(int index);
++    QList<int> YCbCr(int index);
+ 
+-    QVector<QRgb> colorTable() { return colors; }
++    QList<QRgb> colorTable() { return colors; }
+ 
+-    static QVector<int> RGB2YCbCr(QRgb rgb, bool use601);
++    static QList<int> RGB2YCbCr(QRgb rgb, bool use601);
+ 
+ private:
+     int paletteSize = 0;
+ 
+     bool useBT601 = false;
+ 
+-    QVector<QRgb> colors;
+-    QVector<uchar> y;
+-    QVector<uchar> cb;
+-    QVector<uchar> cr;
++    QList<QRgb> colors;
++    QList<uchar> y;
++    QList<uchar> cb;
++    QList<uchar> cr;
+ 
+     QRgb YCbCr2RGB(int y, int cb, int cr, bool useBT601);
+ };
+diff --git a/src/Subtitles/subdvd.cpp b/src/Subtitles/subdvd.cpp
+index 63fc9f8..ac7a084 100644
+--- a/src/Subtitles/subdvd.cpp
++++ b/src/Subtitles/subdvd.cpp
+@@ -101,22 +101,22 @@ SubPicture *SubDVD::subPicture(int index)
+     return &subPictures[index];
+ }
+ 
+-QVector<int> &SubDVD::getFrameAlpha(int index)
++QList<int> &SubDVD::getFrameAlpha(int index)
+ {
+     return subPictures[index].alpha;
+ }
+ 
+-QVector<int> &SubDVD::getFramePal(int index)
++QList<int> &SubDVD::getFramePal(int index)
+ {
+     return subPictures[index].pal;
+ }
+ 
+-QVector<int> SubDVD::getOriginalFrameAlpha(int index)
++QList<int> SubDVD::getOriginalFrameAlpha(int index)
+ {
+     return subPictures[index].originalAlpha;
+ }
+ 
+-QVector<int> SubDVD::getOriginalFramePal(int index)
++QList<int> SubDVD::getOriginalFramePal(int index)
+ {
+     return subPictures[index].originalPal;
+ }
+@@ -131,7 +131,7 @@ void SubDVD::readSubFrame(SubPictureDVD &pic, qint64 endOfs)
+     int rleBufferFound = 0;
+     int ctrlSize = -1;
+     int ctrlHeaderCopied = 0;
+-    QVector<uchar> ctrlHeader;
++    QList<uchar> ctrlHeader;
+     ImageObjectFragment rleFrag;
+     int length;
+     int packHeaderSize;
+@@ -197,7 +197,7 @@ void SubDVD::readSubFrame(SubPictureDVD &pic, qint64 endOfs)
+             {
+                 throw QString("Invalid control buffer size");
+             }
+-            ctrlHeader = QVector<uchar>(ctrlSize);
++            ctrlHeader = QList<uchar>(ctrlSize);
+             ctrlOfs = ctrlOfsRel + ofs; // might have to be corrected for multiple packets
+             ofs += 2;
+             headerSize = (int)(ofs - startOfs);
+@@ -267,7 +267,7 @@ void SubDVD::readSubFrame(SubPictureDVD &pic, qint64 endOfs)
+ 
+     pic.setRleSize(rleBufferFound);
+     int alphaSum = 0;
+-    QVector<int> alphaUpdate(4);
++    QList<int> alphaUpdate(4);
+     int alphaUpdateSum;
+     int delay = -1;
+     bool ColAlphaUpdate = false;
+@@ -493,10 +493,10 @@ void SubDVD::readAllSubFrames()
+     subtitleProcessor->printX(QString("\nDetected %1 forced captions.\n").arg(QString::number(_numForcedFrames)));
+ }
+ 
+-QVector<uchar> SubDVD::createSubFrame(SubPictureDVD &subPicture, Bitmap &bitmap)
++QList<uchar> SubDVD::createSubFrame(SubPictureDVD &subPicture, Bitmap &bitmap)
+ {
+-    QVector<uchar> even = encodeLines(bitmap, true);
+-    QVector<uchar> odd = encodeLines(bitmap, false);
++    QList<uchar> even = encodeLines(bitmap, true);
++    QList<uchar> odd = encodeLines(bitmap, false);
+     int tmp;
+ 
+     int forcedOfs;
+@@ -620,7 +620,7 @@ QVector<uchar> SubDVD::createSubFrame(SubPictureDVD &subPicture, Bitmap &bitmap)
+     }
+ 
+     // allocate and fill buffer
+-    QVector<uchar> buf((1 + numAdditionalPackets) * 0x800);
++    QList<uchar> buf((1 + numAdditionalPackets) * 0x800);
+ 
+     int stuffingBytes;
+     int diff = buf.size() - bufSize;
+@@ -817,7 +817,7 @@ void SubDVD::readIdx(int idxToRead)
+         // size (e.g. "size: 720x576")
+         if (key == "size")
+         {
+-            keyValue = value.split("x", QString::SkipEmptyParts);
++            keyValue = value.split("x", Qt::SkipEmptyParts);
+             if (keyValue.isEmpty() || keyValue.size() <= 1)
+             {
+                 throw QString("Illegal size: %1").arg(value);
+@@ -842,7 +842,7 @@ void SubDVD::readIdx(int idxToRead)
+         // origin (e.g. "org: 0, 0")
+         if (key == "org")
+         {
+-            keyValue = value.split(",", QString::SkipEmptyParts);
++            keyValue = value.split(",", Qt::SkipEmptyParts);
+             if (keyValue.isEmpty() || keyValue.size() <= 1)
+             {
+                 throw QString("Illegal origin: %1").arg(value);
+@@ -968,7 +968,7 @@ void SubDVD::readIdx(int idxToRead)
+         if (key == "id")
+         {
+             QString id;
+-            QStringList vals = value.split(',', QString::SkipEmptyParts);
++            QStringList vals = value.split(',', Qt::SkipEmptyParts);
+             id = vals[0];
+             if (id.size() != 2)
+             {
+@@ -1004,7 +1004,7 @@ void SubDVD::readIdx(int idxToRead)
+             {
+                 subtitleProcessor->printWarning(QString("Illegal language id: %1\n").arg(id));
+             }
+-            vals = value.split(':', QString::SkipEmptyParts);
++            vals = value.split(':', Qt::SkipEmptyParts);
+             if (vals.size() == 1)
+             {
+                 subtitleProcessor->printError(QString("Missing index key: %1\n").arg(value));
+@@ -1052,7 +1052,7 @@ void SubDVD::readIdx(int idxToRead)
+             if (key == "timestamp")
+             {
+                 QString vs;
+-                QStringList vals = value.split(',', QString::SkipEmptyParts);
++                QStringList vals = value.split(',', Qt::SkipEmptyParts);
+                 if (vals.isEmpty() || vals.size() <= 1)
+                 {
+                     throw QString("Illegal timestamp entry: %1").arg(value);
+@@ -1065,7 +1065,7 @@ void SubDVD::readIdx(int idxToRead)
+                     throw QString("Illegal timestamp: %1").arg(vals[0]);
+                 }
+                 vs = vals[1].trimmed().toLower();
+-                vals = vs.split(':', QString::SkipEmptyParts);
++                vals = vs.split(':', Qt::SkipEmptyParts);
+                 if (vals.isEmpty() || vals.size() <= 1)
+                 {
+                     throw QString("Missing filepos: %1").arg(value);
+@@ -1100,8 +1100,8 @@ void SubDVD::readIdx(int idxToRead)
+     emit maxProgressChanged(subPictures.size());
+ }
+ 
+-void SubDVD::writeIdx(QString filename, SubPicture &subPicture, QVector<int> offsets,
+-                      QVector<int> timestamps, Palette &palette)
++void SubDVD::writeIdx(QString filename, SubPicture &subPicture, QList<int> offsets,
++                      QList<int> timestamps, Palette &palette)
+ {
+     QScopedPointer<QFile> out(new QFile(filename));
+     if (!out->open(QIODevice::WriteOnly | QIODevice::Text))
+diff --git a/src/Subtitles/subdvd.h b/src/Subtitles/subdvd.h
+index 3056aff..71727ed 100644
+--- a/src/Subtitles/subdvd.h
++++ b/src/Subtitles/subdvd.h
+@@ -26,7 +26,7 @@
+ #include <QObject>
+ #include <QString>
+ #include <QFile>
+-#include <QVector>
++#include <QList>
+ 
+ class FileBuffer;
+ class Palette;
+@@ -44,7 +44,7 @@ public:
+     void decode(int index);
+     void setSrcPalette(Palette &palette);
+     void readIdx(int idxToRead = -1);
+-    void writeIdx(QString filename, SubPicture &subPicture, QVector<int> offsets, QVector<int> timestamps, Palette &palette);
++    void writeIdx(QString filename, SubPicture &subPicture, QList<int> offsets, QVector<int> timestamps, Palette &palette);
+     void readSubFrame(SubPictureDVD &pic, qint64 endOfs);
+     void readAllSubFrames();
+     void setTimeOffset(QString value) { timeOffset = value; }
+@@ -72,12 +72,12 @@ public:
+ 
+     SubPicture *subPicture(int index);
+ 
+-    QVector<uchar> createSubFrame(SubPictureDVD &subPicture, Bitmap &bitmap);
++    QList<uchar> createSubFrame(SubPictureDVD &subPicture, Bitmap &bitmap);
+ 
+-    QVector<int> &getFrameAlpha(int index);
+-    QVector<int> &getFramePal(int index);
+-    QVector<int> getOriginalFrameAlpha(int index);
+-    QVector<int> getOriginalFramePal(int index);
++    QList<int> &getFrameAlpha(int index);
++    QList<int> &getFramePal(int index);
++    QList<int> getOriginalFrameAlpha(int index);
++    QList<int> getOriginalFramePal(int index);
+ 
+ signals:
+     void maxProgressChanged(qint64 maxProgress);
+@@ -95,19 +95,19 @@ private:
+     QString subFileName;
+     QString timeOffset = "";
+ 
+-    QVector<SubPictureDVD> subPictures;
++    QList<SubPictureDVD> subPictures;
+ 
+     void decode(SubPictureDVD &pic);
+-    void decodeLine(QVector<uchar> src, int srcOfs, int srcLen, QImage *trg, int trgOfs, int width, int maxPixels);
++    void decodeLine(QList<uchar> src, int srcOfs, int srcLen, QImage *trg, int trgOfs, int width, int maxPixels);
+ 
+-    QVector<uchar> packHeader = {
++    QList<uchar> packHeader = {
+         0x00, 0x00, 0x01, 0xba,                         // 0:  0x000001ba - packet ID
+         0x44, 0x02, 0xc4, 0x82, 0x04, 0xa9,             // 4:  system clock reference
+         0x01, 0x89, 0xc3,                               // 10: multiplexer rate
+         0xf8,                                           // 13: stuffing info
+     };
+ 
+-    QVector<uchar> headerFirst = {                      // header only in first packet
++    QList<uchar> headerFirst = {                      // header only in first packet
+         0x00, 0x00, 0x01, 0xbd,                         // 0: 0x000001bd - sub ID
+         0x00, 0x00,                                     // 4: packet length
+         0x81, 0x80,                                     // 6:  packet type
+@@ -118,7 +118,7 @@ private:
+         0x00, 0x00,                                     // 17: offset to control header
+     };
+ 
+-    QVector<uchar> headerNext = {                       // header in following packets
++    QList<uchar> headerNext = {                       // header in following packets
+         0x00, 0x00, 0x01, 0xbd,                         // 0: 0x000001bd - sub ID
+         0x00, 0x00,                                     // 4: packet length
+         0x81, 0x00,                                     // 6: packet type
+@@ -126,7 +126,7 @@ private:
+         0x20                                            // 9: Stream ID
+     };
+ 
+-    QVector<uchar> controlHeader = {
++    QList<uchar> controlHeader = {
+         0x00,                                           //  dummy byte (for shifting when forced)
+         0x00, 0x00,                                     //  0: offset to end sequence
+         0x01,                                           //  2: CMD 1: start displaying
+diff --git a/src/Subtitles/subpicture.h b/src/Subtitles/subpicture.h
+index f492762..28835b8 100644
+--- a/src/Subtitles/subpicture.h
++++ b/src/Subtitles/subpicture.h
+@@ -22,7 +22,7 @@
+ 
+ #include "erasepatch.h"
+ 
+-#include <QVector>
++#include <QList>
+ #include <QRect>
+ #include <QMap>
+ 
+@@ -131,13 +131,13 @@ public:
+     QMap<int, QRect> &windowSizes() { return scaledWindowRects; }
+     void setWindowSizes(QMap<int, QRect> rects) { windowRects = rects; scaledWindowRects = rects; }
+ 
+-    QVector<int> &objectIDs() { return objectIds; }
++    QList<int> &objectIDs() { return objectIds; }
+ 
+     QMap<int, int> forcedFlags;
+ 
+     virtual SubPicture* copy();
+ 
+-    QVector<ErasePatch*> erasePatch;
++    QList<ErasePatch*> erasePatch;
+ 
+ protected:
+     int _imageWidth = 0;
+@@ -161,7 +161,7 @@ protected:
+     bool forced = false;
+     bool decoded = false;
+     bool excluded = false;
+-    QVector<int> objectIds;
++    QList<int> objectIds;
+ };
+ 
+ #endif // SUBPICTURE_H
+diff --git a/src/Subtitles/subpicturebd.cpp b/src/Subtitles/subpicturebd.cpp
+index c10c1ec..cd952bc 100644
+--- a/src/Subtitles/subpicturebd.cpp
++++ b/src/Subtitles/subpicturebd.cpp
+@@ -36,7 +36,7 @@ SubPictureBD::SubPictureBD(const SubPictureBD *other) :
+     }
+     QList<int> keys = other->palettes.keys();
+     int i = 0;
+-    for (QVector<PaletteInfo> paletteInfos : other->palettes)
++    for (QList<PaletteInfo> paletteInfos : other->palettes)
+     {
+         for (PaletteInfo paletteInfo : paletteInfos)
+         {
+@@ -59,7 +59,7 @@ SubPictureBD::SubPictureBD(const SubPictureBD &other) :
+     }
+     QList<int> keys = other.palettes.keys();
+     int i = 0;
+-    for (QVector<PaletteInfo> paletteInfos : other.palettes)
++    for (QList<PaletteInfo> paletteInfos : other.palettes)
+     {
+         for (PaletteInfo paletteInfo : paletteInfos)
+         {
+@@ -74,7 +74,7 @@ SubPicture* SubPictureBD::copy()
+     return new SubPictureBD(this);
+ }
+ 
+-void SubPictureBD::setData(const PCS &pcs, QMap<int, QVector<ODS>> ods, QMap<int, QVector<PaletteInfo>> pds, const WDS &wds)
++void SubPictureBD::setData(const PCS &pcs, QMap<int, QList<ODS>> ods, QMap<int, QVector<PaletteInfo>> pds, const WDS &wds)
+ {
+     start = pcs.pts;
+     _screenWidth = pcs.videoWidth;
+diff --git a/src/Subtitles/subpicturebd.h b/src/Subtitles/subpicturebd.h
+index e40f4e8..3b3840a 100644
+--- a/src/Subtitles/subpicturebd.h
++++ b/src/Subtitles/subpicturebd.h
+@@ -25,7 +25,7 @@
+ #include "paletteinfo.h"
+ #include "../types.h"
+ 
+-#include <QVector>
++#include <QList>
+ #include <QMap>
+ 
+ class ImageObject;
+@@ -42,7 +42,7 @@ struct PCS
+     bool paletteUpdate = false;
+     int paletteId;
+     int numberOfCompositionObjects;
+-    QVector<int> objectIds;
++    QList<int> objectIds;
+     QMap<int, int> windowIds;       // map of object id to window id
+     QMap<int, int> forcedFlags;     // map of object id to forced flag
+     QMap<int, int> xPositions;      // map of object id to x position
+@@ -52,7 +52,7 @@ struct PCS
+ struct WDS
+ {
+     int numberOfWindows;
+-    QVector<int> windowIds;
++    QList<int> windowIds;
+     QMap<int, QRect> windows;
+ };
+ 
+@@ -181,11 +181,11 @@ public:
+         }
+     }
+ 
+-    void setData(const PCS &pcs, QMap<int, QVector<ODS>> ods, QMap<int, QVector<PaletteInfo>> pds, const WDS &wds);
++    void setData(const PCS &pcs, QMap<int, QList<ODS>> ods, QMap<int, QVector<PaletteInfo>> pds, const WDS &wds);
+ 
+     QMap<int, ImageObject> imageObjectList;
+ 
+-    QMap<int, QVector<PaletteInfo>> palettes;
++    QMap<int, QList<PaletteInfo>> palettes;
+ 
+ private:
+     int type = 0;
+diff --git a/src/Subtitles/subpicturedvd.cpp b/src/Subtitles/subpicturedvd.cpp
+index 3491bd4..e5743a9 100644
+--- a/src/Subtitles/subpicturedvd.cpp
++++ b/src/Subtitles/subpicturedvd.cpp
+@@ -85,7 +85,7 @@ void SubPictureDVD::copyInfo(SubPicture &subPicture)
+     QRect rect = QRect(subPicture.x(), subPicture.y(), subPicture.imageWidth(), subPicture.imageHeight());
+     numWindows = 1;
+     numberCompObjects = 1;
+-    objectIds = QVector<int> { 0 };
++    objectIds = QList<int> { 0 };
+     imageRects[0] = rect;
+     setWindowSizes(imageRects);
+     setImageSizes(imageRects);
+diff --git a/src/Subtitles/subpicturedvd.h b/src/Subtitles/subpicturedvd.h
+index bbb043c..9fdb867 100644
+--- a/src/Subtitles/subpicturedvd.h
++++ b/src/Subtitles/subpicturedvd.h
+@@ -23,7 +23,7 @@
+ #include "subpicture.h"
+ #include "imageobjectfragment.h"
+ 
+-#include <QVector>
++#include <QList>
+ 
+ class SubPictureDVD : public SubPicture
+ {
+@@ -33,12 +33,12 @@ public:
+     SubPictureDVD(const SubPictureDVD *other);
+     ~SubPictureDVD() { }
+ 
+-    QVector<int> originalAlpha = QVector<int>(4);
+-    QVector<int> originalPal = QVector<int>(4);
+-    QVector<int> alpha = QVector<int>(4);
+-    QVector<int> pal = QVector<int>(4);
++    QList<int> originalAlpha = QVector<int>(4);
++    QList<int> originalPal = QVector<int>(4);
++    QList<int> alpha = QVector<int>(4);
++    QList<int> pal = QVector<int>(4);
+ 
+-    QVector<ImageObjectFragment> rleFragments;
++    QList<ImageObjectFragment> rleFragments;
+ 
+     void setOriginal();
+     void copyInfo(SubPicture &subPicture);
+diff --git a/src/Subtitles/subpicturexml.h b/src/Subtitles/subpicturexml.h
+index 9bd28fc..cd5efe2 100644
+--- a/src/Subtitles/subpicturexml.h
++++ b/src/Subtitles/subpicturexml.h
+@@ -44,14 +44,14 @@ public:
+     void setOriginalX(int originalX) { origX = originalX; }
+     int originalY() { return origY; }
+     void setOriginalY(int originalY) { origY = originalY; }
+-    QVector<QString> fileNames() { return filenames; }
++    QList<QString> fileNames() { return filenames; }
+     void setFileName(QString fileName) { filenames.push_back(fileName); }
+ 
+ private:
+     int origX = 0;
+     int origY = 0;
+ 
+-    QVector<QString> filenames;
++    QList<QString> filenames;
+ 
+     friend class SupXML;
+ };
+diff --git a/src/Subtitles/substreamdvd.cpp b/src/Subtitles/substreamdvd.cpp
+index 8a8cfb4..ab00e28 100644
+--- a/src/Subtitles/substreamdvd.cpp
++++ b/src/Subtitles/substreamdvd.cpp
+@@ -62,13 +62,13 @@ Palette SubstreamDVD::decodePalette(SubPictureDVD &pic, Palette &palette, int al
+     return miniPalette;
+ }
+ 
+-QVector<uchar> SubstreamDVD::encodeLines(Bitmap &bitmap, bool even)
++QList<uchar> SubstreamDVD::encodeLines(Bitmap &bitmap, bool even)
+ {
+     int ofs = 0;
+     uchar color;
+     int len;
+     int y;
+-    QVector<uchar> nibbles;
++    QList<uchar> nibbles;
+ 
+     if (even)
+     {
+@@ -144,8 +144,8 @@ QVector<uchar> SubstreamDVD::encodeLines(Bitmap &bitmap, bool even)
+     nibbles.push_back((uchar)(0));
+ 
+     int size =  nibbles.size() / 2; // number of bytes
+-    QVector<uchar> retval(size);
+-    QVectorIterator<uchar> it(nibbles);
++    QList<uchar> retval(size);
++    QListIterator<uchar> it(nibbles);
+     for (int i = 0; i < size; ++i)
+     {
+         int hi = (it.next() & 0xf);
+@@ -174,7 +174,7 @@ Bitmap SubstreamDVD::decodeImage(SubPictureDVD &pic, int transIdx)
+ 
+     Bitmap bm(width, height, transIdx);
+ 
+-    QVector<uchar> buf(pic.rleSize());
++    QList<uchar> buf(pic.rleSize());
+     int index = 0;
+ 
+     int sizeEven;
+@@ -255,10 +255,10 @@ void SubstreamDVD::decode(SubPictureDVD &pic, SubtitleProcessor* subtitleProcess
+     _primaryColorIndex = _bitmap.primaryColorIndex(_palette, subtitleProcessor->getAlphaThreshold());
+ }
+ 
+-void SubstreamDVD::decodeLine(QVector<uchar> src, int srcOfs, int srcLen,
++void SubstreamDVD::decodeLine(QList<uchar> src, int srcOfs, int srcLen,
+                               QImage &trg, int trgOfs, int width, int maxPixels)
+ {
+-    QVector<uchar> nibbles(srcLen * 2);
++    QList<uchar> nibbles(srcLen * 2);
+     int b;
+ 
+     for (int i = 0; i < srcLen; ++i)
+diff --git a/src/Subtitles/substreamdvd.h b/src/Subtitles/substreamdvd.h
+index 74649ef..2f020dd 100644
+--- a/src/Subtitles/substreamdvd.h
++++ b/src/Subtitles/substreamdvd.h
+@@ -21,7 +21,7 @@
+ #define SUBSTREAMDVD_H
+ 
+ #include <QtCore/QScopedPointer>
+-#include <QVector>
++#include <QList>
+ #include <QImage>
+ 
+ #include <Subtitles/bitmap.h>
+@@ -46,11 +46,11 @@ public:
+     virtual Palette &getSrcPalette() = 0;
+     static Palette decodePalette(SubPictureDVD &pic, Palette &palette, int alphaCrop);
+ 
+-    QVector<uchar> encodeLines(Bitmap &bitmap, bool even);
+-    virtual QVector<int> &getFrameAlpha(int index) = 0;
+-    virtual QVector<int> &getFramePal(int index) = 0;
+-    virtual QVector<int> getOriginalFrameAlpha(int index) = 0;
+-    virtual QVector<int> getOriginalFramePal(int index) = 0;
++    QList<uchar> encodeLines(Bitmap &bitmap, bool even);
++    virtual QList<int> &getFrameAlpha(int index) = 0;
++    virtual QList<int> &getFramePal(int index) = 0;
++    virtual QList<int> getOriginalFrameAlpha(int index) = 0;
++    virtual QList<int> getOriginalFramePal(int index) = 0;
+ 
+ protected:
+     Bitmap _bitmap;
+@@ -62,8 +62,8 @@ protected:
+ 
+     QScopedPointer<FileBuffer> fileBuffer;
+ 
+-    QVector<int> lastAlpha = { 0, 0xf, 0xf, 0xf };
+-    QVector<SubPictureDVD> subPictures;
++    QList<int> lastAlpha = { 0, 0xf, 0xf, 0xf };
++    QList<SubPictureDVD> subPictures;
+ 
+     int screenWidth = 720;
+     int screenHeight = 576;
+@@ -74,7 +74,7 @@ protected:
+     int _primaryColorIndex = 0;
+ 
+ private:
+-    void decodeLine(QVector<uchar> src, int srcOfs, int srcLen, QImage &trg, int trgOfs, int width, int maxPixels);
++    void decodeLine(QList<uchar> src, int srcOfs, int srcLen, QImage &trg, int trgOfs, int width, int maxPixels);
+ 
+     Bitmap decodeImage(SubPictureDVD &pic, int transIdx);
+ };
+diff --git a/src/Subtitles/subtitleprocessor.cpp b/src/Subtitles/subtitleprocessor.cpp
+index 461f396..83b8329 100644
+--- a/src/Subtitles/subtitleprocessor.cpp
++++ b/src/Subtitles/subtitleprocessor.cpp
+@@ -191,7 +191,7 @@ int SubtitleProcessor::getNumForcedFrames()
+     return substream->numForcedFrames();
+ }
+ 
+-QVector<int> &SubtitleProcessor::getFrameAlpha(int index)
++QList<int> &SubtitleProcessor::getFrameAlpha(int index)
+ {
+     if (inMode == InputMode::VOBSUB)
+     {
+@@ -200,7 +200,7 @@ QVector<int> &SubtitleProcessor::getFrameAlpha(int index)
+     return supDVD->getFrameAlpha(index);
+ }
+ 
+-QVector<int> SubtitleProcessor::getOriginalFrameAlpha(int index)
++QList<int> SubtitleProcessor::getOriginalFrameAlpha(int index)
+ {
+     if (inMode == InputMode::VOBSUB)
+     {
+@@ -209,7 +209,7 @@ QVector<int> SubtitleProcessor::getOriginalFrameAlpha(int index)
+     return supDVD->getOriginalFrameAlpha(index);
+ }
+ 
+-QVector<int> &SubtitleProcessor::getFramePal(int index)
++QList<int> &SubtitleProcessor::getFramePal(int index)
+ {
+     if (inMode == InputMode::VOBSUB)
+     {
+@@ -218,7 +218,7 @@ QVector<int> &SubtitleProcessor::getFramePal(int index)
+     return supDVD->getFramePal(index);
+ }
+ 
+-QVector<int> SubtitleProcessor::getOriginalFramePal(int index)
++QList<int> SubtitleProcessor::getOriginalFramePal(int index)
+ {
+     if (inMode == InputMode::VOBSUB)
+     {
+@@ -382,7 +382,7 @@ void SubtitleProcessor::exit()
+ 
+ void SubtitleProcessor::scanSubtitles()
+ {
+-    subPictures = QVector<SubPicture*>(substream->numFrames());
++    subPictures = QList<SubPicture*>(substream->numFrames());
+     SubPicture* picSrc = 0;
+ 
+     double factTS = 1.0;
+@@ -601,8 +601,8 @@ void SubtitleProcessor::reScanSubtitles(Resolution oldResolution, double fpsTrgO
+ 
+     if (oldResolution != resolutionTrg)
+     {
+-        QVector<int> rOld = getResolution(oldResolution);
+-        QVector<int> rNew = getResolution(resolutionTrg);
++        QList<int> rOld = getResolution(oldResolution);
++        QList<int> rNew = getResolution(resolutionTrg);
+         factX = (double)rNew[0] / (double)rOld[0];
+         factY = (double)rNew[1] / (double)rOld[1];
+     }
+@@ -784,7 +784,7 @@ void SubtitleProcessor::reScanSubtitles(Resolution oldResolution, double fpsTrgO
+     }
+ }
+ 
+-QVector<int> SubtitleProcessor::getResolution(Resolution resolution)
++QList<int> SubtitleProcessor::getResolution(Resolution resolution)
+ {
+     return resolutions.at((int) resolution);
+ }
+@@ -1000,8 +1000,8 @@ void SubtitleProcessor::createSubtitleStream()
+ void SubtitleProcessor::writeSub(QString filename)
+ {
+     QScopedPointer<QFile> out;
+-    QVector<int> offsets;
+-    QVector<int> timestamps;
++    QList<int> offsets;
++    QList<int> timestamps;
+     int frameNum = 0;
+     int maxNum;
+     QString fn = "";
+@@ -1069,7 +1069,7 @@ void SubtitleProcessor::writeSub(QString filename)
+                 {
+                     subDVD = QSharedPointer<SubDVD>(new SubDVD("", "", this));
+                 }
+-                QVector<uchar> buf = subDVD->createSubFrame(*subVobTrg, trgBitmap);
++                QList<uchar> buf = subDVD->createSubFrame(*subVobTrg, trgBitmap);
+                 out->write((const char*)buf.constData(), buf.size());
+                 offset += buf.size();
+                 offsets.push_back(offset);
+@@ -1083,7 +1083,7 @@ void SubtitleProcessor::writeSub(QString filename)
+                 {
+                     supDVD = QSharedPointer<SupDVD>(new SupDVD("", "", this));
+                 }
+-                QVector<uchar> buf = supDVD->createSupFrame(*subVobTrg, trgBitmap);
++                QList<uchar> buf = supDVD->createSupFrame(*subVobTrg, trgBitmap);
+                 out->write((const char*)buf.constData(), buf.size());
+             }
+             else if (outMode == OutputMode::BDSUP)
+@@ -1094,7 +1094,7 @@ void SubtitleProcessor::writeSub(QString filename)
+                 {
+                     supBD = QSharedPointer<SupBD>(new SupBD("", this));
+                 }
+-                QVector<uchar> buf = supBD->createSupFrame(subPictures[i], trgBitmap, trgPal, exportForced);
++                QList<uchar> buf = supBD->createSupFrame(subPictures[i], trgBitmap, trgPal, exportForced);
+                 out->write((const char*)buf.constData(), buf.size());
+             }
+             else
+@@ -1183,12 +1183,12 @@ void SubtitleProcessor::writeSub(QString filename)
+     {
+         // VobSub - write IDX
+         /* return offets as array of ints */
+-        QVector<int> ofs(offsets.size());
++        QList<int> ofs(offsets.size());
+         for (int i = 0; i < ofs.size(); ++i)
+         {
+             ofs.replace(i, offsets[i]);
+         }
+-        QVector<int> ts(timestamps.size());
++        QList<int> ts(timestamps.size());
+         for (int i = 0; i < ts.size(); ++i)
+         {
+             ts.replace(i, timestamps[i]);
+@@ -1588,7 +1588,7 @@ void SubtitleProcessor::determineFramePalette(int index)
+         }
+ 
+         // set new frame palette
+-        QVector<int> paletteFrame(4);
++        QList<int> paletteFrame(4);
+         paletteFrame.replace(0, 0);        // black - transparent color
+         paletteFrame.replace(1, colIdx);   // primary color
+         if (colIdx == 1)
+@@ -1611,8 +1611,8 @@ void SubtitleProcessor::determineFramePalette(int index)
+         SubstreamDVD* substreamDVD;
+         // use palette from loaded VobSub or SUP/IFO
+         Palette miniPal(4, true);
+-        QVector<int> alpha;
+-        QVector<int> paletteFrame;
++        QList<int> alpha;
++        QList<int> paletteFrame;
+ 
+         if (inMode == InputMode::VOBSUB)
+         {
+@@ -2516,7 +2516,7 @@ Resolution SubtitleProcessor::getResolution(QString string)
+     return Resolution::HD_1080;
+ }
+ 
+-QVector<int> SubtitleProcessor::getResolutions(Resolution resolution)
++QList<int> SubtitleProcessor::getResolutions(Resolution resolution)
+ {
+     if (resolution == Resolution::NTSC)
+     {
+diff --git a/src/Subtitles/subtitleprocessor.h b/src/Subtitles/subtitleprocessor.h
+index 19c5cc1..f8585b7 100644
+--- a/src/Subtitles/subtitleprocessor.h
++++ b/src/Subtitles/subtitleprocessor.h
+@@ -27,7 +27,7 @@
+ #include <QString>
+ #include <QStringList>
+ #include <QSharedPointer>
+-#include <QVector>
++#include <QList>
+ #include <QSettings>
+ 
+ class QTextStream;
+@@ -54,7 +54,7 @@ enum class RunType : int;
+ 
+ static QStringList resolutionNamesXml = { "480i", "576i", "720p", "1440x1080", "1080p" };
+ 
+-static QVector<QVector<int>> resolutions = {
++static QList<QVector<int>> resolutions = {
+     {720, 480},
+     {720, 576},
+     {1280, 720},
+@@ -70,7 +70,7 @@ static QStringList resolutionNames = {
+     "1080p (1920x1080)"
+ };
+ 
+-static QVector<QVector<QString>> languages = {{
++static QList<QVector<QString>> languages = {{
+     {"German",       "de", "deu"},
+     {"English",      "en", "eng"},
+     {"French",       "fr", "fra"},
+@@ -272,7 +272,7 @@ public:
+ 
+     void convertSup(int index, int displayNumber, int displayMax, bool skipScaling = false);
+     void setActive(bool value) { isActive = value; }
+-    QVector<QVector<QString>>& getLanguages() { return languages; }
++    QList<QVector<QString>>& getLanguages() { return languages; }
+     Palette &getDefaultDVDPalette() { return defaultDVDPalette; }
+     Palette &getCurrentDVDPalette() { return currentDVDPalette; }
+     Palette &getCurrentSrcDVDPalette() { return currentSourceDVDPalette; }
+@@ -328,8 +328,8 @@ public:
+     void setCliMode(bool value) { cliMode = value; }
+     bool getExportForced() { return exportForced; }
+     void setExportForced(bool value) { exportForced = value; }
+-    QVector<int> getLuminanceThreshold() { return luminanceThreshold; }
+-    void setLuminanceThreshold(QVector<int> value) { luminanceThreshold = value; }
++    QList<int> getLuminanceThreshold() { return luminanceThreshold; }
++    void setLuminanceThreshold(QList<int> value) { luminanceThreshold = value; }
+     void setLoadPath(QString value) { fileName = value; }
+     void setIFOFileName(QString value) { ifoFile = value; }
+     int getCropOfsY() { return cropOfsY; }
+@@ -468,13 +468,13 @@ public:
+     Resolution getResolution(int width, int height);
+     SubPicture *getSubPictureSrc(int index);
+     Resolution getResolution(QString string);
+-    QVector<int> getResolutions(Resolution resolution);
++    QList<int> getResolutions(Resolution resolution);
+     QImage getTrgImagePatched(SubPicture* subPicture);
+     SubPicture *getSubPictureTrg(int index);
+-    QVector<int> &getFrameAlpha(int index);
+-    QVector<int> getOriginalFrameAlpha(int index);
+-    QVector<int> &getFramePal(int index);
+-    QVector<int> getOriginalFramePal(int index);
++    QList<int> &getFrameAlpha(int index);
++    QList<int> getOriginalFrameAlpha(int index);
++    QList<int> &getFramePal(int index);
++    QList<int> getOriginalFramePal(int index);
+     Filter *scaleFilter;
+ 
+     void storeFreeScale(double xScale, double yScale);
+@@ -526,7 +526,7 @@ private:
+ 
+     SubPictureDVD* subVobTrg = 0;
+ 
+-    QVector<SubPicture*> subPictures;
++    QList<SubPicture*> subPictures;
+ 
+     int languageIdxRead = false;
+     int maxProgress = 0;
+@@ -592,16 +592,16 @@ private:
+ 
+     QString fileName = "";
+     QString ifoFile = "";
+-    QVector<int> luminanceThreshold = { 210, 160 };
++    QList<int> luminanceThreshold = { 210, 160 };
+ 
+-    QVector<int> alphaDefault = { 0, 0xf, 0xf, 0xf};
++    QList<int> alphaDefault = { 0, 0xf, 0xf, 0xf};
+     void SetValuesFromSettings();
+     int countForcedIncluded();
+     int countIncluded();
+     void writePGCEditPalette(QString filename, Palette &palette);
+     void validateTimes(int index, SubPicture* subPicture, SubPicture* subPictureNext,
+                        SubPicture* subPicturePrevious);
+-    QVector<int> getResolution(Resolution resolution);
++    QList<int> getResolution(Resolution resolution);
+     void determineFramePalette(int index);
+     bool updateTrgPic(int index);
+     QImage getSrcImage(int index);
+diff --git a/src/Subtitles/supbd.cpp b/src/Subtitles/supbd.cpp
+index 62ff08b..37d4b36 100644
+--- a/src/Subtitles/supbd.cpp
++++ b/src/Subtitles/supbd.cpp
+@@ -114,8 +114,8 @@ void SupBD::readAllSupFrames()
+     int bufsize = (int)fileBuffer->getSize();
+     SupSegment segment;
+     SubPictureBD pic;
+-    QMap<int, QVector<PaletteInfo>> palettes;
+-    QMap<int, QVector<ODS>> imageObjects;
++    QMap<int, QList<PaletteInfo>> palettes;
++    QMap<int, QList<ODS>> imageObjects;
+     int subCount = 0;
+     bool forceFirstOds = true;
+     ODS ods;
+@@ -166,7 +166,7 @@ void SupBD::readAllSupFrames()
+                     {
+                         if (!palettes.contains(pds.paletteId))
+                         {
+-                            palettes[palId] = QVector<PaletteInfo>();
++                            palettes[palId] = QList<PaletteInfo>();
+                         }
+                         else
+                         {
+@@ -200,7 +200,7 @@ void SupBD::readAllSupFrames()
+                     {
+                         if (isFirst)
+                         {
+-                            imageObjects[ods.objectId] = QVector<ODS> { ods };
++                            imageObjects[ods.objectId] = QList<ODS> { ods };
+                             subtitleProcessor->print(QString("%1, img size: %2*%3\n")
+                                                      .arg(out)
+                                                      .arg(QString::number(ods.width))
+@@ -424,10 +424,10 @@ bool SupBD::imagesAreMergeable(SubPictureBD &currentSub, SubPictureBD &prevSub)
+     {
+         if (!currentSub.imageObjectList.empty() && !prevSub.imageObjectList.empty())
+         {
+-            QVector<uchar> curImageBuf, prevImageBuf;
++            QList<uchar> curImageBuf, prevImageBuf;
+             for (auto& imageObject : currentSub.imageObjectList)
+             {
+-                curImageBuf = QVector<uchar>(imageObject.bufferSize());
++                curImageBuf = QList<uchar>(imageObject.bufferSize());
+                 int index = 0;
+                 for (auto& fragment : imageObject.fragmentList())
+                 {
+@@ -437,7 +437,7 @@ bool SupBD::imagesAreMergeable(SubPictureBD &currentSub, SubPictureBD &prevSub)
+             }
+             for (auto& imageObject : prevSub.imageObjectList)
+             {
+-                prevImageBuf = QVector<uchar>(imageObject.bufferSize());
++                prevImageBuf = QList<uchar>(imageObject.bufferSize());
+                 int index = 0;
+                 for (auto& fragment : imageObject.fragmentList())
+                 {
+@@ -451,7 +451,7 @@ bool SupBD::imagesAreMergeable(SubPictureBD &currentSub, SubPictureBD &prevSub)
+     return false;
+ }
+ 
+-QVector<uchar> SupBD::encodeImage(Bitmap &bm)
++QList<uchar> SupBD::encodeImage(Bitmap &bm)
+ {
+     uchar color;
+     int ofs;
+@@ -464,7 +464,7 @@ QVector<uchar> SupBD::encodeImage(Bitmap &bm)
+     const uchar* pixels = bm.image().constScanLine(0);
+     int sourcePitch = bm.image().bytesPerLine();
+ 
+-    QVector<uchar> bytes;
++    QList<uchar> bytes;
+     bytes.reserve(height * sourcePitch);
+ 
+     for (int y = 0; y < height; ++y)
+@@ -552,7 +552,7 @@ int SupBD::getFpsId(double fps)
+     return 0x10;
+ }
+ 
+-QVector<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette &pal, bool forcedOnly)
++QList<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette &pal, bool forcedOnly)
+ {
+     // the last palette entry must be transparent
+     if (pal.size() > 255 && pal.alpha(255) > 0)
+@@ -560,7 +560,7 @@ QVector<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette
+         // quantize image
+         QuantizeFilter qf;
+         Bitmap bmQ(bm.width(), bm.height());
+-        QVector<QRgb> ct = qf.quantize(bm.toARGB(pal), &bmQ.image(), bm.width(), bm.height(), 255, false, false);
++        QList<QRgb> ct = qf.quantize(bm.toARGB(pal), &bmQ.image(), bm.width(), bm.height(), 255, false, false);
+         int size = ct.size();
+ 
+         subtitleProcessor->print(QString("Palette had to be reduced from %1 to %2 entries.\n")
+@@ -597,7 +597,7 @@ QVector<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette
+         }
+     }
+ 
+-    QVector<QVector<uchar>> rleBuf;
++    QList<QVector<uchar>> rleBuf;
+     int rleBufSize = 0;
+ 
+     QMap<int, QRect> imageSizes;
+@@ -623,7 +623,7 @@ QVector<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette
+         numberOfWindows = subPicture->numberOfWindows();
+     }
+ 
+-    QVector<Bitmap> bitmaps;
++    QList<Bitmap> bitmaps;
+     int xOffset1 = 0, xOffset2 = 0, yOffset1 = 0, yOffset2 = 0;
+ 
+     if (numberOfImageObjects == 1)
+@@ -663,7 +663,7 @@ QVector<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette
+         bitmaps.push_back(bm.crop(xOffset2, yOffset2, imageSizes[1].width(), imageSizes[1].height()));
+     }
+ 
+-    QVector<int> forcedFlags;
++    QList<int> forcedFlags;
+ 
+     if (forcedOnly)
+     {
+@@ -700,7 +700,7 @@ QVector<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette
+ 
+     for (int i = 0; i < bitmaps.size(); ++i)
+     {
+-        QVector<uchar> buf = encodeImage(bitmaps[i]);
++        QList<uchar> buf = encodeImage(bitmaps[i]);
+         rleBufSize += buf.size();
+         rleBuf.push_back(buf);
+     }
+@@ -738,7 +738,7 @@ QVector<uchar> SupBD::createSupFrame(SubPicture *subPicture, Bitmap &bm, Palette
+ 
+     int h = subPicture->screenHeight() - (2 * subtitleProcessor->getCropOfsY());
+ 
+-    QVector<uchar> buf(size);
++    QList<uchar> buf(size);
+     int index = 0;
+ 
+     int fpsId = getFpsId(subtitleProcessor->getFPSTrg());
+@@ -1190,7 +1190,7 @@ void SupBD::findImageArea(SubPictureBD *subPicture)
+ {
+     QImage image = _bitmap.image(_palette);
+     int top = 0, bottom = 0, left = 0, right = 0;
+-    QVector<QRgb> colors = image.colorTable();//.constData();
++    QList<QRgb> colors = image.colorTable();//.constData();
+ 
+     const uchar *pixels = image.constScanLine(0);
+     int pitch = image.bytesPerLine();
+@@ -1320,7 +1320,7 @@ Palette SupBD::decodePalette(SubPictureBD *subPicture)
+     bool fadeOut = false;
+     int palIndex = 0;
+ 
+-    QVector<PaletteInfo> pl = subPicture->palettes[subPicture->paletteId()];
++    QList<PaletteInfo> pl = subPicture->palettes[subPicture->paletteId()];
+ 
+     if (pl.isEmpty())
+     {
+@@ -1386,7 +1386,7 @@ Palette SupBD::decodePalette(SubPictureBD *subPicture)
+ Bitmap SupBD::decodeImage(SubPictureBD *subPicture, int transparentIndex)
+ {
+     int numImgObj = 0;
+-    QVector<int> objectIdxes;
++    QList<int> objectIdxes;
+ 
+     for (auto key : subPicture->imageObjectList.keys())
+     {
+@@ -1427,7 +1427,7 @@ Bitmap SupBD::decodeImage(SubPictureBD *subPicture, int transparentIndex)
+         int xpos = 0;
+ 
+         // just for multi-packet support, copy all of the image data in one common buffer
+-        QVector<uchar> buf = QVector<uchar>(imageObject.bufferSize());
++        QList<uchar> buf = QVector<uchar>(imageObject.bufferSize());
+         index = 0;
+         for (int p = 0; p < imageObject.fragmentList().size(); ++p)
+         {
+diff --git a/src/Subtitles/supbd.h b/src/Subtitles/supbd.h
+index fb82789..8046788 100644
+--- a/src/Subtitles/supbd.h
++++ b/src/Subtitles/supbd.h
+@@ -29,7 +29,7 @@
+ #include <QObject>
+ #include <QString>
+ #include <QScopedPointer>
+-#include <QVector>
++#include <QList>
+ 
+ class SubtitleProcessor;
+ class SubPictureBD;
+@@ -72,7 +72,7 @@ public:
+ 
+     SubPicture *subPicture(int index);
+ 
+-    QVector<uchar> createSupFrame(SubPicture* subPicture, Bitmap &bm, Palette &pal, bool forcedOnly);
++    QList<uchar> createSupFrame(SubPicture* subPicture, Bitmap &bm, Palette &pal, bool forcedOnly);
+ 
+ signals:
+     void maxProgressChanged(qint64 maxProgress);
+@@ -97,7 +97,7 @@ private:
+ 
+     QString supFileName;
+ 
+-    QVector<SubPictureBD> subPictures;
++    QList<SubPictureBD> subPictures;
+ 
+     SubtitleProcessor* subtitleProcessor = 0;
+ 
+@@ -118,7 +118,7 @@ private:
+ 
+     Palette decodePalette(SubPictureBD *subPicture);
+ 
+-    QVector<uchar> encodeImage(Bitmap &bm);
++    QList<uchar> encodeImage(Bitmap &bm);
+ 
+     SupSegment readSegment(int offset);
+ 
+@@ -126,7 +126,7 @@ private:
+ 
+     bool imagesAreMergeable(SubPictureBD &currentSub, SubPictureBD &prevSub);
+ 
+-    QVector<uchar> packetHeader =
++    QList<uchar> packetHeader =
+     {
+         0x50, 0x47,                         // 0:  "PG"
+         0x00, 0x00, 0x00, 0x00,             // 2:  PTS - presentation time stamp
+@@ -135,7 +135,7 @@ private:
+         0x00, 0x00,                         // 11: segment_length (bytes following till next PG)
+     };
+ 
+-    QVector<uchar> headerPCSStart =
++    QList<uchar> headerPCSStart =
+     {
+         0x00, 0x00, 0x00, 0x00,             // 0: video_width, video_height
+         0x10,                               // 4: hi nibble: frame_rate (0x10=24p), lo nibble: reserved
+@@ -150,7 +150,7 @@ private:
+         0x00, 0x00, 0x00, 0x00              // 15: composition_object_horizontal_position, composition_object_vertical_position
+     };
+ 
+-    QVector<uchar> headerPCSNext =
++    QList<uchar> headerPCSNext =
+     {
+         0x00, 0x01,                         // 11: 16bit object_id_ref
+         0x01,                               // 13: window_id_ref (0..1)
+@@ -158,7 +158,7 @@ private:
+         0x00, 0x00, 0x00, 0x00              // 15: composition_object_horizontal_position, composition_object_vertical_position
+     };
+ 
+-    QVector<uchar> headerPCSEnd =
++    QList<uchar> headerPCSEnd =
+     {
+         0x00, 0x00, 0x00, 0x00,             // 0: video_width, video_height
+         0x10,                               // 4: hi nibble: frame_rate (0x10=24p), lo nibble: reserved
+@@ -170,7 +170,7 @@ private:
+     };
+ 
+ 
+-    QVector<uchar> headerODSFirst =
++    QList<uchar> headerODSFirst =
+     {
+         0x00, 0x00,                         // 0: object_id
+         0x00,                               // 2: object_version_number
+@@ -179,14 +179,14 @@ private:
+         0x00, 0x00, 0x00, 0x00,             // 7: object_width, object_height
+     };
+ 
+-    QVector<uchar> headerODSNext =
++    QList<uchar> headerODSNext =
+     {
+         0x00, 0x00,                         // 0: object_id
+         0x00,                               // 2: object_version_number
+         0x40,                               // 3: first_in_sequence (0x80), last_in_sequence (0x40), 6bits reserved
+     };
+ 
+-    QVector<uchar> headerWDS =
++    QList<uchar> headerWDS =
+     {
+         0x00,                               // 0 : number of windows (0..2)
+         0x00,                               // 1 : window id (0..1)
+@@ -194,7 +194,7 @@ private:
+         0x00, 0x00, 0x00, 0x00              // 6 : width, height
+     };
+ 
+-    QVector<uchar> headerWDSNext =
++    QList<uchar> headerWDSNext =
+     {
+         0x01,                               // 1 : window id (0..1)
+         0x00, 0x00, 0x00, 0x00,             // 2 : x-ofs, y-ofs
+diff --git a/src/Subtitles/supdvd.cpp b/src/Subtitles/supdvd.cpp
+index 962f43c..a29d853 100644
+--- a/src/Subtitles/supdvd.cpp
++++ b/src/Subtitles/supdvd.cpp
+@@ -89,22 +89,22 @@ SubPicture *SupDVD::subPicture(int index)
+     return &subPictures[index];
+ }
+ 
+-QVector<int> &SupDVD::getFrameAlpha(int index)
++QList<int> &SupDVD::getFrameAlpha(int index)
+ {
+     return subPictures[index].alpha;
+ }
+ 
+-QVector<int> &SupDVD::getFramePal(int index)
++QList<int> &SupDVD::getFramePal(int index)
+ {
+     return subPictures[index].pal;
+ }
+ 
+-QVector<int> SupDVD::getOriginalFrameAlpha(int index)
++QList<int> SupDVD::getOriginalFrameAlpha(int index)
+ {
+     return subPictures[index].originalAlpha;
+ }
+ 
+-QVector<int> SupDVD::getOriginalFramePal(int index)
++QList<int> SupDVD::getOriginalFramePal(int index)
+ {
+     return subPictures[index].originalPal;
+ }
+@@ -113,7 +113,7 @@ void SupDVD::readIfo()
+ {
+     fileBuffer.reset(new FileBuffer(ifoFileName));
+ 
+-    QVector<uchar> header(IFOheader.size());
++    QList<uchar> header(IFOheader.size());
+ 
+     fileBuffer->getBytes(0, header.data(), IFOheader.size());
+ 
+@@ -237,7 +237,7 @@ void SupDVD::readIfo()
+ 
+ void SupDVD::writeIfo(QString filename, SubPicture &subPicture, Palette &palette)
+ {
+-    QVector<uchar> buf(0x1800);
++    QList<uchar> buf(0x1800);
+     int index = 0;
+ 
+     // video attributes
+@@ -290,7 +290,7 @@ void SupDVD::writeIfo(QString filename, SubPicture &subPicture, Palette &palette
+     NumberUtil::setByte(buf, index + 0x03, 0x01);                   // Number of Cells
+     for (int i = 0; i < 16; ++i)
+     {
+-        QVector<int> ycbcr = palette.YCbCr(i);
++        QList<int> ycbcr = palette.YCbCr(i);
+         NumberUtil::setByte(buf, index + 0xA4 + (4 * i) + 1, ycbcr[0]);
+         NumberUtil::setByte(buf, index + 0xA4 + (4 * i) + 2, ycbcr[1]);
+         NumberUtil::setByte(buf, index + 0xA4 + (4 * i) + 3, ycbcr[2]);
+@@ -338,11 +338,11 @@ void SupDVD::setSrcPalette(Palette &palette)
+     srcPalette = palette;
+ }
+ 
+-QVector<uchar> SupDVD::createSupFrame(SubPictureDVD &subPicture, Bitmap &bitmap)
++QList<uchar> SupDVD::createSupFrame(SubPictureDVD &subPicture, Bitmap &bitmap)
+ {
+     /* create RLE buffers */
+-    QVector<uchar> even = encodeLines(bitmap, true);
+-    QVector<uchar> odd  = encodeLines(bitmap, false);
++    QList<uchar> even = encodeLines(bitmap, true);
++    QList<uchar> odd  = encodeLines(bitmap, false);
+     int tmp;
+ 
+     int forcedOfs;
+@@ -366,7 +366,7 @@ QVector<uchar> SupDVD::createSupFrame(SubPictureDVD &subPicture, Bitmap &bitmap)
+     // fill out all info but the offets (determined later)
+     int sizeRLE = even.size() + odd.size();
+     int bufSize = 10 + 4 + controlHeaderLen + sizeRLE;
+-    QVector<uchar> buf(bufSize);
++    QList<uchar> buf(bufSize);
+ 
+     // write header
+     buf.replace(0, 0x53);
+@@ -497,17 +497,17 @@ qint64 SupDVD::readSupFrame(qint64 ofs)
+     }
+     ctrlOfs = ctrlOfsRel + ofs;			// absolute offset of control header
+     ofs += 2;
+-    pic.rleFragments = QVector<ImageObjectFragment>();
++    pic.rleFragments = QList<ImageObjectFragment>();
+     rleFrag = ImageObjectFragment();
+     rleFrag.setImageBufferOffset(ofs);
+     rleFrag.setImagePacketSize(rleSize);
+     pic.rleFragments.push_back(rleFrag);
+     pic.setRleSize(rleSize);
+ 
+-    pic.pal = QVector<int>(4);
+-    pic.alpha = QVector<int>(4);
++    pic.pal = QList<int>(4);
++    pic.alpha = QList<int>(4);
+     int alphaSum = 0;
+-    QVector<int> alphaUpdate(4);
++    QList<int> alphaUpdate(4);
+     int alphaUpdateSum;
+     int delay = -1;
+     bool ColAlphaUpdate = false;
+@@ -515,7 +515,7 @@ qint64 SupDVD::readSupFrame(qint64 ofs)
+     subtitleProcessor->print(QString("SP_DCSQT at ofs: %1\n").arg(QString::number(ctrlOfs, 16), 8, QChar('0')));
+ 
+     // copy control header in buffer (to be more compatible with VobSub)
+-    QVector<uchar> ctrlHeader(ctrlSize);
++    QList<uchar> ctrlHeader(ctrlSize);
+     for (int i = 0; i < ctrlSize; ++i)
+     {
+         ctrlHeader.replace(i, (uchar)fileBuffer->getByte(ctrlOfs + i));
+diff --git a/src/Subtitles/supdvd.h b/src/Subtitles/supdvd.h
+index c46fc19..2db08ec 100644
+--- a/src/Subtitles/supdvd.h
++++ b/src/Subtitles/supdvd.h
+@@ -63,11 +63,11 @@ public:
+     QImage image();
+     QImage image(Bitmap &bitmap);
+ 
+-    QVector<uchar> createSupFrame(SubPictureDVD &subPicture, Bitmap &bitmap);
+-    QVector<int> &getFrameAlpha(int index);
+-    QVector<int> &getFramePal(int index);
+-    QVector<int> getOriginalFrameAlpha(int index);
+-    QVector<int> getOriginalFramePal(int index);
++    QList<uchar> createSupFrame(SubPictureDVD &subPicture, Bitmap &bitmap);
++    QList<int> &getFrameAlpha(int index);
++    QList<int> &getFramePal(int index);
++    QList<int> getOriginalFrameAlpha(int index);
++    QList<int> getOriginalFramePal(int index);
+ 
+     SubPicture *subPicture(int index);
+ 
+@@ -79,11 +79,11 @@ private:
+     QString supFileName;
+     QString ifoFileName;
+ 
+-    QVector<SubPictureDVD> subPictures;
++    QList<SubPictureDVD> subPictures;
+ 
+-    const QVector<uchar> IFOheader = { 0x44, 0x56, 0x44, 0x56, 0x49, 0x44, 0x45, 0x4F, 0x2D, 0x56, 0x54, 0x53 };
++    const QList<uchar> IFOheader = { 0x44, 0x56, 0x44, 0x56, 0x49, 0x44, 0x45, 0x4F, 0x2D, 0x56, 0x54, 0x53 };
+ 
+-    QVector<uchar> controlHeader = {
++    QList<uchar> controlHeader = {
+             0x00,													//  dummy byte (for shifting when forced)
+             0x00, 0x00,												//  0: offset to end sequence
+             0x01,													//  2: CMD 1: start displaying
+diff --git a/src/Subtitles/suphd.cpp b/src/Subtitles/suphd.cpp
+index 6aca4e1..7d004c8 100644
+--- a/src/Subtitles/suphd.cpp
++++ b/src/Subtitles/suphd.cpp
+@@ -435,8 +435,8 @@ Bitmap SupHD::decodeImage(SubPictureHD &subPicture, int transparentIndex)
+         throw QString("Corrupt buffer offset information");
+     }
+ 
+-    QVector<uchar> evenBuf = QVector<uchar>(sizeEven);
+-    QVector<uchar> oddBuf  = QVector<uchar>(sizeOdd);
++    QList<uchar> evenBuf = QVector<uchar>(sizeEven);
++    QList<uchar> oddBuf  = QVector<uchar>(sizeOdd);
+ 
+     for (int i = 0; i < evenBuf.size(); i++)
+     {
+diff --git a/src/Subtitles/suphd.h b/src/Subtitles/suphd.h
+index 376d0c2..0cba963 100644
+--- a/src/Subtitles/suphd.h
++++ b/src/Subtitles/suphd.h
+@@ -26,7 +26,7 @@
+ 
+ #include <QObject>
+ #include <QString>
+-#include <QVector>
++#include <QList>
+ #include <QScopedPointer>
+ 
+ class SubtitleProcessor;
+@@ -78,7 +78,7 @@ private:
+ 
+     QString supFileName;
+ 
+-    QVector<SubPictureHD> subPictures;
++    QList<SubPictureHD> subPictures;
+ 
+     SubtitleProcessor* subtitleProcessor = 0;
+ 
+diff --git a/src/Subtitles/supxml.cpp b/src/Subtitles/supxml.cpp
+index 828e94d..9370743 100644
+--- a/src/Subtitles/supxml.cpp
++++ b/src/Subtitles/supxml.cpp
+@@ -27,8 +27,12 @@
+ #include "types.h"
+ #include <QImage>
+ #include <QFileInfo>
+-#include <QtXml/QXmlSimpleReader>
+-#include <QtXml/QXmlInputSource>
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
++#include <QXmlSimpleReader>
++#include <QXmlInputSource>
++#else
++#include <QXmlStreamReader>
++#endif
+ #include <QRect>
+ #include <QDir>
+ #include <QPainter>
+@@ -65,8 +69,8 @@ QImage SupXML::image(Bitmap &bitmap)
+ 
+ void SupXML::decode(int index)
+ {
+-    QVector<Bitmap> bitmaps;
+-    QVector<Palette> palettes;
++    QList<Bitmap> bitmaps;
++    QList<Palette> palettes;
+     SubPictureXML &subPic = subPictures[index];
+     for (int i = 0; i < subPic.fileNames().size(); ++i)
+     {
+@@ -84,7 +88,7 @@ void SupXML::decode(int index)
+         // first try to read image and palette directly from imported image
+         if (image.format() == QImage::Format_Indexed8)
+         {
+-            QVector<QRgb> colorTable = image.colorTable();
++            QList<QRgb> colorTable = image.colorTable();
+             if (colorTable.size() <= 255 || (image.hasAlphaChannel() && qAlpha(colorTable[255]) == 0))
+             {
+                 // create palette
+@@ -111,7 +115,7 @@ void SupXML::decode(int index)
+             // quantize image
+             QuantizeFilter qf;
+             bitmap = Bitmap(image.width(), image.height());
+-            QVector<QRgb> ct = qf.quantize(image, &bitmap.image(), width, height, 255, false, false);
++            QList<QRgb> ct = qf.quantize(image, &bitmap.image(), width, height, 255, false, false);
+             int size = ct.size();
+             if (size > 255)
+             {
+@@ -252,6 +256,7 @@ SubPicture *SupXML::subPicture(int index)
+ 
+ void SupXML::readAllImages()
+ {
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+     QXmlSimpleReader xmlReader;
+     QXmlInputSource *source = new QXmlInputSource(xmlFile.data());
+ 
+@@ -263,7 +268,16 @@ void SupXML::readAllImages()
+     {
+         throw QString("Failed to parse file: '%1'").arg(xmlFileName);
+     }
++#else
++    QXmlStreamReader reader(xmlFile.data());
+ 
++    while (!reader.atEnd()) {
++        reader.readNext();
++    }
++    if (reader.hasError()) {
++        throw QString("Failed to parse file: '%1'").arg(xmlFileName);
++    }
++#endif
+     subtitleProcessor->print(QString("\nDetected %1 forced captions.\n").arg(QString::number(_numForcedFrames)));
+ }
+ 
+@@ -273,7 +287,7 @@ QString SupXML::getPNGname(QString filename, int idx)
+     return QString("%1/%2_%3.png").arg(info.absolutePath()).arg(info.completeBaseName()).arg(QString::number(idx), 4, QChar('0'));
+ }
+ 
+-void SupXML::writeXml(QString filename, QVector<SubPicture*> pics)
++void SupXML::writeXml(QString filename, QList<SubPicture*> pics)
+ {
+     double fps = subtitleProcessor->getFPSTrg();
+     double fpsXml = XmlFps(fps);
+@@ -392,8 +406,13 @@ bool SupXML::XmlHandler::endElement(const QString &/*namespaceURI*/, const QStri
+     return true;
+ }
+ 
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QString &/*localName*/,
+                                       const QString &qName, const QXmlAttributes &atts)
++#else
++bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QString &/*localName*/,
++                                      const QString &qName, const QXmlStreamAttributes &atts)
++#endif
+ {
+     state = findState(qName.toLower());
+     QString at;
+@@ -424,7 +443,11 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+     } break;
+     case (int)SupXML::XmlHandler::XmlState::NAME:
+     {
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("Title");
++#else
++        at = atts.value("Title").toString();
++#endif
+         if (!at.isEmpty())
+         {
+             parent->title = at;
+@@ -433,7 +456,11 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+     } break;
+     case (int)SupXML::XmlHandler::XmlState::LANGUAGE:
+     {
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("Code");
++#else
++        at = atts.value("Code").toString();
++#endif
+         if (!at.isEmpty())
+         {
+             parent->language = at;
+@@ -442,14 +469,22 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+     } break;
+     case (int)SupXML::XmlHandler::XmlState::FORMAT:
+     {
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("FrameRate");
++#else
++        at = atts.value("FrameRate").toString();
++#endif
+         if (!at.isEmpty())
+         {
+             parent->fps = parent->subtitleProcessor->getFPS(at);
+             parent->fpsXml = parent->XmlFps(parent->fps);
+             parent->subtitleProcessor->print(QString("fps: %1\n").arg(QString::number(parent->fps, 'g', 6)));
+         }
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("VideoFormat");
++#else
++        at = atts.value("VideoFormat").toString();
++#endif
+         if (!at.isEmpty())
+         {
+             QString res = QString(at);
+@@ -463,7 +498,11 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+     } break;
+     case (int)SupXML::XmlHandler::XmlState::EVENTS:
+     {
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("NumberofEvents");
++#else
++        at = atts.value("NumberofEvents").toString();
++#endif
+         if (!at.isEmpty())
+         {
+             bool ok;
+@@ -489,7 +528,11 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+         parent->subtitleProcessor->printX(QString("#%1\n").arg(QString::number(num)));
+ 
+         emit parent->currentProgressChanged(num);
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("InTC");
++#else
++        at = atts.value("InTC").toString();
++#endif
+ 
+         if (!at.isEmpty())
+         {
+@@ -500,7 +543,11 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+                 parent->subtitleProcessor->printWarning(QString("Invalid start time %1\n").arg(at));
+             }
+         }
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("OutTC");
++#else
++        at = atts.value("OutTC").toString();
++#endif
+         if (!at.isEmpty())
+         {
+             subPicture->setEndTime(TimeUtil::timeStrXmlToPTS(at, parent->fpsXml));
+@@ -515,7 +562,11 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+             subPicture->setStartTime(((subPicture->startTime() * 1001) + 500) / 1000);
+             subPicture->setEndTime(((subPicture->endTime() * 1001) + 500) / 1000);
+         }
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         at = atts.value("Forced");
++#else
++        at = atts.value("Forced").toString();
++#endif
+         if (!at.isEmpty())
+         {
+             subPicture->setForced(at.toLower() == "true");
+@@ -528,7 +579,7 @@ bool SupXML::XmlHandler::startElement(const QString &/*namespaceURI*/, const QSt
+         {
+             parent->_numForcedFrames++;
+         }
+-        QVector<int> dim = parent->subtitleProcessor->getResolutions(parent->resolution);
++        QList<int> dim = parent->subtitleProcessor->getResolutions(parent->resolution);
+         subPicture->setScreenWidth(dim.at(0));
+         subPicture->setScreenHeight(dim.at(1));
+     } break;
+diff --git a/src/Subtitles/supxml.h b/src/Subtitles/supxml.h
+index 4456766..24ec4fa 100644
+--- a/src/Subtitles/supxml.h
++++ b/src/Subtitles/supxml.h
+@@ -26,10 +26,15 @@
+ 
+ #include <QObject>
+ #include <QFile>
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+ #include <QtXml/QXmlDefaultHandler>
++#else
++#include <QXmlStreamReader>
++#include <QXmlStreamAttributes>
++#endif
+ #include <QStringList>
+ #include <QString>
+-#include <QVector>
++#include <QList>
+ #include <QScopedPointer>
+ 
+ class SubtitleProcessor;
+@@ -44,14 +49,22 @@ class SupXML : public QObject, public Substream
+ {
+     Q_OBJECT
+ 
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+     class XmlHandler : public QXmlDefaultHandler
++#else
++    class XmlHandler : public QXmlStreamReader
++#endif
+     {
+     public:
+         XmlHandler(SupXML* parent) { this->parent = parent; }
+ 
+         bool characters(const QString &ch);
+         bool endElement(const QString &namespaceURI, const QString &localName, const QString &qName);
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+         bool startElement(const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts);
++#else
++        bool startElement(const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlStreamAttributes &atts);
++#endif
+ 
+     private:
+ 
+@@ -61,7 +74,7 @@ class SupXML : public QObject, public Substream
+ 
+         QString txt;
+ 
+-        QVector<int> getResolutions(Resolution resolution);
++        QList<int> getResolutions(Resolution resolution);
+ 
+         Resolution getResolution (QString string);
+ 
+@@ -81,7 +94,7 @@ public:
+ 
+     void decode(int index);
+     void readAllImages();
+-    void writeXml(QString filename, QVector<SubPicture*> pics);
++    void writeXml(QString filename, QList<SubPicture*> pics);
+ 
+     int primaryColorIndex() { return _primaryColorIndex; }
+     int numFrames();
+@@ -128,7 +141,7 @@ private:
+     QString language = "deu";
+     QString xmlFileName;
+ 
+-    QVector<SubPictureXML> subPictures;
++    QList<SubPictureXML> subPictures;
+ 
+     Resolution resolution;
+ 
+diff --git a/src/Tools/bitstream.cpp b/src/Tools/bitstream.cpp
+index 7846146..871953c 100644
+--- a/src/Tools/bitstream.cpp
++++ b/src/Tools/bitstream.cpp
+@@ -19,7 +19,7 @@
+ 
+ #include "bitstream.h"
+ 
+-BitStream::BitStream(QVector<uchar> &buffer) :
++BitStream::BitStream(QList<uchar> &buffer) :
+     byteOfs(0),
+     b(buffer[0] & 0xff),
+     bits(8),
+diff --git a/src/Tools/bitstream.h b/src/Tools/bitstream.h
+index aa757f4..05b9885 100644
+--- a/src/Tools/bitstream.h
++++ b/src/Tools/bitstream.h
+@@ -20,12 +20,12 @@
+ #ifndef BITSTREAM_H
+ #define BITSTREAM_H
+ 
+-#include <QVector>
++#include <QList>
+ 
+ class BitStream
+ {
+ public:
+-    BitStream(QVector<uchar> &buffer);
++    BitStream(QList<uchar> &buffer);
+ 
+     void syncToByte();
+ 
+@@ -37,7 +37,7 @@ private:
+     int b;
+     int bits;
+ 
+-    QVector<uchar> buf;
++    QList<uchar> buf;
+ };
+ 
+ #endif // BITSTREAM_H
+diff --git a/src/Tools/filebuffer.h b/src/Tools/filebuffer.h
+index 8a479ce..75721d5 100644
+--- a/src/Tools/filebuffer.h
++++ b/src/Tools/filebuffer.h
+@@ -24,7 +24,7 @@
+ #include <QFile>
+ #include <QFileInfo>
+ #include <QString>
+-#include <QVector>
++#include <QList>
+ 
+ class FileBuffer
+ {
+diff --git a/src/Tools/numberutil.cpp b/src/Tools/numberutil.cpp
+index 55d546f..02e8fa6 100644
+--- a/src/Tools/numberutil.cpp
++++ b/src/Tools/numberutil.cpp
+@@ -19,7 +19,7 @@
+ 
+ #include "numberutil.h"
+ 
+-void NumberUtil::setString(QVector<uchar> &buf, int index, QString string)
++void NumberUtil::setString(QList<uchar> &buf, int index, QString string)
+ {
+     for (int i = 0; i < string.size(); ++i)
+     {
+diff --git a/src/Tools/numberutil.h b/src/Tools/numberutil.h
+index 20369a7..7c9fd56 100644
+--- a/src/Tools/numberutil.h
++++ b/src/Tools/numberutil.h
+@@ -21,28 +21,28 @@
+ #define NUMBERUTIL_H
+ 
+ #include <QString>
+-#include <QVector>
++#include <QList>
+ 
+ class NumberUtil
+ {
+ public:
+-    static void setByte(QVector<uchar>& buf, int index, int value)
++    static void setByte(QList<uchar>& buf, int index, int value)
+     {
+         buf.replace(index, (uchar)value);
+     }
+-    static void setWord(QVector<uchar>& buf, int index, int value)
++    static void setWord(QList<uchar>& buf, int index, int value)
+     {
+         buf.replace(index, (uchar)(value >> 8));
+         buf.replace(index + 1, (uchar)value);
+     }
+-    static void setDWord(QVector<uchar>& buf, int index, int value)
++    static void setDWord(QList<uchar>& buf, int index, int value)
+     {
+         buf.replace(index, (uchar)(value >> 24));
+         buf.replace(index + 1, (uchar)(value >> 16));
+         buf.replace(index + 2, (uchar)(value >> 8));
+         buf.replace(index + 3, (uchar)value);
+     }
+-    static void setString(QVector<uchar> &buf, int index, QString string);
++    static void setString(QList<uchar> &buf, int index, QString string);
+ };
+ 
+ #endif // NUMBERUTIL_H
+diff --git a/src/Tools/quantizefilter.cpp b/src/Tools/quantizefilter.cpp
+index fb8b82e..a7be8d4 100644
+--- a/src/Tools/quantizefilter.cpp
++++ b/src/Tools/quantizefilter.cpp
+@@ -28,12 +28,12 @@ void QuantizeFilter::setNumColors(int numColors)
+     this->_numColors = std::min(std::max(numColors, 8), 256);
+ }
+ 
+-QVector<QRgb> QuantizeFilter::quantize(QImage inImage, QImage *outImage, int width, int height,
++QList<QRgb> QuantizeFilter::quantize(QImage inImage, QImage *outImage, int width, int height,
+                                       int numColors, bool dither, bool serpentine)
+ {
+     quantizer.setup(numColors);
+     quantizer.addPixels(inImage);
+-    QVector<QRgb> table = quantizer.buildColorTable();
++    QList<QRgb> table = quantizer.buildColorTable();
+ 
+     QRgb *inPixels = 0;
+     int sourcePitch = inImage.bytesPerLine() / 4;
+@@ -129,7 +129,7 @@ QVector<QRgb> QuantizeFilter::quantize(QImage inImage, QImage *outImage, int wid
+     }
+ 
+     // create palette
+-    QVector<QRgb> p;
++    QList<QRgb> p;
+ 
+     inPixels = (QRgb*)inImage.scanLine(0);
+     outPixels = outImage->scanLine(0);
+@@ -247,14 +247,14 @@ int QuantizeFilter::OctTreeQuantizer::indexForColor(QRgb argb)
+     return 0;
+ }
+ 
+-QVector<QRgb> QuantizeFilter::OctTreeQuantizer::buildColorTable()
++QList<QRgb> QuantizeFilter::OctTreeQuantizer::buildColorTable()
+ {
+-    QVector<QRgb> table(colors);
++    QList<QRgb> table(colors);
+     buildColorTable(root, table, 0);
+     return table;
+ }
+ 
+-void QuantizeFilter::OctTreeQuantizer::buildColorTable(QVector<QRgb> inPixels, QVector<QRgb>& table)
++void QuantizeFilter::OctTreeQuantizer::buildColorTable(QList<QRgb> inPixels, QVector<QRgb>& table)
+ {
+     int count = inPixels.size();
+     maximumColors = table.size();
+@@ -353,7 +353,7 @@ void QuantizeFilter::OctTreeQuantizer::reduceTree(int numColors)
+ {
+     for (int level = MAX_LEVEL - 1; level >= 0; --level)
+     {
+-        QVector<OctTreeNode*> v = colorList[level];
++        QList<OctTreeNode*> v = colorList[level];
+         if (!v.isEmpty())
+         {
+             for (int j = 0; j < v.size(); j++)
+@@ -390,7 +390,7 @@ void QuantizeFilter::OctTreeQuantizer::reduceTree(int numColors)
+     }
+ }
+ 
+-int QuantizeFilter::OctTreeQuantizer::buildColorTable(QuantizeFilter::OctTreeQuantizer::OctTreeNode *node, QVector<QRgb>& table, int index)
++int QuantizeFilter::OctTreeQuantizer::buildColorTable(QuantizeFilter::OctTreeQuantizer::OctTreeNode *node, QList<QRgb>& table, int index)
+ {
+     if (colors > maximumColors)
+     {
+diff --git a/src/Tools/quantizefilter.h b/src/Tools/quantizefilter.h
+index 86ed2f7..5dd1c25 100644
+--- a/src/Tools/quantizefilter.h
++++ b/src/Tools/quantizefilter.h
+@@ -22,12 +22,12 @@
+ 
+ #include <QColor>
+ #include <QImage>
+-#include <QVector>
++#include <QList>
+ 
+ /**
+  * Floyd-Steinberg dithering matrix.
+  */
+-static QVector<int> matrix = {
++static QList<int> matrix = {
+     0, 0, 0,
+     0, 0, 7,
+     3, 5, 1,
+@@ -42,7 +42,7 @@ class QuantizeFilter
+             int children = 0;
+             int level = 0;
+             OctTreeNode* parent = 0;
+-            QVector<OctTreeNode*> leaf = QVector<OctTreeNode*>(16);
++            QList<OctTreeNode*> leaf = QVector<OctTreeNode*>(16);
+             bool isLeaf = false;
+             int count = 0;
+             int totalAlpha = 0;
+@@ -65,12 +65,12 @@ class QuantizeFilter
+             }
+         }
+         void addPixels(QImage &image);
+-        void buildColorTable(QVector<QRgb> inPixels, QVector<QRgb> &table);
++        void buildColorTable(QList<QRgb> inPixels, QVector<QRgb> &table);
+         void setup(int numColors);
+ 
+         int indexForColor(QRgb argb);
+ 
+-        QVector<QRgb> buildColorTable();
++        QList<QRgb> buildColorTable();
+ 
+     private:
+         static constexpr int MAX_LEVEL = 5;
+@@ -82,11 +82,11 @@ class QuantizeFilter
+ 
+         OctTreeNode* root = new OctTreeNode;
+ 
+-        QVector<QVector<OctTreeNode*>> colorList = QVector<QVector<OctTreeNode*>>(MAX_LEVEL + 1);
++        QList<QVector<OctTreeNode*>> colorList = QVector<QVector<OctTreeNode*>>(MAX_LEVEL + 1);
+ 
+         void insertColor(QRgb rgb);
+         void reduceTree(int numColors);
+-        int buildColorTable(OctTreeNode* node, QVector<QRgb>& table, int index);
++        int buildColorTable(OctTreeNode* node, QList<QRgb>& table, int index);
+     }quantizer;
+ 
+ public:
+@@ -112,7 +112,7 @@ public:
+      bool getDither() { return dither; }
+      bool getSerpentine() { return serpentine; }
+ 
+-     QVector<QRgb> quantize(QImage inImage, QImage *outImage, int width, int height,
++     QList<QRgb> quantize(QImage inImage, QImage *outImage, int width, int height,
+                            int numColors, bool dither, bool serpentine);
+ 
+ private:
+diff --git a/src/Tools/timeutil.cpp b/src/Tools/timeutil.cpp
+index 5d1ca80..b728410 100644
+--- a/src/Tools/timeutil.cpp
++++ b/src/Tools/timeutil.cpp
+@@ -20,7 +20,7 @@
+ #include "timeutil.h"
+ 
+ #include <QStringList>
+-#include <QVector>
++#include <QList>
+ 
+ TimeUtil::TimeUtil()
+ {
+@@ -28,13 +28,13 @@ TimeUtil::TimeUtil()
+ 
+ qint64 TimeUtil::timeStrXmlToPTS(QString s, double fps)
+ {
+-    if (timePattern.exactMatch(s) && timePattern.indexIn(s) != -1)
++    QRegularExpressionMatch match = timePattern.match(s);
++    if (match.hasMatch())
+     {
+-        QStringList m = timePattern.capturedTexts();
+-        qint64 hour = m[1].toInt();
+-        qint64 min = m[2].toInt();
+-        qint64 sec = m[3].toInt();
+-        qint64 frames = m[4].toInt();
++        qint64 hour = match.captured(1).toInt();
++        qint64 min = match.captured(2).toInt();
++        qint64 sec = match.captured(3).toInt();
++        qint64 frames = match.captured(4).toInt();
+ 
+         qint64 temp = hour * 60;
+         temp += min;
+@@ -54,13 +54,13 @@ qint64 TimeUtil::timeStrToPTS(QString s, bool *ok)
+     *ok = false;
+     bool timestampIsNegative = s[0] == '-';
+     QString temp = timestampIsNegative ? s.mid(1) : s;
+-    if (timePattern.exactMatch(temp) && timePattern.indexIn(temp) != -1)
++    QRegularExpressionMatch match = timePattern.match(s);
++    if (match.hasMatch())
+     {
+-        QStringList m = timePattern.capturedTexts();
+-        qint64 hour = m[1].toInt();
+-        qint64 min = m[2].toInt();
+-        qint64 sec = m[3].toInt();
+-        qint64 ms  = m[4].toInt();
++        qint64 hour = match.captured(1).toInt();
++        qint64 min = match.captured(2).toInt();
++        qint64 sec = match.captured(3).toInt();
++        qint64 ms  = match.captured(4).toInt();
+ 
+         qint64 temp = hour * 60;
+         temp += min;
+@@ -79,7 +79,7 @@ qint64 TimeUtil::timeStrToPTS(QString s, bool *ok)
+ 
+ QString TimeUtil::ptsToTimeStrXml(qint64 pts, double fps)
+ {
+-    QVector<int> time = msToTime((pts + 45) / 90);
++    QList<int> time = msToTime((pts + 45) / 90);
+     return QString("%1:%2:%3:%4").arg(QString::number(time[0]), 2, QChar('0'))
+                                  .arg(QString::number(time[1]), 2, QChar('0'))
+                                  .arg(QString::number(time[2]), 2, QChar('0'))
+@@ -90,7 +90,7 @@ QString TimeUtil::ptsToTimeStr(qint64 pts)
+ {
+     bool ptsIsNegative = pts < 0;
+     pts = ptsIsNegative ? -pts : pts;
+-    QVector<int> time = msToTime((pts + 45) / 90);
++    QList<int> time = msToTime((pts + 45) / 90);
+     return QString("%1%2:%3:%4.%5").arg(ptsIsNegative ? "-" : "")
+                                    .arg(QString::number(time[0]), 2, QChar('0'))
+                                    .arg(QString::number(time[1]), 2, QChar('0'))
+@@ -102,7 +102,7 @@ QString TimeUtil::ptsToTimeStrIdx(qint64 pts)
+ {
+     bool ptsIsNegative = pts < 0;
+     pts = ptsIsNegative ? -pts : pts;
+-    QVector<int> time = msToTime((pts + 45) / 90);
++    QList<int> time = msToTime((pts + 45) / 90);
+     return QString("%1%2:%3:%4:%5").arg(ptsIsNegative ? "-" : "")
+                                    .arg(QString::number(time[0]), 2, QChar('0'))
+                                    .arg(QString::number(time[1]), 2, QChar('0'))
+@@ -110,9 +110,9 @@ QString TimeUtil::ptsToTimeStrIdx(qint64 pts)
+                                    .arg(QString::number(time[3]), 3, QChar('0'));
+ }
+ 
+-QVector<int> TimeUtil::msToTime(qint64 ms)
++QList<int> TimeUtil::msToTime(qint64 ms)
+ {
+-    QVector<int> time(4);
++    QList<int> time(4);
+     // time[0] = hours
+     time.replace(0, (int)(ms / (60 * 60 * 1000)));
+     ms -= (time[0] * 60 * 60 * 1000);
+diff --git a/src/Tools/timeutil.h b/src/Tools/timeutil.h
+index 3535f02..c5a3fab 100644
+--- a/src/Tools/timeutil.h
++++ b/src/Tools/timeutil.h
+@@ -21,11 +21,12 @@
+ #define TIMEUTIL_H
+ 
+ #include <QString>
+-#include <QRegExp>
++#include <QRegularExpression>
++#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
++template <typename T> class QList;
++#endif
+ 
+-template <typename T> class QVector;
+-
+-static QRegExp timePattern = QRegExp("(\\d+):(\\d+):(\\d+)[:\\.](\\d+)");
++static QRegularExpression timePattern = QRegularExpression("(\\d+):(\\d+):(\\d+)[:\\.](\\d+)");
+ 
+ class TimeUtil
+ {
+@@ -35,13 +36,13 @@ public:
+     static qint64 timeStrToPTS(QString s, bool *ok = 0);
+     static qint64 timeStrXmlToPTS(QString s, double fps);
+ 
+-    static QRegExp getTimePattern() { return timePattern; }
++    static QRegularExpression getTimePattern() { return timePattern; }
+ 
+     static QString ptsToTimeStrXml(qint64 pts, double fps);
+     static QString ptsToTimeStr(qint64 pts);
+     static QString ptsToTimeStrIdx(qint64 pts);
+ 
+-    static QVector<int> msToTime(qint64 ms);
++    static QList<int> msToTime(qint64 ms);
+ };
+ 
+ #endif // TIMEUTIL_H
+diff --git a/src/bdsup2sub++.pro b/src/bdsup2sub++.pro
+index 8a39813..a1b93bd 100644
+--- a/src/bdsup2sub++.pro
++++ b/src/bdsup2sub++.pro
+@@ -19,7 +19,20 @@ QT        += widgets
+ }
+ CONFIG    += qt console
+ DEFINES   += BUILD_QXT_CORE
+-QMAKE_CXXFLAGS += -std=c++14
++win32-msvc* {
++  lessThan(QT_MAJOR_VERSION, 6) {
++    CONFIG += c++14 # C++14 support
++  } else {
++    CONFIG += c++17 # C++11 support
++    QMAKE_CXXFLAGS += /std:c++17
++  }
++} else {
++  lessThan(QT_MAJOR_VERSION, 6) {
++    QMAKE_CXXFLAGS += -std=c++14
++  } else {
++    QMAKE_CXXFLAGS += -std=c++17
++  }
++}
+ TARGET     = bdsup2sub++
+ TEMPLATE   = app
+ 
+diff --git a/src/bdsup2sub.cpp b/src/bdsup2sub.cpp
+index b67bc33..63e3811 100644
+--- a/src/bdsup2sub.cpp
++++ b/src/bdsup2sub.cpp
+@@ -134,7 +134,7 @@ void BDSup2Sub::onLoadingSubtitleFileFinished(const QString &errorString)
+         }
+         if (setLumaThreshold)
+         {
+-            QVector<int> lumaThr = subtitleProcessor->getLuminanceThreshold();
++            QList<int> lumaThr = subtitleProcessor->getLuminanceThreshold();
+             if (lumThr1 > 0)
+             {
+                 lumaThr.replace(0, lumThr1);
+@@ -589,7 +589,7 @@ void BDSup2Sub::saveFile()
+         QFileInfo fileInfo(fileName);
+         savePath = fileInfo.absolutePath();
+         saveFileName = fileInfo.completeBaseName();
+-        saveFileName = saveFileName.replace(QRegExp("_exp$"), "");
++        saveFileName = saveFileName.replace(QRegularExpression("_exp$"), "");
+         QString fi, fs;
+ 
+         if (currentText.contains("IDX"))
+@@ -802,15 +802,15 @@ void BDSup2Sub::printWarnings(QTextStream &stream)
+ 
+ void BDSup2Sub::showUsage(QTextStream& outStream)
+ {
+-    outStream << progNameVer << " " << authorDate << endl;
+-    outStream << "Syntax:" << endl;
+-    outStream << QString("%1 [options] -o outfile infile").arg(progName.toLower()) << endl;
++    outStream << progNameVer << " " << authorDate << Qt::endl;
++    outStream << "Syntax:" << Qt::endl;
++    outStream << QString("%1 [options] -o outfile infile").arg(progName.toLower()) << Qt::endl;
+     options->showUsage(false, outStream);
+-    outStream << endl << "Wildcard support:" << endl;
+-    outStream << "Use \"*\" for any character and \"?\" for one character in the source name" << endl;
+-    outStream << "Use exactly one \"*\" in the target file name." << endl;
+-    outStream << "Example:" << endl;
+-    outStream << "bdsup2sub++ --resolution 720 --fps-target 25p -o dvd_*.sub 'movie* 1?.sup'" << endl;
++    outStream << Qt::endl << "Wildcard support:" << Qt::endl;
++    outStream << "Use \"*\" for any character and \"?\" for one character in the source name" << Qt::endl;
++    outStream << "Use exactly one \"*\" in the target file name." << Qt::endl;
++    outStream << "Example:" << Qt::endl;
++    outStream << "bdsup2sub++ --resolution 720 --fps-target 25p -o dvd_*.sub 'movie* 1?.sup'" << Qt::endl;
+ }
+ 
+ void BDSup2Sub::addCLIOptions()
+@@ -945,7 +945,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+         }
+         else
+         {
+-            errorStream << QString("ERROR: File '%1' does not exist.").arg(positional[0]) << endl;
++            errorStream << QString("ERROR: File '%1' does not exist.").arg(positional[0]) << Qt::endl;
+             exit(1);
+         }
+     }
+@@ -963,7 +963,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             QString ext = QFileInfo(trg).suffix();
+             if (ext.isEmpty())
+             {
+-                errorStream << QString("ERROR: No extension given for target %1").arg(trg) << endl;
++                errorStream << QString("ERROR: No extension given for target %1").arg(trg) << Qt::endl;
+                 exit(1);
+             }
+             if (ext == "sup")
+@@ -984,7 +984,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             }
+             else
+             {
+-                errorStream << QString("ERROR: Unknown extension of target %1").arg(trg) << endl;
++                errorStream << QString("ERROR: Unknown extension of target %1").arg(trg) << Qt::endl;
+                 exit(1);
+             }
+         }
+@@ -1008,12 +1008,12 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+ 
+             if (srcFiles.size() == 0)
+             {
+-                errorStream << QString("ERROR: No match found for '%1'").arg(src) << endl;
++                errorStream << QString("ERROR: No match found for '%1'").arg(src) << Qt::endl;
+                 exit(1);
+             }
+             if (trg.indexOf('*') == -1)
+             {
+-                errorStream << "ERROR: No wildcards in target string!" << endl;
++                errorStream << "ERROR: No wildcards in target string!" << Qt::endl;
+                 exit(1);
+             }
+             for (int i = 0; i < srcFiles.size(); ++i)
+@@ -1068,7 +1068,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             ival = ok ? ival : -1;
+             if (ival < 0 || ival > 255)
+             {
+-                errorStream << QString("ERROR: Illegal number range for alpha threshold: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Illegal number range for alpha threshold: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+             else
+@@ -1076,7 +1076,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 alphaThreshold = ival;
+                 setAlphaThreshold = true;
+             }
+-            outStream << QString("OPTION: Set alpha threshold to %1").arg(value) << endl;
++            outStream << QString("OPTION: Set alpha threshold to %1").arg(value) << Qt::endl;
+         }
+ 
+         if (options->count("med-low-thr"))
+@@ -1086,7 +1086,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             ival = ok ? ival : -1;
+             if (ival <0 || ival > 255)
+             {
+-                errorStream << QString("ERROR: Illegal number range for luminance: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Illegal number range for luminance: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+             else
+@@ -1094,7 +1094,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 lumThr1 = ival;
+                 setLumaThreshold = true;
+             }
+-            outStream << QString("OPTION: Set med/low luminance threshold to %1").arg(value) << endl;
++            outStream << QString("OPTION: Set med/low luminance threshold to %1").arg(value) << Qt::endl;
+         }
+ 
+         if (options->count("med-hi-thr"))
+@@ -1104,7 +1104,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             ival = ok ? ival : -1;
+             if (ival <0 || ival > 255)
+             {
+-                errorStream << QString("ERROR: Illegal number range for luminance: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Illegal number range for luminance: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+             else
+@@ -1112,7 +1112,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 lumThr2 = ival;
+                 setLumaThreshold = true;
+             }
+-            outStream << QString("OPTION: Set med/hi luminance threshold to %1").arg(value) << endl;
++            outStream << QString("OPTION: Set med/hi luminance threshold to %1").arg(value) << Qt::endl;
+         }
+ 
+         if (options->count("resolution"))
+@@ -1171,12 +1171,12 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 else
+                 {
+                     errorStream << QString("ERROR: Illegal resolution: %1")
+-                                   .arg(value) << endl;
++                                   .arg(value) << Qt::endl;
+                     exit(1);
+                 }
+                 subtitleProcessor->setOutputResolution(resolution);
+                 outStream << QString("OPTION: Set resolution to %1")
+-                             .arg(subtitleProcessor->getResolutionName(resolution)) << endl;
++                             .arg(subtitleProcessor->getResolutionName(resolution)) << Qt::endl;
+             }
+         }
+ 
+@@ -1194,19 +1194,19 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             }
+             if (langIdx == -1)
+             {
+-                errorStream << QString("ERROR: Unknown language %1").arg(value) << endl;
+-                errorStream << "Use one of the following 2 character codes:" << endl;
++                errorStream << QString("ERROR: Unknown language %1").arg(value) << Qt::endl;
++                errorStream << "Use one of the following 2 character codes:" << Qt::endl;
+                 for (int l = 0; l < subtitleProcessor->getLanguages().size(); ++l)
+                 {
+                     errorStream << QString("    %1 - %2")
+                                    .arg(subtitleProcessor->getLanguages()[l][1])
+-                                   .arg(subtitleProcessor->getLanguages()[l][0]) << endl;
++                                   .arg(subtitleProcessor->getLanguages()[l][0]) << Qt::endl;
+                 }
+                 exit(1);
+             }
+             outStream << QString("OPTION: Set language to %1 (%2)")
+                          .arg(subtitleProcessor->getLanguages()[langIdx][0])
+-                         .arg(subtitleProcessor->getLanguages()[langIdx][1]) << endl;
++                         .arg(subtitleProcessor->getLanguages()[langIdx][1]) << Qt::endl;
+             subtitleProcessor->setLanguageIdxSet(true);
+         }
+ 
+@@ -1216,7 +1216,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             QFileInfo f(value);
+             if (!f.exists())
+             {
+-                errorStream << QString("ERROR: No palette file found at: %1").arg(value) << endl;
++                errorStream << QString("ERROR: No palette file found at: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+ 
+@@ -1228,7 +1228,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             file.close();
+             if (header != "#COL")
+             {
+-                errorStream << "ERROR: Not a valid palette file" << endl;
++                errorStream << "ERROR: Not a valid palette file" << Qt::endl;
+                 exit(1);
+             }
+ 
+@@ -1250,19 +1250,19 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                     importedPalette.setColor(c + 1, QColor(red, green, blue, 0));
+                 }
+             }
+-            outStream << QString("OPTION: Loaded palette from %1").arg(value) << endl;
++            outStream << QString("OPTION: Loaded palette from %1").arg(value) << Qt::endl;
+         }
+ 
+         if (options->count("forced-only"))
+         {
+             subtitleProcessor->setExportForced(true);
+-            outStream << "OPTION: Exporting only forced subtitles." << endl;
++            outStream << "OPTION: Exporting only forced subtitles." << Qt::endl;
+         }
+ 
+         if (options->count("swap"))
+         {
+             subtitleProcessor->setSwapCrCb(true);
+-            outStream << "OPTION: Swapping Cr/Cb components." << endl;
++            outStream << "OPTION: Swapping Cr/Cb components." << Qt::endl;
+         }
+ 
+         if (options->count("fps-source"))
+@@ -1279,11 +1279,11 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 else
+                 {
+                     errorStream << QString("ERROR: Invalid source framerate: %1")
+-                                   .arg(value) << endl;
++                                   .arg(value) << Qt::endl;
+                     exit(1);
+                 }
+             }
+-            outStream << QString("OPTION: synchronize target framerate to %1").arg(value) << endl;
++            outStream << QString("OPTION: synchronize target framerate to %1").arg(value) << Qt::endl;
+         }
+ 
+         if (options->count("fps-target"))
+@@ -1302,12 +1302,12 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 else
+                 {
+                     errorStream << QString("ERROR: Invalid target framerate: %1")
+-                                   .arg(value) << endl;
++                                   .arg(value) << Qt::endl;
+                     exit(1);
+                 }
+                 outStream << QString("OPTION: Converting framerate from %1fps to %2fps")
+                              .arg(QString::number(subtitleProcessor->getFPSSrc(), 'g', 6))
+-                             .arg(QString::number(subtitleProcessor->getFPSTrg(), 'g', 6)) << endl;
++                             .arg(QString::number(subtitleProcessor->getFPSTrg(), 'g', 6)) << Qt::endl;
+             }
+             else
+             {
+@@ -1329,13 +1329,13 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+ 
+             if (!ok)
+             {
+-                errorStream << QString("ERROR: Illegal delay value: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Illegal delay value: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+             int delayPTS = (int)subtitleProcessor->syncTimePTS((qint64)delay, subtitleProcessor->getFPSTrg());
+             subtitleProcessor->setDelayPTS(delayPTS);
+             outStream << QString("OPTION: Set delay to %1")
+-                         .arg(QString::number(delayPTS / 90.0, 'g', 6)) << endl;
++                         .arg(QString::number(delayPTS / 90.0, 'g', 6)) << Qt::endl;
+         }
+ 
+         if (options->count("minimum-time"))
+@@ -1349,14 +1349,14 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             if (!ok)
+             {
+                 errorStream << QString("ERROR: Illegal value for minimum display time: %1")
+-                               .arg(value) << endl;
++                               .arg(value) << Qt::endl;
+                 exit(1);
+             }
+             int tMin = (int)subtitleProcessor->syncTimePTS((qint64)time, subtitleProcessor->getFPSTrg());
+             subtitleProcessor->setMinTimePTS(tMin);
+             subtitleProcessor->setFixShortFrames(true);
+             outStream << QString("OPTION: Set minimum display time to %1")
+-                         .arg(QString::number(tMin / 90.0, 'g', 6)) << endl;
++                         .arg(QString::number(tMin / 90.0, 'g', 6)) << Qt::endl;
+         }
+ 
+         double screenRatio = -1;
+@@ -1381,7 +1381,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+ 
+             if (screenRatio <= (16.0 / 9))
+             {
+-                errorStream << QString("ERROR: Invalid screen ratio: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Invalid screen ratio: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+ 
+@@ -1392,7 +1392,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 int moveOffsetY = value.toInt(&ok);
+                 if (!ok)
+                 {
+-                    errorStream << QString("ERROR: Invalid pixel offset: %1").arg(value) << endl;
++                    errorStream << QString("ERROR: Invalid pixel offset: %1").arg(value) << Qt::endl;
+                     exit(1);
+                 }
+                 subtitleProcessor->setMoveOffsetY(moveOffsetY);
+@@ -1401,7 +1401,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             outStream << QString("OPTION: Moving captions %1 %2:1 plus/minus %3 pixels")
+                          .arg(sm)
+                          .arg(QString::number(screenRatio, 'g', 6))
+-                         .arg(QString::number(subtitleProcessor->getMoveOffsetY())) << endl;
++                         .arg(QString::number(subtitleProcessor->getMoveOffsetY())) << Qt::endl;
+         }
+ 
+         if (options->count("move-y-origin"))
+@@ -1416,7 +1416,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 int moveOffsetY = value.toInt(&ok);
+                 if (!ok)
+                 {
+-                    errorStream << QString("ERROR: Invalid pixel offset: %1").arg(value) << endl;
++                    errorStream << QString("ERROR: Invalid pixel offset: %1").arg(value) << Qt::endl;
+                     exit(1);
+                 }
+                 if (sm == "up")
+@@ -1426,7 +1426,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 subtitleProcessor->setMoveOffsetY(moveOffsetY);
+             }
+             outStream << QString("OPTION: Moving captions from the original Y position plus/minus %1 pixels")
+-                         .arg(QString::number(subtitleProcessor->getMoveOffsetY())) << endl;
++                         .arg(QString::number(subtitleProcessor->getMoveOffsetY())) << Qt::endl;
+         }
+ 
+         if (options->count("move-x"))
+@@ -1451,7 +1451,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             }
+             else
+             {
+-                errorStream << QString("ERROR: Invalid moveX command: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Invalid moveX command: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+ 
+@@ -1464,14 +1464,14 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 int moveOffsetX = value.toInt(&ok);
+                 if (!ok)
+                 {
+-                    errorStream << QString("ERROR: Invalid pixel offset: %1").arg(value) << endl;
++                    errorStream << QString("ERROR: Invalid pixel offset: %1").arg(value) << Qt::endl;
+                     exit(1);
+                 }
+                 subtitleProcessor->setMoveOffsetX(moveOffsetX);
+             }
+             outStream << QString("OPTION: Moving captions to the %1 plus/minus %2 pixels")
+                          .arg(mx)
+-                         .arg(QString::number(subtitleProcessor->getMoveOffsetX())) << endl;
++                         .arg(QString::number(subtitleProcessor->getMoveOffsetX())) << Qt::endl;
+         }
+ 
+         if (options->count("crop-y"))
+@@ -1484,11 +1484,11 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             if (ok && cropY > 0)
+             {
+                 subtitleProcessor->setCropOfsY(cropY);
+-                outStream << QString("OPTION: Set delay to %1").arg(value) << endl;
++                outStream << QString("OPTION: Set delay to %1").arg(value) << Qt::endl;
+             }
+             else
+             {
+-                errorStream << QString("ERROR: Invalid crop y value: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Invalid crop y value: %1").arg(value) << Qt::endl;
+             }
+         }
+ 
+@@ -1510,21 +1510,21 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             }
+             else
+             {
+-                errorStream << QString("ERROR: Invalid palette mode: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Invalid palette mode: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+-            outStream << QString("OPTION: Set palette mode to %1").arg(value) << endl;
++            outStream << QString("OPTION: Set palette mode to %1").arg(value) << Qt::endl;
+         }
+ 
+         if (options->count("verbose"))
+         {
+             subtitleProcessor->setVerbatim(true);
+-            outStream << QString("OPTION: Enabled verbose output.") << endl;
++            outStream << QString("OPTION: Enabled verbose output.") << Qt::endl;
+         }
+         if (options->count("no-verbose"))
+         {
+             subtitleProcessor->setVerbatim(false);
+-            outStream << QString("OPTION: Disabled verbose output.") << endl;
++            outStream << QString("OPTION: Disabled verbose output.") << Qt::endl;
+         }
+ 
+         if (options->count("filter"))
+@@ -1546,11 +1546,11 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             if (idx != -1)
+             {
+                 subtitleProcessor->setScalingFilter((ScalingFilters)idx);
+-                outStream << QString("OPTION: Set scaling filter to: %1").arg(value) << endl;
++                outStream << QString("OPTION: Set scaling filter to: %1").arg(value) << Qt::endl;
+             }
+             else
+             {
+-                errorStream << QString("ERROR: Invalid scaling filter: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Invalid scaling filter: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+         }
+@@ -1568,12 +1568,12 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+ 
+             if (!ok)
+             {
+-                errorStream << QString("ERROR: Illegal value for maximum merge time: %1").arg(value) << endl;
++                errorStream << QString("ERROR: Illegal value for maximum merge time: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+             int ti = (int)(time + 0.5);
+             subtitleProcessor->setMergePTSdiff(ti);
+-            outStream << QString("OPTION: Set maximum merge time to %1").arg(QString::number(ti / 90.0, 'g', 6)) << endl;
++            outStream << QString("OPTION: Set maximum merge time to %1").arg(QString::number(ti / 90.0, 'g', 6)) << Qt::endl;
+         }
+ 
+         if (options->count("scale-x") || options->count("scale-y"))
+@@ -1586,7 +1586,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 scaleX = value.toDouble(&ok);
+                 if (!ok)
+                 {
+-                    errorStream << QString("ERROR: Invalid x scaling factor: %1").arg(value) << endl;
++                    errorStream << QString("ERROR: Invalid x scaling factor: %1").arg(value) << Qt::endl;
+                     exit(1);
+                 }
+             }
+@@ -1598,7 +1598,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 scaleY = value.toDouble(&ok);
+                 if (!ok)
+                 {
+-                    errorStream << QString("ERROR: Invalid y scaling factor: %1").arg(value) << endl;
++                    errorStream << QString("ERROR: Invalid y scaling factor: %1").arg(value) << Qt::endl;
+                     exit(1);
+                 }
+             }
+@@ -1607,7 +1607,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             subtitleProcessor->setApplyFreeScale(true);
+             outStream << QString("OPTION: Set free scaling factors to %1, %2")
+                          .arg(QString::number(scaleX, 'g', 6))
+-                         .arg(QString::number(scaleY, 'g', 6)) << endl;
++                         .arg(QString::number(scaleY, 'g', 6)) << Qt::endl;
+         }
+ 
+         if (options->count("alpha-crop"))
+@@ -1619,20 +1619,20 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             if (ival < 0 || ival > 255)
+             {
+                 errorStream << QString("ERROR: Illegal number range for alpha cropping threshold: %1")
+-                               .arg(value) << endl;
++                               .arg(value) << Qt::endl;
+                 exit(1);
+             }
+             else
+             {
+                 subtitleProcessor->setAlphaCrop(ival);
+             }
+-            outStream << QString("OPTION: Set alpha cropping threshold to %1").arg(value) << endl;
++            outStream << QString("OPTION: Set alpha cropping threshold to %1").arg(value) << Qt::endl;
+         }
+ 
+         if (options->count("export-palette"))
+         {
+             subtitleProcessor->setWritePGCEditPal(true);
+-            outStream << QString("OPTION: Export target palette in PGCEDit text format") << endl;
++            outStream << QString("OPTION: Export target palette in PGCEDit text format") << Qt::endl;
+         }
+         if (options->count("no-export-palette"))
+         {
+@@ -1642,7 +1642,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+         if (options->count("fix-invisible"))
+         {
+             subtitleProcessor->setFixZeroAlpha(true);
+-            outStream << QString("OPTION: Fix zero alpha frame palette for SUB/IDX and SUP/IFO") << endl;
++            outStream << QString("OPTION: Fix zero alpha frame palette for SUB/IDX and SUP/IFO") << Qt::endl;
+         }
+         if (options->count("no-fix-invisible"))
+         {
+@@ -1655,11 +1655,11 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             if (value == "set" || value == "clear")
+             {
+                 subtitleProcessor->setForceAll(value == "set" ? SetState::SET : SetState::CLEAR);
+-                outStream << QString("OPTION: Set forced state of all captions to: %1").arg(value) << endl;
++                outStream << QString("OPTION: Set forced state of all captions to: %1").arg(value) << Qt::endl;
+             }
+             else
+             {
+-                errorStream << QString("Invalid set state: %1").arg(value) << endl;
++                errorStream << QString("Invalid set state: %1").arg(value) << Qt::endl;
+                 exit(1);
+             }
+         }
+@@ -1686,12 +1686,12 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+ 
+             try
+             {
+-                outStream << QString("\nConverting %1\n").arg(modes[(int)mode]) << endl;
++                outStream << QString("\nConverting %1\n").arg(modes[(int)mode]) << Qt::endl;
+ 
+                 QFileInfo srcFileInfo(src);
+                 if (!srcFileInfo.exists())
+                 {
+-                    errorStream << QString("ERROR: File '%1' does not exist.").arg(QDir::toNativeSeparators(src)) << endl;
++                    errorStream << QString("ERROR: File '%1' does not exist.").arg(QDir::toNativeSeparators(src)) << Qt::endl;
+                     exit(1);
+                 }
+ 
+@@ -1703,7 +1703,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 StreamID sid = (id.isEmpty()) ? StreamID::UNKNOWN : subtitleProcessor->getStreamID(id);
+                 if (!idx && !xml && !ifo && sid == StreamID::UNKNOWN)
+                 {
+-                    errorStream << QString("File '%1' is not a supported subtitle stream.").arg(src) << endl;
++                    errorStream << QString("File '%1' is not a supported subtitle stream.").arg(src) << Qt::endl;
+                     exit(1);
+                 }
+ 
+@@ -1727,7 +1727,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 {
+                     if ((fi.exists() && !fi.isWritable()) || (fs.exists() && !fs.isWritable()))
+                     {
+-                        errorStream << QString("Target file '%1' is write protected.").arg(trg) << endl;
++                        errorStream << QString("Target file '%1' is write protected.").arg(trg) << Qt::endl;
+                         exit(1);
+                     }
+                 }
+@@ -1780,7 +1780,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+ 
+                 printWarnings(outStream);
+ 
+-                QVector<int> lumaThr = subtitleProcessor->getLuminanceThreshold();
++                QList<int> lumaThr = subtitleProcessor->getLuminanceThreshold();
+                 if (lumThr1 > 0)
+                 {
+                     lumaThr.replace(0, lumThr1);
+@@ -1808,7 +1808,7 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+                 }
+                 if (subtitleProcessor->getExportForced() && subtitleProcessor->getNumForcedFrames()==0)
+                 {
+-                    errorStream << "No forced subtitles found." << endl;
++                    errorStream << "No forced subtitles found." << Qt::endl;
+                     exit(1);
+                 }
+ 
+@@ -1816,14 +1816,14 @@ bool BDSup2Sub::execCLI(int /*argc*/, char** /*argv*/)
+             }
+             catch(QString e)
+             {
+-                errorStream << QString("ERROR: %1").arg(e) << endl;
++                errorStream << QString("ERROR: %1").arg(e) << Qt::endl;
+                 exit(1);
+             }
+ 
+             printWarnings(outStream);
+             subtitleProcessor->exit();
+         }
+-        outStream << QString("\nConversion of %1 file(s) finished\n").arg(QString::number(srcFileNames.size())) << endl;
++        outStream << QString("\nConversion of %1 file(s) finished\n").arg(QString::number(srcFileNames.size())) << Qt::endl;
+     }
+     exit(0);
+ }
+@@ -1997,8 +1997,8 @@ void BDSup2Sub::editDefaultDVDPalette_triggered()
+                                "Color 6 light", "Color 6 dark"
+                              };
+ 
+-    QVector<QColor> colors;
+-    QVector<QColor> defaultColors;
++    QList<QColor> colors;
++    QList<QColor> defaultColors;
+ 
+     for (int i = 0; i < colorNames.size(); ++i)
+     {
+@@ -2041,8 +2041,8 @@ void BDSup2Sub::editImportedDVDPalette_triggered()
+                                "Color 12", "Color 13", "Color 14", "Color 15"
+                              };
+ 
+-    QVector<QColor> colors;
+-    QVector<QColor> defaultColors;
++    QList<QColor> colors;
++    QList<QColor> defaultColors;
+ 
+     for (int i = 0; i < 16; ++i)
+     {
+@@ -2237,7 +2237,7 @@ void BDSup2Sub::on_filterComboBox_currentIndexChanged(int index)
+ void BDSup2Sub::on_hiMedThresholdComboBox_currentIndexChanged(int index)
+ {
+     int idx = index;
+-    QVector<int> lumaThreshold = subtitleProcessor->getLuminanceThreshold();
++    QList<int> lumaThreshold = subtitleProcessor->getLuminanceThreshold();
+ 
+     if (idx <= lumaThreshold[1])
+     {
+@@ -2273,7 +2273,7 @@ void BDSup2Sub::on_hiMedThresholdComboBox_currentIndexChanged(int index)
+ void BDSup2Sub::on_medLowThresholdComboBox_currentIndexChanged(int index)
+ {
+     int idx = index;
+-    QVector<int> lumaThreshold = subtitleProcessor->getLuminanceThreshold();
++    QList<int> lumaThreshold = subtitleProcessor->getLuminanceThreshold();
+     if (idx >= lumaThreshold[0])
+     {
+         idx = lumaThreshold[0] - 1;
+diff --git a/src/colordialog.cpp b/src/colordialog.cpp
+index b7777e2..58429ef 100644
+--- a/src/colordialog.cpp
++++ b/src/colordialog.cpp
+@@ -51,7 +51,7 @@ ColorDialog::~ColorDialog()
+     delete ui;
+ }
+ 
+-void ColorDialog::setParameters(QStringList names, QVector<QColor> currentColor, QVector<QColor> defaultColor)
++void ColorDialog::setParameters(QStringList names, QList<QColor> currentColor, QVector<QColor> defaultColor)
+ {
+     QPixmap* pixmap;
+     colorNames = names;
+diff --git a/src/colordialog.h b/src/colordialog.h
+index b6bf1df..1eb0e21 100644
+--- a/src/colordialog.h
++++ b/src/colordialog.h
+@@ -42,10 +42,10 @@ public:
+     explicit ColorDialog(QWidget *parent = 0, SubtitleProcessor* subtitleProcessor = 0);
+     ~ColorDialog();
+ 
+-    void setParameters(QStringList names, QVector<QColor> currentColor, QVector<QColor> defaultColor);
++    void setParameters(QStringList names, QList<QColor> currentColor, QVector<QColor> defaultColor);
+     void setPath(QString value) { colorPath = value; }
+     QString getPath() { return colorPath; }
+-    QVector<QColor> getColors() { return selectedColors; }
++    QList<QColor> getColors() { return selectedColors; }
+     
+ private slots:
+     void on_colorList_doubleClicked(const QModelIndex &index);
+@@ -59,9 +59,9 @@ private slots:
+ private:
+     Ui::ColorDialog *ui;
+     SubtitleProcessor* subtitleProcessor = 0;
+-    QVector<QIcon> colorIcons;
+-    QVector<QColor> selectedColors;
+-    QVector<QColor> defaultColors;
++    QList<QIcon> colorIcons;
++    QList<QColor> selectedColors;
++    QList<QColor> defaultColors;
+     QStringList colorNames;
+     QString colorPath;
+ 
+diff --git a/src/conversiondialog.cpp b/src/conversiondialog.cpp
+index 04e8aaa..2ab5059 100644
+--- a/src/conversiondialog.cpp
++++ b/src/conversiondialog.cpp
+@@ -31,7 +31,7 @@
+ #endif
+ 
+ #include <QDoubleValidator>
+-#include <QRegExpValidator>
++#include <QRegularExpressionValidator>
+ #include <QPalette>
+ #include <QKeyEvent>
+ #include <QSettings>
+@@ -47,9 +47,11 @@ ConversionDialog::ConversionDialog(QWidget *parent, SubtitleProcessor *subtitleP
+     this->subtitleProcessor = subtitleProcessor;
+     this->settings = settings;
+ 
+-    QRegExp regex("[0-9]+([.][0-9]+)?|pal|25p|ntsc|30p|24p|50i|60i");
+-    fpsSrcValidator = new QRegExpValidator(regex);
+-    fpsTrgValidator = new QRegExpValidator(regex);
++    QRegularExpression regex("[0-9]+([.][0-9]+)?|pal|25p|ntsc|30p|24p|50i|60i");
++    fpsSrcValidator = new QRegularExpressionValidator();
++    fpsSrcValidator->setRegularExpression(regex);
++    fpsTrgValidator = new QRegularExpressionValidator();
++    fpsTrgValidator->setRegularExpression(regex);
+     scaleXValidator = new QDoubleValidator;
+     scaleYValidator = new QDoubleValidator;
+     delayPTSValidator = new QDoubleValidator;
+diff --git a/src/conversiondialog.h b/src/conversiondialog.h
+index e0b9cad..1d77ec1 100644
+--- a/src/conversiondialog.h
++++ b/src/conversiondialog.h
+@@ -30,7 +30,7 @@
+ class QPalette;
+ class SubtitleProcessor;
+ class QDoubleValidator;
+-class QRegExpValidator;
++class QRegularExpressionValidator;
+ class QSettings;
+ 
+ enum class Resolution : int;
+@@ -87,8 +87,8 @@ private:
+     Ui::ConversionDialog *ui;
+     SubtitleProcessor *subtitleProcessor;
+ 
+-    QRegExpValidator* fpsSrcValidator;
+-    QRegExpValidator* fpsTrgValidator;
++    QRegularExpressionValidator* fpsSrcValidator;
++    QRegularExpressionValidator* fpsTrgValidator;
+     QDoubleValidator* scaleXValidator;
+     QDoubleValidator* scaleYValidator;
+     QDoubleValidator* delayPTSValidator;
+diff --git a/src/editdialog.cpp b/src/editdialog.cpp
+index 1c600ed..0159485 100644
+--- a/src/editdialog.cpp
++++ b/src/editdialog.cpp
+@@ -29,7 +29,7 @@
+ #include <QKeyEvent>
+ #include <QDoubleValidator>
+ #include <QIntValidator>
+-#include <QRegExpValidator>
++#include <QRegularExpressionValidator>
+ 
+ EditDialog::EditDialog(QWidget *parent, SubtitleProcessor* subtitleProcessor) :
+     QDialog(parent),
+@@ -67,9 +67,12 @@ EditDialog::EditDialog(QWidget *parent, SubtitleProcessor* subtitleProcessor) :
+     ui->xOffsetLineEdit->setValidator(xOffsetValidator);
+     yOffsetValidator = new QIntValidator;
+     ui->yOffsetLineEdit->setValidator(yOffsetValidator);
+-    startTimeValidator = new QRegExpValidator(TimeUtil::getTimePattern());
++    startTimeValidator = new QRegularExpressionValidator();
++    QRegularExpression pattern(TimeUtil::getTimePattern().pattern());
++    startTimeValidator->setRegularExpression(pattern);
+     ui->startTimeLineEdit->setValidator(startTimeValidator);
+-    endTimeValidator = new QRegExpValidator(TimeUtil::getTimePattern());
++    endTimeValidator = new QRegularExpressionValidator();
++    endTimeValidator->setRegularExpression(pattern);
+     ui->endTimeLineEdit->setValidator(endTimeValidator);
+ 
+     this->resize(minimumWidth + 36, minimumHeight + 280);
+@@ -389,7 +392,7 @@ void EditDialog::on_okButton_clicked()
+ 
+ void EditDialog::on_addErasePatchButton_clicked()
+ {
+-    QVector<int> selectionCoordinates = ui->subtitleImage->getSelection();
++    QList<int> selectionCoordinates = ui->subtitleImage->getSelection();
+     if (!selectionCoordinates.isEmpty())
+     {
+         ErasePatch* ep = new ErasePatch(selectionCoordinates[0], selectionCoordinates[1],
+diff --git a/src/editdialog.h b/src/editdialog.h
+index d5133b9..b159cb5 100644
+--- a/src/editdialog.h
++++ b/src/editdialog.h
+@@ -32,7 +32,7 @@ class SubPicture;
+ class QImage;
+ class QDoubleValidator;
+ class QIntValidator;
+-class QRegExpValidator;
++class QRegularExpressionValidator;
+ class QPalette;
+ 
+ namespace Ui {
+@@ -101,8 +101,8 @@ private:
+     QDoubleValidator* durationValidator;
+     QIntValidator* xOffsetValidator;
+     QIntValidator* yOffsetValidator;
+-    QRegExpValidator* startTimeValidator;
+-    QRegExpValidator* endTimeValidator;
++    QRegularExpressionValidator* startTimeValidator;
++    QRegularExpressionValidator* endTimeValidator;
+     QPalette* errorBackground;
+     QPalette* warnBackground;
+     QPalette* okBackground;
+diff --git a/src/editpane.cpp b/src/editpane.cpp
+index 32d4b38..0f93086 100644
+--- a/src/editpane.cpp
++++ b/src/editpane.cpp
+@@ -222,9 +222,9 @@ void EditPane::setImage(const QImage &image, int width, int height)
+     update();
+ }
+ 
+-QVector<int> EditPane::getSelection()
++QList<int> EditPane::getSelection()
+ {
+-    QVector<int> selectionCoordinates;
++    QList<int> selectionCoordinates;
+     if (!allowSelection || !validSelection)
+     {
+         return selectionCoordinates;
+diff --git a/src/editpane.h b/src/editpane.h
+index c1ab795..8dc3a86 100644
+--- a/src/editpane.h
++++ b/src/editpane.h
+@@ -40,7 +40,7 @@ public:
+     void setExcluded(bool excluded) { this->excluded = excluded; }
+     void setAllowSelection(bool value) { allowSelection = value; }
+     void setIsLabel(bool value) { isLabel = value; }
+-    QVector<int> getSelection();
++    QList<int> getSelection();
+     void removeSelection() { if (allowSelection && validSelection) { validSelection = false; } }
+     void setScreenRatio(double ratio) { screenRatioIn = ratio; cineBarFactor = (1.0 - (screenRatio / screenRatioIn)) / 2.0; }
+ 
+diff --git a/src/framepalettedialog.cpp b/src/framepalettedialog.cpp
+index d594742..784b500 100644
+--- a/src/framepalettedialog.cpp
++++ b/src/framepalettedialog.cpp
+@@ -73,8 +73,8 @@ void FramePaletteDialog::setIndex(int idx)
+ {
+     index = idx;
+ 
+-    QVector<int> a = subtitleProcessor->getFrameAlpha(index);
+-    QVector<int> p = subtitleProcessor->getFramePal(index);
++    QList<int> a = subtitleProcessor->getFrameAlpha(index);
++    QList<int> p = subtitleProcessor->getFramePal(index);
+ 
+     if (!a.isEmpty())
+     {
+@@ -140,10 +140,10 @@ void FramePaletteDialog::on_resetAllButton_clicked()
+ {
+     for (int j = 0; j < subtitleProcessor->getNumberOfFrames(); ++j)
+     {
+-        QVector<int> originalAlpha = subtitleProcessor->getOriginalFrameAlpha(j);
+-        QVector<int> originalPalette = subtitleProcessor->getOriginalFramePal(j);
+-        QVector<int> a = subtitleProcessor->getFrameAlpha(j);
+-        QVector<int> p = subtitleProcessor->getFramePal(j);
++        QList<int> originalAlpha = subtitleProcessor->getOriginalFrameAlpha(j);
++        QList<int> originalPalette = subtitleProcessor->getOriginalFramePal(j);
++        QList<int> a = subtitleProcessor->getFrameAlpha(j);
++        QList<int> p = subtitleProcessor->getFramePal(j);
+ 
+         if (!a.isEmpty() && !originalAlpha.isEmpty())
+         {
+@@ -166,8 +166,8 @@ void FramePaletteDialog::on_setAllButton_clicked()
+ {
+     for (int j = 0; j < subtitleProcessor->getNumberOfFrames(); ++j)
+     {
+-        QVector<int> &a = subtitleProcessor->getFrameAlpha(j);
+-        QVector<int> &p = subtitleProcessor->getFramePal(j);
++        QList<int> &a = subtitleProcessor->getFrameAlpha(j);
++        QList<int> &p = subtitleProcessor->getFramePal(j);
+         if (!a.isEmpty())
+         {
+             for (int i = 0; i < a.size(); ++i)
+@@ -192,10 +192,10 @@ void FramePaletteDialog::on_cancelButton_clicked()
+ 
+ void FramePaletteDialog::on_resetButton_clicked()
+ {
+-    QVector<int> originalAlpha = subtitleProcessor->getOriginalFrameAlpha(index);
+-    QVector<int> originalPalette = subtitleProcessor->getOriginalFramePal(index);
+-    QVector<int> &a = subtitleProcessor->getFrameAlpha(index);
+-    QVector<int> &p = subtitleProcessor->getFramePal(index);
++    QList<int> originalAlpha = subtitleProcessor->getOriginalFrameAlpha(index);
++    QList<int> originalPalette = subtitleProcessor->getOriginalFramePal(index);
++    QList<int> &a = subtitleProcessor->getFrameAlpha(index);
++    QList<int> &p = subtitleProcessor->getFramePal(index);
+ 
+     if (!a.isEmpty() && !originalAlpha.isEmpty())
+     {
+@@ -216,8 +216,8 @@ void FramePaletteDialog::on_resetButton_clicked()
+ 
+ void FramePaletteDialog::on_okButton_clicked()
+ {
+-    QVector<int> &a = subtitleProcessor->getFrameAlpha(index);
+-    QVector<int> &p = subtitleProcessor->getFramePal(index);
++    QList<int> &a = subtitleProcessor->getFrameAlpha(index);
++    QList<int> &p = subtitleProcessor->getFramePal(index);
+     if (!a.isEmpty())
+     {
+         for (int i = 0; i < a.size(); ++i)
+diff --git a/src/framepalettedialog.h b/src/framepalettedialog.h
+index f7de4d2..6f5e969 100644
+--- a/src/framepalettedialog.h
++++ b/src/framepalettedialog.h
+@@ -66,10 +66,10 @@ private:
+     QStringList colorNames = {	"00", "01", "02", "03", "04", "05", "06" ,"07",
+                                 "08", "09", "10", "11", "12", "13", "14", "15"
+                              };
+-    QVector<QIcon> colorIcons;
++    QList<QIcon> colorIcons;
+     int index;
+-    QVector<int> alpha;
+-    QVector<int> pal;
++    QList<int> alpha;
++    QList<int> pal;
+ };
+ 
+ #endif // FRAMEPALETTEDIALOG_H
+diff --git a/src/qxtcommandoptions.cpp b/src/qxtcommandoptions.cpp
+index 14c040d..b935b2c 100644
+--- a/src/qxtcommandoptions.cpp
++++ b/src/qxtcommandoptions.cpp
+@@ -753,10 +753,10 @@ bool QxtCommandOptions::showUnrecognizedWarning(QTextStream& stream) const
+         name = "QxtCommandOptions";
+ 
+     if (qxt_d().unrecognized.count())
+-        stream << name << ": " << tr("unrecognized parameters: ") << qxt_d().unrecognized.join(" ") << endl;
++        stream << name << ": " << tr("unrecognized parameters: ") << qxt_d().unrecognized.join(" ") << Qt::endl;
+ 
+     foreach(const QString& param, qxt_d().missingParams)
+-        stream << name << ": " << tr("%1 requires a parameter").arg(param) << endl;
++        stream << name << ": " << tr("%1 requires a parameter").arg(param) << Qt::endl;
+ 
+     return true;
+ }
+@@ -900,19 +900,19 @@ void QxtCommandOptions::showUsage(bool showQtOptions, QTextStream& stream) const
+         if (names[i].isEmpty())
+         {
+             // Section headers have no name entry
+-            stream << endl << descs[i] << ":" << endl;
++            stream << Qt::endl << descs[i] << ":" << Qt::endl;
+             continue;
+         }
+         line = ' ' + names[i] + QString(maxNameLength - names[i].length() + 2, ' ');
+-        foreach(const QString& word, descs[i].split(' ', QString::SkipEmptyParts))
++        foreach(const QString& word, descs[i].split(' ', Qt::SkipEmptyParts))
+         {
+             if (qxt_d().screenWidth > 0 && line.length() + word.length() >= qxt_d().screenWidth)
+             {
+-                stream << line << endl;
++                stream << line << Qt::endl;
+                 line = wrap;
+             }
+             line += word + ' ';
+         }
+-        stream << line << endl;
++        stream << line << Qt::endl;
+     }
+ }
+diff --git a/src/types.h b/src/types.h
+index 3d8f656..0c22973 100644
+--- a/src/types.h
++++ b/src/types.h
+@@ -22,7 +22,7 @@
+ 
+ #include <QString>
+ #include <QStringList>
+-#include <QVector>
++#include <QList>
+ #include <QColor>
+ 
+ const QString progName = "BDSup2Sub++";
+@@ -43,28 +43,28 @@ const QStringList paletteModeNames = {
+ 
+ const QStringList modes = { "SUB/IDX", "SUP/IFO", "SUP(BD)", "XML/PNG"};
+ 
+-const QVector<uchar> defaultPalR = {
++const QList<uchar> defaultPalR = {
+     0x00, 0xf0, 0xcc, 0x99,
+     0x33, 0x11, 0xfa, 0xbb,
+     0x33, 0x11, 0xfa, 0xbb,
+     0xfa, 0xbb, 0x33, 0x11
+ };
+ 
+-const QVector<uchar> defaultPalG = {
++const QList<uchar> defaultPalG = {
+     0x00, 0xf0, 0xcc, 0x99,
+     0x33, 0x11, 0x33, 0x11,
+     0xfa, 0xbb, 0xfa, 0xbb,
+     0x33, 0x11, 0xfa, 0xbb
+ };
+ 
+-const QVector<uchar> defaultPalB = {
++const QList<uchar> defaultPalB = {
+     0x00, 0xf0, 0xcc, 0x99,
+     0xfa, 0xbb, 0x33, 0x11,
+     0x33, 0x11, 0x33, 0x11,
+     0xfa, 0xbb, 0xfa, 0xbb
+ };
+ 
+-const QVector<uchar> defaultAlpha = {
++const QList<uchar> defaultAlpha = {
+     0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00,
+     0x00, 0x00, 0x00, 0x00,
+-- 
+2.52.0
+

@@ -24,19 +24,22 @@ SLOT="0"
 IUSE=""
 
 DEPEND="
-	dev-qt/qtcore:5
-	dev-qt/qtwidgets:5
-	dev-qt/qtxml:5
+	dev-qt/qtbase:6[widgets,xml]
 "
 
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
+PATCHES="
+	${FILESDIR}/0001-Make-compatible-with-Qt6.patch
+	${FILESDIR}/0001-index-fix.patch
+"
+
 S="${WORKDIR}/BDSup2SubPlusPlus-${MY_PV}"
 
 src_compile() {
 	pushd src
-	eqmake5
+	eqmake6
 	emake
 	popd
 }

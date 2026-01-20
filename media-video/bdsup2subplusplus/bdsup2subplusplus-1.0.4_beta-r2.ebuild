@@ -25,13 +25,14 @@ IUSE=""
 
 DEPEND="
 	dev-qt/qtbase:6[widgets,xml]
+	dev-qt/qt5compat:6
 "
 
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
 PATCHES="
-	${FILESDIR}/0001-Make-compatible-with-Qt6.patch
+	${FILESDIR}/0001-Qt6.patch
 	${FILESDIR}/0001-index-fix.patch
 "
 

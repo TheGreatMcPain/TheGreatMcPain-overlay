@@ -26,7 +26,6 @@ IUSE=""
 
 DEPEND="
 	dev-qt/qtbase:6[widgets,xml]
-	dev-qt/qt5compat:6
 "
 
 RDEPEND="${DEPEND}"

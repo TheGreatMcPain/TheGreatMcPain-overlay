@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+    <maintainer type="person">
+        <name>James McClain</name>
+        <email>james@thegreatmcpain.xyz</email>
+    </maintainer>
+    <upstream>
+        <remote-id type="github">slhck/ffmpeg-progress-yield</remote-id>
+        <remote-id type="pypi">ffmpeg-progress-yield</remote-id>
+    </upstream>
+</pkgmetadata>

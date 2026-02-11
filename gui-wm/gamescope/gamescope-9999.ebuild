@@ -39,7 +39,7 @@ RDEPEND="
 	dev-lang/luajit:2=
 	>=dev-libs/wayland-1.23
 	gui-libs/libdecor
-	<media-libs/libdisplay-info-0.3:=
+	<media-libs/libdisplay-info-0.4:=
 	media-libs/vulkan-loader
 	sys-apps/hwdata
 	sys-libs/libcap

@@ -20,7 +20,6 @@ DEPEND="
 	media-libs/leptonica
 "
 RDEPEND="${DEPEND}"
-BDEPEND=""
 
 src_configure() {
 	local mycmakeargs=(
@@ -30,6 +29,6 @@ src_configure() {
 }
 
 src_install() {
-	dobin ${BUILD_DIR}/src/sup2srt
-	dobin ${BUILD_DIR}/src/sup2disk
+	dobin "${BUILD_DIR}/src/sup2srt"
+	dobin "${BUILD_DIR}/src/sup2disk"
 }

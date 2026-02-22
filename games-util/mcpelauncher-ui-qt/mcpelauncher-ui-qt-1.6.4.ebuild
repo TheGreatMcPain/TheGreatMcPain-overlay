@@ -26,7 +26,6 @@ RDEPEND="${DEPEND}"
 BDEPEND=""
 
 PATCHES="
-	${FILESDIR}/0001-cmake-Fix-compatibility-with-newer-protobuf-versions.patch
 	${FILESDIR}/0001-ext-glfw.cmake-Workaround-cmake-warning.patch
 "
 

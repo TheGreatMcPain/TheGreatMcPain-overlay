@@ -1,0 +1,34 @@
+From 3c09280d6ecde0295a27f2cf3b2afa51f960a1bd Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Sun, 22 Feb 2026 02:00:08 -0600
+Subject: [PATCH] Use system nlohmann_json
+
+---
+ ext/json.cmake | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/ext/json.cmake b/ext/json.cmake
+index 9824519..280611f 100644
+--- a/ext/json.cmake
++++ b/ext/json.cmake
+@@ -1,15 +1 @@
+-include(FetchContent)
+-
+-FetchContent_Declare(
+-        nlohmann_json_ext
+-        URL "https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip"
+-)
+-
+-FetchContent_GetProperties(nlohmann_json_ext)
+-if(NOT nlohmann_json_ext_POPULATED)
+-  FetchContent_Populate(nlohmann_json_ext)
+-endif()
+-
+-add_library(nlohmann_json INTERFACE IMPORTED)
+-add_dependencies(nlohmann_json nlohmann_json_ext)
+-set_property(TARGET nlohmann_json PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${nlohmann_json_ext_SOURCE_DIR}/include")
+\ No newline at end of file
++find_package(nlohmann_json REQUIRED)
+-- 
+2.52.0
+

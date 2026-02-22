@@ -1,0 +1,33 @@
+From 1ac3ea6c1cf4f73a84d73f0bff510fba94a7d0f2 Mon Sep 17 00:00:00 2001
+From: ChristopherHX <christopher.homberger@web.de>
+Date: Sat, 14 Feb 2026 12:15:45 +0100
+Subject: [PATCH] mutex shim
+
+---
+ include/bits/struct_mutex.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+ create mode 100644 include/bits/struct_mutex.h
+
+diff --git a/mcpelauncher-linker/include/bits/struct_mutex.h b/mcpelauncher-linker/include/bits/struct_mutex.h
+new file mode 100644
+index 0000000..9ebc402
+--- /dev/null
++++ b/mcpelauncher-linker/include/bits/struct_mutex.h
+@@ -0,0 +1,16 @@
++/// GLIBC uses __unused in mutex struct in archlinux recently
++/// RE https://github.com/minecraft-linux/mcpelauncher-linker/issues/3#issuecomment-3901699076
++/// this shims the internal header to temporary disable the macro
++
++/* deal with possible sys/cdefs.h conflict with fcntl.h */
++#ifdef __unused
++#define __unused_defined __unused
++#undef __unused
++#endif
++
++#include_next <bits/struct_mutex.h>
++
++/* restore definitions from above */
++#ifdef __unused_defined
++#define __unused __attribute__((__unused__))
++#endif
+\ No newline at end of file

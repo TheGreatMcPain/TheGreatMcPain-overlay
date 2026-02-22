@@ -1,4 +1,4 @@
-# Copyright 2024 Gentoo Authors
+# Copyright 2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -7,9 +7,13 @@ inherit git-r3 cmake toolchain-funcs flag-o-matic
 
 DESCRIPTION="Minecraft Bedrock Launcher for Linux (unofficial)"
 HOMEPAGE="https://github.com/minecraft-linux/mcpelauncher-manifest"
-SRC_URI="https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip -> nlohmann_json-3.7.3.zip"
-EGIT_COMMIT="v${PV}-qt6"
 EGIT_REPO_URI="https://github.com/minecraft-linux/mcpelauncher-manifest.git"
+
+if ver_test "${PV}" -eq 9999; then
+	EGIT_BRANCH="qt6"
+else
+	EGIT_COMMIT="v${PV}-qt6"
+fi
 
 LICENSE="MIT GPL-3"
 SLOT="0"
@@ -19,8 +23,10 @@ DEPEND="
 	net-misc/curl
 	sys-libs/zlib
 	media-libs/libpng
+	media-libs/libsdl3
 	dev-libs/libevdev
 	x11-libs/libXi
+	>=dev-cpp/nlohmann_json-3.12.0
 	dev-qt/qtwebengine:6
 	dev-qt/qtdeclarative:6
 	dev-qt/qtbase:6
@@ -29,17 +35,13 @@ DEPEND="
 	llvm-core/llvm:*"
 RDEPEND="${DEPEND}
 	games-util/mcpelauncher-ui-qt"
-BDEPEND="app-arch/unzip"
 
 # Prevent downloading nlohmann_json sources
 PATCHES="
-	${FILESDIR}/system-nlohmann_json.patch
+	${FILESDIR}/mutex-shim_mcpelauncher-linker.patch
+	${FILESDIR}/0001-Use-system-nlohmann_json.patch
+	${FILESDIR}/0001-Make-compatible-with-nlohmann_json-3.12.0.patch
 "
-
-src_unpack() {
-	unpack "${DISTDIR}/nlohmann_json-3.7.3.zip"
-	git-r3_src_unpack
-}
 
 src_configure() {
 	# Force clang (pulled from www-client/firefox)
@@ -50,6 +52,8 @@ src_configure() {
 	CXX=${CHOST}-clang++
 	NM=llvm-nm
 	RANLIB=llvm-ranlib
+	append-cxxflags "-DNDEBUG"
+	append-ldflags "-fuse-ld=lld"
 
 	strip-unsupported-flags
 	append-flags "-D_FORTIFY_SOURCE=0"
@@ -62,9 +66,9 @@ src_configure() {
 	local mycmakeargs=(
 		-DUSE_OWN_CURL=OFF
 		-DBUILD_SHARED_LIBS=OFF
-		-DUSE_EXTERNAL_JSON=YES               # Workaround for nlohmann_json
-		-DJSON_SOURCES="${WORKDIR}"           # Workaround for nlohmann_json
 		-DENABLE_DEV_PATHS=OFF
+		-DGAMEWINDOW_SYSTEM=SDL3
+		-DSDL3_VENDORED=OFF
 		-Wno-dev
 	)
 

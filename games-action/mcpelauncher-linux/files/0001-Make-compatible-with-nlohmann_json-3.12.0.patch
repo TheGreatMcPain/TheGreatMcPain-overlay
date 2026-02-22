@@ -1,0 +1,64 @@
+From 51eb581627e46152c87991504eeb080870173e24 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Sun, 22 Feb 2026 01:57:05 -0600
+Subject: [PATCH] Make compatible with nlohmann_json 3.12.0
+
+---
+ src/common/encoding/encoding_json.cpp      | 2 +-
+ src/common/encoding/encoding_json_cbor.cpp | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/simple-ipc/src/common/encoding/encoding_json.cpp b/simple-ipc/src/common/encoding/encoding_json.cpp
+index 5e1369e..1e976e5 100644
+--- a/simple-ipc/src/common/encoding/encoding_json.cpp
++++ b/simple-ipc/src/common/encoding/encoding_json.cpp
+@@ -50,7 +50,7 @@ ssize_t encoding::json::check_read_message_complete(const char* buf, size_t buf_
+ }
+ 
+ void encoding::json::read_message(const char* buf, size_t buf_size, message_container& ret) {
+-    nlohmann::json data = nlohmann::json::parse(nlohmann::detail::input_adapter(buf, buf_size));
++    nlohmann::json data = nlohmann::json::parse(buf, buf + buf_size);
+     auto msg_id = data.find("id");
+     if (data.count("method") > 0) {
+         if (msg_id != data.end() && msg_id->is_number())
+diff --git a/simple-ipc/simple-ipc/src/common/encoding/encoding_json_cbor.cpp b/simple-ipc/src/common/encoding/encoding_json_cbor.cpp
+index 4d70d35..c2675c1 100644
+--- a/simple-ipc/src/common/encoding/encoding_json_cbor.cpp
++++ b/simple-ipc/src/common/encoding/encoding_json_cbor.cpp
+@@ -42,7 +42,7 @@ void encoding::json_cbor::read_message(const char* buf, size_t buf_size, message
+     size_t varint_size = buf_size;
+     auto size = varint::decode_unsigned(buf, buf_size, &varint_size);
+     nlohmann::json data =
+-            nlohmann::json::from_cbor(nlohmann::detail::input_adapter(&buf[varint_size], buf_size - varint_size));
++            nlohmann::json::from_cbor(&buf[varint_size], buf + (buf_size - varint_size));
+ 
+     if (data.size() == 3) { // rpc request
+         if (data[0].is_number())
+-- 
+2.52.0
+
+From e0e20341c8ca760421348fdcdd84dd95b68a39f5 Mon Sep 17 00:00:00 2001
+From: TheGreatMcPain <james@thegreatmcpain.xyz>
+Date: Sun, 22 Feb 2026 02:32:23 -0600
+Subject: [PATCH] Make compatible with nlohmann_json 3.12.0
+
+---
+ src/cll_upload_auth_step.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mcpelauncher-client/src/cll_upload_auth_step.cpp b/mcpelauncher-client/src/cll_upload_auth_step.cpp
+index 49e5933..e439735 100644
+--- a/mcpelauncher-client/src/cll_upload_auth_step.cpp
++++ b/mcpelauncher-client/src/cll_upload_auth_step.cpp
+@@ -38,7 +38,7 @@ void CllUploadAuthStep::onRequest(cll::EventUploadRequest& request) {
+         char const* e = (char const*)memchr(ptr, '\n', end - ptr);
+         if(e == nullptr)
+             break;
+-        nlohmann::json event = nlohmann::json::parse(nlohmann::detail::input_adapter(ptr, e - ptr - 1));
++        nlohmann::json event = nlohmann::json::parse(ptr, e);
+         for(auto const& ticket : event["ext"]["android"]["tickets"]) {
+             std::string ticketStr = ticket;
+             if(tickets.count(ticketStr) == 0) {
+-- 
+2.52.0
+

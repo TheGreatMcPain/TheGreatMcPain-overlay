@@ -23,6 +23,11 @@ DEPEND+=(
 	!!sys-kernel/zenpower
 )
 
+src_prepare() {
+	default
+	sed -i "s|Wimplicit-fallthrough=3|Wimplicit-fallthrough|" Makefile || die
+}
+
 src_compile() {
 	MODULES_MAKEARGS+=(
 		TARGET="${KV_FULL}"

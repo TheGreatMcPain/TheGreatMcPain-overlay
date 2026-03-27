@@ -24,5 +24,6 @@ RDEPEND="
 		>=media-sound/ffmpeg-normalize-1.37.3[${PYTHON_USEDEP}]
 		>=dev-python/psutil-7.2.2[${PYTHON_USEDEP}]
 		>=dev-python/subtitle-filter-1.5.0[${PYTHON_USEDEP}]
+		>=dev-python/subtitle-filter-0.3.1[${PYTHON_USEDEP}]
 	')
 "

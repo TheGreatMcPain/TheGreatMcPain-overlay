@@ -25,5 +25,6 @@ RDEPEND="
 		>=dev-python/psutil-7.2.2[${PYTHON_USEDEP}]
 		>=dev-python/subtitle-filter-1.5.0[${PYTHON_USEDEP}]
 		>=dev-python/subtitle-filter-0.3.1[${PYTHON_USEDEP}]
+		dev-python/makemkv[${PYTHON_USEDEP}]
 	')
 "

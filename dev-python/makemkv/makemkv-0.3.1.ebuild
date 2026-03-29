@@ -19,5 +19,5 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	media-video/makemkv
-	dev-python/iso639
+	dev-python/iso639-lang
 "

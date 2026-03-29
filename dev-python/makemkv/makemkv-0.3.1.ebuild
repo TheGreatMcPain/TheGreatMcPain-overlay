@@ -4,7 +4,7 @@
 EAPI=8
 
 DISTUTILS_USE_PEP517=flit
-PYTHON_COMPAT=( python3_13 )
+PYTHON_COMPAT=( python3_{13..14} )
 
 inherit distutils-r1 pypi
 
@@ -19,4 +19,5 @@ KEYWORDS="~amd64"
 
 RDEPEND="
 	media-video/makemkv
+	dev-python/iso639
 "

@@ -1,0 +1,62 @@
+diff --git a/src/theme-dark/meson.build b/src/theme-dark/meson.build
+index fcd1db4..8f6b20d 100644
+--- a/src/theme-dark/meson.build
++++ b/src/theme-dark/meson.build
+@@ -18,7 +18,7 @@ sass_depend_files = run_command(
+ gtk_dark_css_target = custom_target('generate_gtk_dark_css',
+   input: '../sass/gtk-dark.scss',
+   output: 'gtk.css',
+-  command: [sass, '--no-source-map', '@INPUT@', '@OUTPUT@'],
++  command: [sass, '--sourcemap=none', '@INPUT@', '@OUTPUT@'],
+   build_by_default: true,
+   install: true,
+   install_dir: gtk3_dir_dark,
+@@ -28,7 +28,7 @@ gtk_dark_css_target = custom_target('generate_gtk_dark_css',
+ gtk_dark_dark_css_target = custom_target('generate_gtk_dark_dark_css',
+   input: '../sass/gtk-dark.scss',
+   output: 'gtk-dark.css',
+-  command: [sass, '--no-source-map', '@INPUT@', '@OUTPUT@'],
++  command: [sass, '--sourcemap=none', '@INPUT@', '@OUTPUT@'],
+   build_by_default: true,
+   install: true,
+   install_dir: gtk3_dir_dark,
+@@ -55,7 +55,7 @@ gtk4_css = [
+ libadwaita_tweaks_target = custom_target('generate_libadwaita_tweaks_css',
+   input: '../sass/gtk4/libadwaita-tweaks.scss',
+   output: 'libadwaita-tweaks.css',
+-  command: [sass, '--no-source-map', '@INPUT@', '@OUTPUT@'],
++  command: [sass, '--sourcemap=none', '@INPUT@', '@OUTPUT@'],
+   build_by_default: true,
+   install: true,
+   install_dir: gtk4_dir_dark,
+diff --git a/src/theme-light/meson.build b/src/theme-light/meson.build
+index ac55654..74e163b 100644
+--- a/src/theme-light/meson.build
++++ b/src/theme-light/meson.build
+@@ -18,7 +18,7 @@ sass_depend_files = run_command(
+ gtk_light_css_target = custom_target('generate_gtk_light_css',
+   input: '../sass/gtk.scss',
+   output: 'gtk.css',
+-  command: [sass, '--no-source-map', '@INPUT@', '@OUTPUT@'],
++  command: [sass, '--sourcemap=none', '@INPUT@', '@OUTPUT@'],
+   build_by_default: true,
+   install: true,
+   install_dir: gtk3_dir,
+@@ -28,7 +28,7 @@ gtk_light_css_target = custom_target('generate_gtk_light_css',
+ gtk_light_dark_css_target = custom_target('generate_gtk_light_dark_css',
+   input: '../sass/gtk-dark.scss',
+   output: 'gtk-dark.css',
+-  command: [sass, '--no-source-map', '@INPUT@', '@OUTPUT@'],
++  command: [sass, '--sourcemap=none', '@INPUT@', '@OUTPUT@'],
+   build_by_default: true,
+   install: true,
+   install_dir: gtk3_dir,
+@@ -55,7 +55,7 @@ gtk4_css = [
+ libadwaita_tweaks_target = custom_target('generate_libadwaita_tweaks_css',
+   input: '../sass/gtk4/libadwaita-tweaks.scss',
+   output: 'libadwaita-tweaks.css',
+-  command: [sass, '--no-source-map', '@INPUT@', '@OUTPUT@'],
++  command: [sass, '--sourcemap=none', '@INPUT@', '@OUTPUT@'],
+   build_by_default: true,
+   install: true,
+   install_dir: gtk4_dir,

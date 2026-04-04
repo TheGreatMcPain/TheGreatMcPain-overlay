@@ -3,18 +3,17 @@
 
 EAPI=8
 
-inherit git-r3 meson
-
 DESCRIPTION="The theme from libadwaita ported to GTK-3"
 HOMEPAGE="https://github.com/lassekongo83/adw-gtk3"
-EGIT_REPO_URI="https://github.com/lassekongo83/adw-gtk3.git"
+SRC_URI="https://github.com/lassekongo83/adw-gtk3/releases/download/v${PV}/adw-gtk3v${PV}.tar.xz -> ${P}.tar.xz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS=""
 
-DEPEND="
-	dev-ruby/sass
-"
+S="${WORKDIR}"
 
-PATCHES="${FILESDIR}/ruby-sass.patch"
+src_install() {
+	insinto "/usr/share/themes"
+	doins -r ./*
+}

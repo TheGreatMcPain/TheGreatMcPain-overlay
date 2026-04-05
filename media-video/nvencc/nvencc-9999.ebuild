@@ -16,7 +16,7 @@ KEYWORDS=""
 
 # TODO
 DEPEND="
-	media-video/libhdr10plus
+	media-libs/libhdr10plus
 	media-libs/libdovi
 "
 RDEPEND="${DEPEND}"

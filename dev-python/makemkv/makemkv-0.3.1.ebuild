@@ -20,4 +20,5 @@ KEYWORDS="~amd64"
 RDEPEND="
 	media-video/makemkv
 	dev-python/iso639-lang
+	dev-python/typing-extensions
 "

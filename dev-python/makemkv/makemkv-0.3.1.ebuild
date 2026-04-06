@@ -21,4 +21,6 @@ RDEPEND="
 	media-video/makemkv
 	dev-python/iso639-lang
 	dev-python/typing-extensions
+	dev-python/rich
+	dev-python/click
 "

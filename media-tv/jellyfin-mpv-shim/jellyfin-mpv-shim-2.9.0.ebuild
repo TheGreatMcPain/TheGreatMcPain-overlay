@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{10..14} )
 
 DISTUTILS_USE_PEP517=setuptools
 
@@ -29,7 +29,7 @@ DEPEND="
 	dev-python/python-mpv[${PYTHON_USEDEP}]
 	dev-python/python-mpv-jsonipc[${PYTHON_USEDEP}]
 	dev-python/jellyfin-apiclient-python[${PYTHON_USEDEP}]
-	dev-lang/python:*[tk]
+	>=dev-lang/python-3[tk]
 	systray? ( dev-python/pystray[${PYTHON_USEDEP}] )
 	display-mirroring? (
 		dev-python/jinja2[${PYTHON_USEDEP}]

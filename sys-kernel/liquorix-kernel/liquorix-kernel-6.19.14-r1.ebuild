@@ -1,4 +1,4 @@
-# Copyright 2020-2024 Gentoo Authors
+# Copyright 2020-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -16,19 +16,17 @@ HOMEPAGE="https://liquorix.net/"
 BASE_P=linux-${PV%.*}
 GENTOO_CONFIG_VER=g18
 LIQUORIX_VERSION="${GIT_COMMIT/_p[0-9]*}"
-LIQUORIX_FILE="${P}.tar.gz"
-LIQUORIX_URI="https://github.com/damentz/liquorix-package/archive/${LIQUORIX_VERSION}.tar.gz -> ${LIQUORIX_FILE}"
 SRC_URI="
 	https://cdn.kernel.org/pub/linux/kernel/v$(ver_cut 1).x/${BASE_P}.tar.xz
 	https://github.com/projg2/gentoo-kernel-config/archive/${GENTOO_CONFIG_VER}.tar.gz
 		-> gentoo-kernel-config-${GENTOO_CONFIG_VER}.tar.gz
-	${LIQUORIX_URI}
+	https://github.com/damentz/liquorix-package/archive/${LIQUORIX_VERSION}.tar.gz
+		-> ${PN}-${LIQUORIX_VERSION}.tar.gz
 "
 
 KEYWORDS="-* ~amd64"
 IUSE="debug"
 
-KV_FULL="${PVR/_p/-p}-lqx"
 S="${WORKDIR}"/"${BASE_P}"
 
 pkg_setup(){
@@ -38,11 +36,6 @@ pkg_setup(){
 	ewarn "Do *not* open bugs in Gentoo's bugzilla unless you have issues with"
 	ewarn "the ebuilds. Thank you."
 	ewarn
-}
-
-src_unpack() {
-	unpack "${LIQUORIX_FILE}"
-	default
 }
 
 src_prepare(){
@@ -60,12 +53,10 @@ src_prepare(){
 
 	eapply_user
 
-	sed -i "s|-lqx|-p|" Makefile || die
-
 	cp "${WORKDIR}/liquorix-package-${GIT_COMMIT}/linux-liquorix/debian/config/kernelarch-x86/config-arch-64" \
 		".config" || die
 
-	local myversion="-lqx"
+	local myversion="-dist"
 	echo "CONFIG_LOCALVERSION=\"${myversion}\"" > "${T}"/version.config || die
 
 	local dist_conf_path="${WORKDIR}/gentoo-kernel-config-${GENTOO_CONFIG_VER}"

@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python3_{11..14} )
 
 DISTUTILS_USE_PEP517="setuptools"
 
-inherit distutils-r1
+inherit distutils-r1 desktop
 
 DESCRIPTION="Graphical monitor configurator for Hyprland and Sway"
 HOMEPAGE="https://github.com/ToRvaLDz/monique"
@@ -23,3 +23,10 @@ DEPEND="
 	gui-libs/libadwaita
 "
 RDEPEND="${DEPEND}"
+
+src_install() {
+	distutils-r1_src_install
+
+	domenu "data/com.github.monique.desktop"
+	doicon -s scalable "data/com.github.monique.svg"
+}

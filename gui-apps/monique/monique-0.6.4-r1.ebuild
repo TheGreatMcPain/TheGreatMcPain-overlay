@@ -20,5 +20,6 @@ KEYWORDS="~amd64"
 DEPEND="
 	dev-python/pygobject[${PYTHON_USEDEP}]
 	dev-python/pyudev[${PYTHON_USEDEP}]
+	gui-libs/libadwaita
 "
 RDEPEND="${DEPEND}"

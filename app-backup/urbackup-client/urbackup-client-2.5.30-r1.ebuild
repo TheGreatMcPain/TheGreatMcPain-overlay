@@ -17,7 +17,7 @@ S=${WORKDIR}/${P}.0
 SLOT="0"
 LICENSE="AGPL-3"
 KEYWORDS="~amd64 ~x86"
-IUSE="hardened X zlib"
+IUSE="hardened gui zlib"
 
 RDEPEND="
 	acct-user/urbackup
@@ -25,24 +25,22 @@ RDEPEND="
 	app-backup/urbackup-certificate
 	dev-db/sqlite
 	dev-libs/crypto++
-	X? ( x11-libs/wxGTK:* )
-	zlib? ( sys-libs/zlib )"
+	gui? ( x11-libs/wxGTK:* )
+	zlib? ( virtual/zlib )"
 DEPEND="${RDEPEND}"
 
-PATCHES=(
-	"${FILESDIR}/0001-Fix-compile-with-GCC13.patch"
-)
+PATCHES="${FILESDIR}/0001-Fix-compile-with-GCC13.patch"
 
 src_configure() {
 	econf \
 	$(use_enable hardened fortify) \
-	$(use_enable !X headless) \
+	$(use_enable !gui headless) \
 	$(use_with zlib) \
 	--disable-clientupdate
 }
 
 src_install() {
-	dodir /usr/share/man/man1
+	#dodir /usr/share/man/man1
 	emake DESTDIR="${D}" install
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}"/logrotate_urbackupclient urbackupclient
@@ -52,12 +50,12 @@ src_install() {
 	insinto /etc/urbackup
 	dodir /etc/urbackup
 	doins "${FILESDIR}"/snapshot.cfg
-	insinto /usr/share/urbackup/scripts
-	insopts -m0700
-	doins "${FILESDIR}"/linux_snapshot/*
+	exeinto /usr/share/urbackup/scripts
+	exeopts -m0700
+	doexe "${FILESDIR}"/linux_snapshot/*
 
 	# Already installed by urbackup-certificate
-	rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"
+	#rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"
 
-	keepdir /var/lib/urbackup/data
+	#keepdir /var/lib/urbackup/data
 }

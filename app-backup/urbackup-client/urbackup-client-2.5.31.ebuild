@@ -40,7 +40,7 @@ src_configure() {
 }
 
 src_install() {
-	#dodir /usr/share/man/man1
+	dodir /usr/share/man/man1
 	emake DESTDIR="${D}" install
 	insinto /etc/logrotate.d
 	newins "${FILESDIR}"/logrotate_urbackupclient urbackupclient
@@ -55,7 +55,7 @@ src_install() {
 	doexe "${FILESDIR}"/linux_snapshot/*
 
 	# Already installed by urbackup-certificate
-	#rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"
+	rm "${ED}/usr/share/urbackup/urbackup_ecdsa409k1.pub"
 
-	#keepdir /var/lib/urbackup/data
+	keepdir /var/lib/urbackup/data
 }

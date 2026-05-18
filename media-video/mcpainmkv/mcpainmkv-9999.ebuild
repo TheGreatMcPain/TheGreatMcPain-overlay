@@ -27,4 +27,11 @@ RDEPEND="
 		>=dev-python/subtitle-filter-0.3.1[${PYTHON_USEDEP}]
 		dev-python/makemkv[${PYTHON_USEDEP}]
 	')
+	media-video/bdsup2subplusplus
 "
+
+pkg_postinst() {
+	elog
+	elog "This package requires media-libs/vapoursynth from the 'vapoursynth' overlay"
+	elog
+}

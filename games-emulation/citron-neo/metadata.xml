@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <name>James McClain</name>
+    <email>james@thegreatmcpain.xyz</email>
+  </maintainer>
+  <use>
+    <flag name="camera">Enable camera support through dev-qt/qtmultimedia</flag>
+    <flag name="cubeb">Enable the cubeb audio backend</flag>
+    <flag name="discord">Enable Discord Rich Presence</flag>
+    <flag name="llvm">Enable the LLVM backend for disassembly and symbol demangling</flag>
+    <flag name="room">Compile the dedicated room executable</flag>
+    <flag name="usb">Enable the LibUSB controller backend</flag>
+    <flag name="web-applet">Enable the custom web applet frontend through dev-qt/qtwebengine</flag>
+    <flag name="web-service">Enable multiplayer support</flag>
+  </use>
+  <upstream>
+  </upstream>
+</pkgmetadata>

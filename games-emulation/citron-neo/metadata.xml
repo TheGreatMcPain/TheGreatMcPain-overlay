@@ -16,5 +16,6 @@
     <flag name="web-service">Enable multiplayer support</flag>
   </use>
   <upstream>
+    <remote-id type="github">citron-neo/emulator</remote-id>
   </upstream>
 </pkgmetadata>

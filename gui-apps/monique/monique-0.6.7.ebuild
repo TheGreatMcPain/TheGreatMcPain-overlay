@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python3_{11..14} )
 
 DISTUTILS_USE_PEP517="setuptools"
 
-inherit distutils-r1 desktop
+inherit distutils-r1 desktop xdg
 
 DESCRIPTION="Graphical monitor configurator for Hyprland and Sway"
 HOMEPAGE="https://github.com/ToRvaLDz/monique"

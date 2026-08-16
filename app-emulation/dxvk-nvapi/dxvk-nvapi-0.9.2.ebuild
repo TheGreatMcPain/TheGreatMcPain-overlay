@@ -8,11 +8,14 @@ inherit flag-o-matic meson-multilib
 
 DESCRIPTION="Alternative NVAPI implementation on top of DXVK"
 HOMEPAGE="https://github.com/jp7677/dxvk-nvapi"
-VULKAN_HEADERS_HASH="d4a196d8c84e032d27f999adcea3075517c1c97f"
-NVAPI_HASH="ce6d2a183f9559f717e82b80333966d19edb9c8c"
+DX_HEADERS_HASH="c94b9b23aaadc2034dd1cad656a5a69f1526f98a"
+VULKAN_HEADERS_HASH="2cd90f9d20df57eac214c148f3aed885372ddcfe"
+NVAPI_HASH="9b181ea572f680327fe01a14a0f1f41c78034104"
 SRC_URI="
 	https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz
 		-> ${P}.tar.gz
+	https://github.com/microsoft/DirectX-Headers/archive/${DX_HEADERS_HASH}.tar.gz
+		-> ${P}-dx-headers.tar.gz
 	https://github.com/KhronosGroup/Vulkan-Headers/archive/${VULKAN_HEADERS_HASH}.tar.gz
 		-> ${P}-vulkan-headers.tar.gz
 	https://github.com/NVIDIA/nvapi/archive/${NVAPI_HASH}.tar.gz
@@ -50,6 +53,8 @@ pkg_pretend() {
 
 src_prepare() {
 	if [[ ${PV} != "9999" ]]; then
+		rm -r "${S}/external/DirectX-Headers"
+		mv "${WORKDIR}/DirectX-Headers-${DX_HEADERS_HASH}" "${S}/external/DirectX-Headers"
 		rm -r "${S}/external/Vulkan-Headers"
 		mv "${WORKDIR}/Vulkan-Headers-${VULKAN_HEADERS_HASH}" "${S}/external/Vulkan-Headers"
 		rm -r "${S}/external/nvapi"

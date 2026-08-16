@@ -8,9 +8,9 @@ inherit flag-o-matic meson-multilib
 
 DESCRIPTION="Nvidia Reflex Vulkan Layer for DXVK-NVAPI"
 HOMEPAGE="https://github.com/jp7677/dxvk-nvapi"
-VULKAN_HEADERS_HASH="d4a196d8c84e032d27f999adcea3075517c1c97f"
-NVAPI_HASH="ce6d2a183f9559f717e82b80333966d19edb9c8c"
-VKROOTS_HASH="a1ce1dad9a0beff57eaf925116a0e49b5e5e0be3"
+VULKAN_HEADERS_HASH="2cd90f9d20df57eac214c148f3aed885372ddcfe"
+NVAPI_HASH="9b181ea572f680327fe01a14a0f1f41c78034104"
+VKROOTS_HASH="ee76e620798612c52fb8dcc32a1058a0a3538930"
 SRC_URI="
 	https://github.com/jp7677/dxvk-nvapi/archive/refs/tags/v${PV}.tar.gz
 		-> ${P}.tar.gz

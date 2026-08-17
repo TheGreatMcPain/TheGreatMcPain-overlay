@@ -12,7 +12,7 @@ inherit distutils-r1
 DESCRIPTION="Cast media from Jellyfin to MPV"
 HOMEPAGE="https://github.com/jellyfin/jellyfin-mpv-shim"
 
-SHADERS_PV="2.1.0"
+SHADERS_PV="3.0.0"
 
 SRC_URI="
 	https://github.com/jellyfin/jellyfin-mpv-shim/archive/v${PV}.tar.gz -> ${P}.tar.gz
